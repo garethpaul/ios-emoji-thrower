@@ -1,7 +1,6 @@
 //
 //  GameScene.swift
 //
-
 import SpriteKit
 
 //MARK: - Vector Calculation Functions
@@ -56,11 +55,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var playerDestroyed = false
     
-    let scoreLabel = SKLabelNode(fontNamed: "Helvetica")
+    let scoreLabel = SKLabelNode(fontNamed: "Sketch3D")
+    let backgroundVelocity : CGFloat = 3.0
     
     override func didMove(to view: SKView) {
         // set background color
-        backgroundColor = SKColor.white()
+        self.backgroundColor = SKColor.white()
+        self.initializingScrollingBackground()
         // background music
         let backgroundMusic = SKAudioNode(fileNamed: "background-music-aac.caf")
         backgroundMusic.autoplayLooped = true
@@ -75,7 +76,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         player.physicsBody?.categoryBitMask = PhysicsCategory.Player
         player.physicsBody?.contactTestBitMask = PhysicsCategory.Monster
         player.physicsBody?.collisionBitMask = PhysicsCategory.None
-        
         // set gravity to none and set scene as the delegate
         physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         physicsWorld.contactDelegate = self
@@ -86,9 +86,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 SKAction.wait(forDuration: 1.0)
                 ])
             ))
-        scoreLabel.fontSize = 20
-        scoreLabel.position = CGPoint(x: 50, y: 50)
-        scoreLabel.fontColor = UIColor.black()
+        scoreLabel.fontSize = 50
+        scoreLabel.position = CGPoint(x: (self.view?.frame.width)!/2, y: (self.view?.frame.height)!-40)
+        scoreLabel.fontColor = #colorLiteral(red: 0.137254902, green: 0.137254902, blue: 0.3450980392, alpha: 1)
         addChild(scoreLabel)
     }
     //MARK: - Create a random number
@@ -100,11 +100,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         return random() * (max - min) + min
     }
     
+    //MARK: - Get Profile Picture
+    func roundSquareImage(imageName: String) -> SKSpriteNode {
+        let originalPicture = UIImage(named: imageName)
+        // create the image with rounded corners
+        UIGraphicsBeginImageContextWithOptions(originalPicture!.size, false, 0)
+        let rect = CGRect(x: 0, y: 0, width: originalPicture!.size.width, height: (originalPicture?.size.height)!)
+        
+        let rectPath : UIBezierPath = UIBezierPath(roundedRect: rect, cornerRadius: 30.0)
+        rectPath.addClip()
+        originalPicture!.draw(in: rect)
+        let scaledImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext();
+        
+        let texture = SKTexture(image: scaledImage!)
+        let roundedImage = SKSpriteNode(texture: texture, size: CGSize(width: (originalPicture?.size.width)!, height: (originalPicture?.size.height)!))
+        roundedImage.name = imageName
+        return roundedImage
+    }
+    
     //MARK: - Create Monster Sprite
     func addMonster() {
         
         // Create sprite
         let monster = SKSpriteNode(imageNamed: "Goblin")
+        
         
         // Determine where to spawn the monster along the Y axis
         let actualY = random(min: monster.size.height/2, max: size.height - monster.size.height/2)
@@ -124,18 +144,51 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         monster.physicsBody?.collisionBitMask = PhysicsCategory.None
         
         // Determine speed of the monster
-        let actualSpeed = random(min: CGFloat(2.0), max: CGFloat(4.0))
+        let actualSpeed = random(min: CGFloat(4.0), max: CGFloat(10.0))
         
         // Create the actions
         let actionMove = SKAction.move(to: CGPoint(x: -monster.size.width/2, y: actualY), duration: TimeInterval(actualSpeed))
         // !this is important to not over-load the memory of the decvice!
         let actionMoveDone = SKAction.removeFromParent()
         
-//        let escapedMonsters = monster.position
+
         // Apply the actions to the monster
         monster.run(SKAction.sequence([actionMove, actionMoveDone]))
         
     }
+    
+    func initializingScrollingBackground() {
+        for index in 0 ..< 2 {
+
+            let bg = SKSpriteNode(imageNamed: "bg")
+            bg.position = CGPoint(x: index * Int(bg.size.width), y: 0)
+            bg.anchorPoint = CGPoint()
+            bg.name = "background"
+            self.addChild(bg)
+        }
+    }
+    
+    //
+    func moveBackground() {
+        self.enumerateChildNodes(withName: "background", using: { (node, stop) -> Void in
+            if let bg = node as? SKSpriteNode {
+                bg.size = self.frame.size
+                bg.position = CGPoint(x: 0 - self.backgroundVelocity, y: bg.position.y)
+                bg.zPosition = -13
+                // Checks if bg node is completely scrolled off the screen, if yes, then puts it at the end of the other node.
+                if bg.position.x <= -bg.size.width {
+                    bg.position = CGPoint(x: bg.position.x + bg.size.width * 2, y: bg.position.y)
+                }
+            }
+        })
+    }
+    
+    override func update(_ currentTime: CFTimeInterval) {
+        /* Called before each frame is rendered */
+        
+        //self.moveBackground()
+    }
+    
     
     //MARK: - Projectile Launching Function
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -184,6 +237,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Projectile sound effect
         run(SKAction.playSoundFileNamed("pew-pew-lei.caf", waitForCompletion: false))
     }
+    
     //MARK: - Projectile Collision Actions
     func projectileDidCollideWithMonster(_ projectile:SKSpriteNode, monster:SKSpriteNode) {
         monstersDestroyed += 1
@@ -191,6 +245,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         scoreLabel.text = "Score: \(monstersDestroyed)"
         projectile.removeFromParent()
         monster.removeFromParent()
+        
+        // check timer and if end then show end
         
         // keep score
         if (monstersDestroyed >= 20) {

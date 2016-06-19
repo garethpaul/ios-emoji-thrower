@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  ScoreViewController.swift
 //  EmojiThrower
 //
 //  Created by Gareth on 6/17/16.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ScoreViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()

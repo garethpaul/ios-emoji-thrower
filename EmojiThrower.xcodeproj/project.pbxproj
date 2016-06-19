@@ -18,7 +18,10 @@
 		7FB5DE701D14C63000813314 /* background-music-aac.caf in Resources */ = {isa = PBXBuildFile; fileRef = 7FB5DE6D1D14C63000813314 /* background-music-aac.caf */; };
 		7FB5DE711D14C63000813314 /* pew-pew-lei.caf in Resources */ = {isa = PBXBuildFile; fileRef = 7FB5DE6E1D14C63000813314 /* pew-pew-lei.caf */; };
 		7FB5DE721D14C63000813314 /* sprites.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 7FB5DE6F1D14C63000813314 /* sprites.atlas */; };
-		7FB5DE741D14C63A00813314 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB5DE731D14C63A00813314 /* ViewController.swift */; };
+		7FC231AC1D15217C000CA761 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FC231AB1D15217C000CA761 /* LoginViewController.swift */; };
+		7FC231AE1D1521B0000CA761 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FC231AD1D1521B0000CA761 /* ViewController.swift */; };
+		7FC231B01D1521BE000CA761 /* ScoreViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FC231AF1D1521BE000CA761 /* ScoreViewController.swift */; };
+		7FC231B31D160543000CA761 /* Sketch3D.otf in Resources */ = {isa = PBXBuildFile; fileRef = 7FC231B21D160526000CA761 /* Sketch3D.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,7 +38,10 @@
 		7FB5DE6D1D14C63000813314 /* background-music-aac.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "background-music-aac.caf"; sourceTree = "<group>"; };
 		7FB5DE6E1D14C63000813314 /* pew-pew-lei.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "pew-pew-lei.caf"; sourceTree = "<group>"; };
 		7FB5DE6F1D14C63000813314 /* sprites.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = sprites.atlas; sourceTree = "<group>"; };
-		7FB5DE731D14C63A00813314 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		7FC231AB1D15217C000CA761 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		7FC231AD1D1521B0000CA761 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		7FC231AF1D1521BE000CA761 /* ScoreViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScoreViewController.swift; sourceTree = "<group>"; };
+		7FC231B21D160526000CA761 /* Sketch3D.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Sketch3D.otf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,12 +75,12 @@
 			isa = PBXGroup;
 			children = (
 				7FB5DE4E1D14C5BC00813314 /* AppDelegate.swift */,
-				7FB5DE731D14C63A00813314 /* ViewController.swift */,
+				7FC231B11D160513000CA761 /* Resources */,
+				7FC231AA1D152141000CA761 /* Controllers */,
 				7FB5DE621D14C60900813314 /* Main.storyboard */,
 				7FB5DE641D14C62600813314 /* GameOverScene.swift */,
 				7FB5DE651D14C62600813314 /* GameScene.sks */,
 				7FB5DE661D14C62600813314 /* GameScene.swift */,
-				7FB5DE671D14C62600813314 /* GameViewController.swift */,
 				7FB5DE6C1D14C63000813314 /* Sounds */,
 				7FB5DE6F1D14C63000813314 /* sprites.atlas */,
 				7FB5DE601D14C5F100813314 /* Assets.xcassets */,
@@ -91,6 +97,25 @@
 				7FB5DE6E1D14C63000813314 /* pew-pew-lei.caf */,
 			);
 			path = Sounds;
+			sourceTree = "<group>";
+		};
+		7FC231AA1D152141000CA761 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				7FB5DE671D14C62600813314 /* GameViewController.swift */,
+				7FC231AB1D15217C000CA761 /* LoginViewController.swift */,
+				7FC231AD1D1521B0000CA761 /* ViewController.swift */,
+				7FC231AF1D1521BE000CA761 /* ScoreViewController.swift */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		7FC231B11D160513000CA761 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				7FC231B21D160526000CA761 /* Sketch3D.otf */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -154,6 +179,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7FC231B31D160543000CA761 /* Sketch3D.otf in Resources */,
 				7FB5DE721D14C63000813314 /* sprites.atlas in Resources */,
 				7FB5DE701D14C63000813314 /* background-music-aac.caf in Resources */,
 				7FB5DE691D14C62600813314 /* GameScene.sks in Resources */,
@@ -171,7 +197,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7FB5DE741D14C63A00813314 /* ViewController.swift in Sources */,
+				7FC231B01D1521BE000CA761 /* ScoreViewController.swift in Sources */,
+				7FC231AE1D1521B0000CA761 /* ViewController.swift in Sources */,
+				7FC231AC1D15217C000CA761 /* LoginViewController.swift in Sources */,
 				7FB5DE6B1D14C62600813314 /* GameViewController.swift in Sources */,
 				7FB5DE681D14C62600813314 /* GameOverScene.swift in Sources */,
 				7FB5DE6A1D14C62600813314 /* GameScene.swift in Sources */,
@@ -302,6 +330,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.gpj.EmojiThrower;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
@@ -325,6 +354,7 @@
 				7FB5DE5F1D14C5BC00813314 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

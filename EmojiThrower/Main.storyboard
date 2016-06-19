@@ -3,9 +3,56 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11103.10"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--Login-->
+        <scene sceneID="p1r-Ul-3Oy">
+            <objects>
+                <viewController title="Login" id="MAh-65-uGM" customClass="LoginViewController" customModule="EmojiThrower" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="530-Vt-odH"/>
+                        <viewControllerLayoutGuide type="bottom" id="LIK-Vr-PWJ"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="JyT-At-rJx">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4E8-NX-yaI">
+                                <color key="backgroundColor" red="0.10980392160000001" green="0.5568627451" blue="0.94117647059999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="80" id="GWF-PT-2Qd"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="28"/>
+                                <state key="normal" title="LOGIN">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                            </button>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Goblin.png" translatesAutoresizingMaskIntoConstraints="NO" id="zny-bR-p2F">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="500" id="hM2-kS-Vsi"/>
+                                    <constraint firstAttribute="width" constant="300" id="z70-X0-wlM"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="zny-bR-p2F" firstAttribute="centerX" secondItem="JyT-At-rJx" secondAttribute="centerX" id="1M3-GU-vW3"/>
+                            <constraint firstItem="4E8-NX-yaI" firstAttribute="leading" secondItem="JyT-At-rJx" secondAttribute="leadingMargin" id="7el-6F-5Tb"/>
+                            <constraint firstItem="LIK-Vr-PWJ" firstAttribute="top" secondItem="4E8-NX-yaI" secondAttribute="bottom" id="HSN-hK-2nX"/>
+                            <constraint firstItem="zny-bR-p2F" firstAttribute="top" secondItem="530-Vt-odH" secondAttribute="bottom" constant="10" id="kJ1-AN-73X"/>
+                            <constraint firstAttribute="trailing" secondItem="4E8-NX-yaI" secondAttribute="trailing" id="vdD-rX-U4p"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <segue destination="LWs-XF-vaK" kind="show" id="PEQ-tf-8jq"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cX3-6D-ZEg" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-535" y="144"/>
+        </scene>
         <!--Game View Controller-->
         <scene sceneID="tXr-a1-R10">
             <objects>
@@ -19,9 +66,99 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
+                    <connections>
+                        <segue destination="d8j-U5-7no" kind="show" id="CwH-xx-ak9"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="1186" y="913"/>
+        </scene>
+        <!--Score View Controller-->
+        <scene sceneID="qXH-K2-P5n">
+            <objects>
+                <viewController id="d8j-U5-7no" customClass="ScoreViewController" customModule="EmojiThrower" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="h9O-DN-VUL"/>
+                        <viewControllerLayoutGuide type="bottom" id="bHM-mp-vFe"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="JJD-EM-2Vt">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hWg-Kb-VXA">
+                                <color key="backgroundColor" red="0.10980392160000001" green="0.5568627451" blue="0.94117647059999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="70" id="7Gb-gC-uXC"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="28"/>
+                                <state key="normal" title="SHARE">
+                                    <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="hWg-Kb-VXA" firstAttribute="leading" secondItem="JJD-EM-2Vt" secondAttribute="leading" id="6RQ-k1-JCZ"/>
+                            <constraint firstAttribute="trailing" secondItem="hWg-Kb-VXA" secondAttribute="trailing" id="QP5-3v-3MK"/>
+                            <constraint firstItem="bHM-mp-vFe" firstAttribute="top" secondItem="hWg-Kb-VXA" secondAttribute="bottom" id="uaR-DU-2zU"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="GfX-a0-P7S" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2129" y="913"/>
+        </scene>
+        <!--Root View Controller-->
+        <scene sceneID="U7n-dR-obe">
+            <objects>
+                <tableViewController id="acz-bT-vIH" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="2Gd-2s-Xf1">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="ODh-2H-Vf9">
+                                <frame key="frameInset" minY="92" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ODh-2H-Vf9" id="cwX-TK-VTV">
+                                    <frame key="frameInset" width="375" height="43"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="acz-bT-vIH" id="coF-PZ-tmA"/>
+                            <outlet property="delegate" destination="acz-bT-vIH" id="mi8-04-nwP"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Root View Controller" id="S8R-1r-PHE"/>
+                    <connections>
+                        <segue destination="BV1-FR-VrT" kind="show" id="PFL-4S-hYt"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="9JU-3Q-XF1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="311" y="936"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="Odj-To-wn7">
+            <objects>
+                <navigationController id="LWs-XF-vaK" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="M0W-hD-fqd">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="acz-bT-vIH" kind="relationship" relationship="rootViewController" id="EZx-fG-pwR"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="7wY-mI-fTf" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-535" y="936"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="Goblin.png" width="40" height="40"/>
+    </resources>
 </document>
