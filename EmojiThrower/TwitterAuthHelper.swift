@@ -7,3 +7,9 @@
 //
 
 import Foundation
+import Firebase
+import Accounts
+
+class TwitterAuthHelper: NSObject {
+
+}

@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7F732CFA1D1B1D9B009EED70 /* UIColorHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F732CF91D1B1D9B009EED70 /* UIColorHelper.swift */; };
+		7F732CFC1D1B29D5009EED70 /* IntHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F732CFB1D1B29D5009EED70 /* IntHelper.swift */; };
+		7F732CFE1D1C1D6B009EED70 /* SettingsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F732CFD1D1C1D6B009EED70 /* SettingsHelper.swift */; };
+		7F9330C51D1A0603006BE8DD /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9330C41D1A0603006BE8DD /* QuartzCore.framework */; };
+		7F9330C71D1A0ABE006BE8DD /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F9330C61D1A0ABE006BE8DD /* ImageCache.swift */; };
+		7FA04FE21D19CA590075BF85 /* FriendTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7FA04FE11D19CA590075BF85 /* FriendTableViewCell.xib */; };
+		7FA04FE41D19CB500075BF85 /* FriendTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FA04FE31D19CB500075BF85 /* FriendTableViewCell.swift */; };
 		7FB5DE4F1D14C5BC00813314 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB5DE4E1D14C5BC00813314 /* AppDelegate.swift */; };
 		7FB5DE591D14C5BC00813314 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7FB5DE571D14C5BC00813314 /* LaunchScreen.storyboard */; };
 		7FB5DE611D14C5F100813314 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7FB5DE601D14C5F100813314 /* Assets.xcassets */; };
@@ -15,16 +22,35 @@
 		7FB5DE691D14C62600813314 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 7FB5DE651D14C62600813314 /* GameScene.sks */; };
 		7FB5DE6A1D14C62600813314 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB5DE661D14C62600813314 /* GameScene.swift */; };
 		7FB5DE6B1D14C62600813314 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB5DE671D14C62600813314 /* GameViewController.swift */; };
-		7FB5DE701D14C63000813314 /* background-music-aac.caf in Resources */ = {isa = PBXBuildFile; fileRef = 7FB5DE6D1D14C63000813314 /* background-music-aac.caf */; };
-		7FB5DE711D14C63000813314 /* pew-pew-lei.caf in Resources */ = {isa = PBXBuildFile; fileRef = 7FB5DE6E1D14C63000813314 /* pew-pew-lei.caf */; };
 		7FB5DE721D14C63000813314 /* sprites.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 7FB5DE6F1D14C63000813314 /* sprites.atlas */; };
 		7FC231AC1D15217C000CA761 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FC231AB1D15217C000CA761 /* LoginViewController.swift */; };
 		7FC231AE1D1521B0000CA761 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FC231AD1D1521B0000CA761 /* ViewController.swift */; };
 		7FC231B01D1521BE000CA761 /* ScoreViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FC231AF1D1521BE000CA761 /* ScoreViewController.swift */; };
 		7FC231B31D160543000CA761 /* Sketch3D.otf in Resources */ = {isa = PBXBuildFile; fileRef = 7FC231B21D160526000CA761 /* Sketch3D.otf */; };
+		7FC231B91D1754DC000CA761 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FC231B81D1754DC000CA761 /* Social.framework */; };
+		7FC231BF1D176D75000CA761 /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7FC231BE1D176D75000CA761 /* Config.plist */; };
+		7FC231C51D17700C000CA761 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FC231C41D17700C000CA761 /* User.swift */; };
+		7FC231C91D1772AA000CA761 /* Friend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FC231C81D1772AA000CA761 /* Friend.swift */; };
+		7FC231CB1D177423000CA761 /* Popular.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FC231CA1D177423000CA761 /* Popular.swift */; };
+		7FC231CF1D1775BE000CA761 /* LoginViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7FC231CE1D1775BE000CA761 /* LoginViewController.xib */; };
+		7FC231D31D18A05F000CA761 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FC231D21D18A05F000CA761 /* API.swift */; };
+		7FC981BC1D19CD160047D594 /* ImageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FC981BB1D19CD160047D594 /* ImageHelper.swift */; };
+		7FD1EBD91D18E954002A1E3B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7FD1EBD81D18E954002A1E3B /* GoogleService-Info.plist */; };
+		7FD1EBDB1D199FE6002A1E3B /* FriendsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD1EBDA1D199FE6002A1E3B /* FriendsViewController.swift */; };
+		D879AB3E25C35CD7AD5CE29E /* Pods_EmojiThrower.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5FA6C8EEAA55AA20CD4250BB /* Pods_EmojiThrower.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1CB683DE7D9A886792999407 /* Pods-EmojiThrower.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmojiThrower.release.xcconfig"; path = "Pods/Target Support Files/Pods-EmojiThrower/Pods-EmojiThrower.release.xcconfig"; sourceTree = "<group>"; };
+		4CFC3F7E99C3515C6B44B7B0 /* Pods-EmojiThrower.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmojiThrower.debug.xcconfig"; path = "Pods/Target Support Files/Pods-EmojiThrower/Pods-EmojiThrower.debug.xcconfig"; sourceTree = "<group>"; };
+		5FA6C8EEAA55AA20CD4250BB /* Pods_EmojiThrower.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmojiThrower.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F732CF91D1B1D9B009EED70 /* UIColorHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIColorHelper.swift; sourceTree = "<group>"; };
+		7F732CFB1D1B29D5009EED70 /* IntHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntHelper.swift; sourceTree = "<group>"; };
+		7F732CFD1D1C1D6B009EED70 /* SettingsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsHelper.swift; sourceTree = "<group>"; };
+		7F9330C41D1A0603006BE8DD /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		7F9330C61D1A0ABE006BE8DD /* ImageCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
+		7FA04FE11D19CA590075BF85 /* FriendTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FriendTableViewCell.xib; sourceTree = "<group>"; };
+		7FA04FE31D19CB500075BF85 /* FriendTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FriendTableViewCell.swift; sourceTree = "<group>"; };
 		7FB5DE4B1D14C5BC00813314 /* EmojiThrower.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmojiThrower.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7FB5DE4E1D14C5BC00813314 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7FB5DE581D14C5BC00813314 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -35,13 +61,22 @@
 		7FB5DE651D14C62600813314 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		7FB5DE661D14C62600813314 /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		7FB5DE671D14C62600813314 /* GameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
-		7FB5DE6D1D14C63000813314 /* background-music-aac.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "background-music-aac.caf"; sourceTree = "<group>"; };
-		7FB5DE6E1D14C63000813314 /* pew-pew-lei.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "pew-pew-lei.caf"; sourceTree = "<group>"; };
 		7FB5DE6F1D14C63000813314 /* sprites.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = sprites.atlas; sourceTree = "<group>"; };
 		7FC231AB1D15217C000CA761 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		7FC231AD1D1521B0000CA761 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		7FC231AF1D1521BE000CA761 /* ScoreViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScoreViewController.swift; sourceTree = "<group>"; };
 		7FC231B21D160526000CA761 /* Sketch3D.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Sketch3D.otf; sourceTree = "<group>"; };
+		7FC231B51D17549B000CA761 /* EmojiThrower-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EmojiThrower-Bridging-Header.h"; sourceTree = "<group>"; };
+		7FC231B81D1754DC000CA761 /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
+		7FC231BE1D176D75000CA761 /* Config.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Config.plist; sourceTree = "<group>"; };
+		7FC231C41D17700C000CA761 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		7FC231C81D1772AA000CA761 /* Friend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Friend.swift; sourceTree = "<group>"; };
+		7FC231CA1D177423000CA761 /* Popular.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Popular.swift; sourceTree = "<group>"; };
+		7FC231CE1D1775BE000CA761 /* LoginViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoginViewController.xib; sourceTree = "<group>"; };
+		7FC231D21D18A05F000CA761 /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		7FC981BB1D19CD160047D594 /* ImageHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageHelper.swift; sourceTree = "<group>"; };
+		7FD1EBD81D18E954002A1E3B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		7FD1EBDA1D199FE6002A1E3B /* FriendsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FriendsViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,17 +84,41 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F9330C51D1A0603006BE8DD /* QuartzCore.framework in Frameworks */,
+				7FC231B91D1754DC000CA761 /* Social.framework in Frameworks */,
+				D879AB3E25C35CD7AD5CE29E /* Pods_EmojiThrower.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5C01C72190C981B1B03B0D15 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				4CFC3F7E99C3515C6B44B7B0 /* Pods-EmojiThrower.debug.xcconfig */,
+				1CB683DE7D9A886792999407 /* Pods-EmojiThrower.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		662DE9FA865084705A74BD27 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7F9330C41D1A0603006BE8DD /* QuartzCore.framework */,
+				7FC231B81D1754DC000CA761 /* Social.framework */,
+				5FA6C8EEAA55AA20CD4250BB /* Pods_EmojiThrower.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		7FB5DE421D14C5BC00813314 = {
 			isa = PBXGroup;
 			children = (
 				7FB5DE4D1D14C5BC00813314 /* EmojiThrower */,
 				7FB5DE4C1D14C5BC00813314 /* Products */,
+				5C01C72190C981B1B03B0D15 /* Pods */,
+				662DE9FA865084705A74BD27 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -75,33 +134,22 @@
 			isa = PBXGroup;
 			children = (
 				7FB5DE4E1D14C5BC00813314 /* AppDelegate.swift */,
-				7FC231B11D160513000CA761 /* Resources */,
+				7FC231D41D18A065000CA761 /* Helpers */,
+				7FC231C31D176FF7000CA761 /* Models */,
+				7FC231C11D176DFD000CA761 /* Views */,
 				7FC231AA1D152141000CA761 /* Controllers */,
-				7FB5DE621D14C60900813314 /* Main.storyboard */,
-				7FB5DE641D14C62600813314 /* GameOverScene.swift */,
-				7FB5DE651D14C62600813314 /* GameScene.sks */,
-				7FB5DE661D14C62600813314 /* GameScene.swift */,
-				7FB5DE6C1D14C63000813314 /* Sounds */,
-				7FB5DE6F1D14C63000813314 /* sprites.atlas */,
-				7FB5DE601D14C5F100813314 /* Assets.xcassets */,
-				7FB5DE571D14C5BC00813314 /* LaunchScreen.storyboard */,
-				7FB5DE5A1D14C5BC00813314 /* Info.plist */,
+				7FC231C01D176DBE000CA761 /* Config */,
+				7FC231B11D160513000CA761 /* Resources */,
+				7FC231B51D17549B000CA761 /* EmojiThrower-Bridging-Header.h */,
 			);
 			path = EmojiThrower;
-			sourceTree = "<group>";
-		};
-		7FB5DE6C1D14C63000813314 /* Sounds */ = {
-			isa = PBXGroup;
-			children = (
-				7FB5DE6D1D14C63000813314 /* background-music-aac.caf */,
-				7FB5DE6E1D14C63000813314 /* pew-pew-lei.caf */,
-			);
-			path = Sounds;
 			sourceTree = "<group>";
 		};
 		7FC231AA1D152141000CA761 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				7FC231CE1D1775BE000CA761 /* LoginViewController.xib */,
+				7FD1EBDA1D199FE6002A1E3B /* FriendsViewController.swift */,
 				7FB5DE671D14C62600813314 /* GameViewController.swift */,
 				7FC231AB1D15217C000CA761 /* LoginViewController.swift */,
 				7FC231AD1D1521B0000CA761 /* ViewController.swift */,
@@ -113,9 +161,58 @@
 		7FC231B11D160513000CA761 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7FB5DE601D14C5F100813314 /* Assets.xcassets */,
+				7FB5DE6F1D14C63000813314 /* sprites.atlas */,
 				7FC231B21D160526000CA761 /* Sketch3D.otf */,
 			);
 			name = Resources;
+			sourceTree = "<group>";
+		};
+		7FC231C01D176DBE000CA761 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				7FD1EBD81D18E954002A1E3B /* GoogleService-Info.plist */,
+				7FB5DE5A1D14C5BC00813314 /* Info.plist */,
+				7FC231BE1D176D75000CA761 /* Config.plist */,
+			);
+			name = Config;
+			sourceTree = "<group>";
+		};
+		7FC231C11D176DFD000CA761 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				7FB5DE571D14C5BC00813314 /* LaunchScreen.storyboard */,
+				7FB5DE621D14C60900813314 /* Main.storyboard */,
+				7FA04FE11D19CA590075BF85 /* FriendTableViewCell.xib */,
+				7FB5DE641D14C62600813314 /* GameOverScene.swift */,
+				7FB5DE651D14C62600813314 /* GameScene.sks */,
+				7FB5DE661D14C62600813314 /* GameScene.swift */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		7FC231C31D176FF7000CA761 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				7FC231C41D17700C000CA761 /* User.swift */,
+				7FC231C81D1772AA000CA761 /* Friend.swift */,
+				7FC231CA1D177423000CA761 /* Popular.swift */,
+				7FA04FE31D19CB500075BF85 /* FriendTableViewCell.swift */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		7FC231D41D18A065000CA761 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				7FC231D21D18A05F000CA761 /* API.swift */,
+				7F732CF91D1B1D9B009EED70 /* UIColorHelper.swift */,
+				7F732CFD1D1C1D6B009EED70 /* SettingsHelper.swift */,
+				7FC981BB1D19CD160047D594 /* ImageHelper.swift */,
+				7F9330C61D1A0ABE006BE8DD /* ImageCache.swift */,
+				7F732CFB1D1B29D5009EED70 /* IntHelper.swift */,
+			);
+			name = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -125,9 +222,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7FB5DE5D1D14C5BC00813314 /* Build configuration list for PBXNativeTarget "EmojiThrower" */;
 			buildPhases = (
+				0C638A740B8BEDAF365D70B6 /* Check Pods Manifest.lock */,
 				7FB5DE471D14C5BC00813314 /* Sources */,
 				7FB5DE481D14C5BC00813314 /* Frameworks */,
 				7FB5DE491D14C5BC00813314 /* Resources */,
+				E4B0D6E1D6DA89346169B5E6 /* Embed Pods Frameworks */,
+				40D69C5ABADB5F9D635C2374 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -152,6 +252,7 @@
 						CreatedOnToolsVersion = 8.0;
 						DevelopmentTeam = 53AF9EMAN4;
 						DevelopmentTeamName = "Gareth Jones";
+						LastSwiftMigration = 0800;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -181,29 +282,90 @@
 			files = (
 				7FC231B31D160543000CA761 /* Sketch3D.otf in Resources */,
 				7FB5DE721D14C63000813314 /* sprites.atlas in Resources */,
-				7FB5DE701D14C63000813314 /* background-music-aac.caf in Resources */,
+				7FC231CF1D1775BE000CA761 /* LoginViewController.xib in Resources */,
 				7FB5DE691D14C62600813314 /* GameScene.sks in Resources */,
 				7FB5DE591D14C5BC00813314 /* LaunchScreen.storyboard in Resources */,
 				7FB5DE611D14C5F100813314 /* Assets.xcassets in Resources */,
+				7FA04FE21D19CA590075BF85 /* FriendTableViewCell.xib in Resources */,
 				7FB5DE631D14C60900813314 /* Main.storyboard in Resources */,
-				7FB5DE711D14C63000813314 /* pew-pew-lei.caf in Resources */,
+				7FD1EBD91D18E954002A1E3B /* GoogleService-Info.plist in Resources */,
+				7FC231BF1D176D75000CA761 /* Config.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0C638A740B8BEDAF365D70B6 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		40D69C5ABADB5F9D635C2374 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-EmojiThrower/Pods-EmojiThrower-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E4B0D6E1D6DA89346169B5E6 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-EmojiThrower/Pods-EmojiThrower-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		7FB5DE471D14C5BC00813314 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F9330C71D1A0ABE006BE8DD /* ImageCache.swift in Sources */,
+				7FC231D31D18A05F000CA761 /* API.swift in Sources */,
 				7FC231B01D1521BE000CA761 /* ScoreViewController.swift in Sources */,
+				7FC231CB1D177423000CA761 /* Popular.swift in Sources */,
 				7FC231AE1D1521B0000CA761 /* ViewController.swift in Sources */,
+				7FD1EBDB1D199FE6002A1E3B /* FriendsViewController.swift in Sources */,
 				7FC231AC1D15217C000CA761 /* LoginViewController.swift in Sources */,
 				7FB5DE6B1D14C62600813314 /* GameViewController.swift in Sources */,
+				7FC231C51D17700C000CA761 /* User.swift in Sources */,
 				7FB5DE681D14C62600813314 /* GameOverScene.swift in Sources */,
+				7F732CFE1D1C1D6B009EED70 /* SettingsHelper.swift in Sources */,
+				7FC231C91D1772AA000CA761 /* Friend.swift in Sources */,
+				7F732CFA1D1B1D9B009EED70 /* UIColorHelper.swift in Sources */,
+				7F732CFC1D1B29D5009EED70 /* IntHelper.swift in Sources */,
 				7FB5DE6A1D14C62600813314 /* GameScene.swift in Sources */,
 				7FB5DE4F1D14C5BC00813314 /* AppDelegate.swift in Sources */,
+				7FA04FE41D19CB500075BF85 /* FriendTableViewCell.swift in Sources */,
+				7FC981BC1D19CD160047D594 /* ImageHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,25 +474,32 @@
 		};
 		7FB5DE5E1D14C5BC00813314 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4CFC3F7E99C3515C6B44B7B0 /* Pods-EmojiThrower.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = EmojiThrower/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.gpj.EmojiThrower;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "EmojiThrower/EmojiThrower-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
 		7FB5DE5F1D14C5BC00813314 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1CB683DE7D9A886792999407 /* Pods-EmojiThrower.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = EmojiThrower/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.gpj.EmojiThrower;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_OBJC_BRIDGING_HEADER = "EmojiThrower/EmojiThrower-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;

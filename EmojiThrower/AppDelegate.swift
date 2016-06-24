@@ -7,26 +7,68 @@
 //
 
 import UIKit
+import Firebase
+import FirebaseAuth
+import FirebaseDatabase
+import TwitterKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    var navigationController: UINavigationController?
     var window: UIWindow?
-
+    
+    var ref: FIRDatabaseReference?
+    var db: FIRDatabase?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+
+        print("app delegate ")
+        FIRApp.configure()
         
-        for family: String in UIFont.familyNames()
-        {
-            print("\(family)")
-            for names: String in UIFont.fontNames(forFamilyName: family)
-            {
-                print("== \(names)")
+        self.db = FIRDatabase.database()
+        
+        self.ref = self.db?.reference()
+        //self.db?.persistenceEnabled = true
+        
+        //print(API.fetchFriends())
+        /*
+        do {
+            try FIRAuth.auth()?.signOut()
+        } catch {
+            print("error")
+        }
+        
+        */
+        
+        if UserDefaults.standard().string(forKey: "username") != nil {
+            print("user is active")
+            self.window = UIWindow(frame: UIScreen.main().bounds)
+            self.window?.makeKeyAndVisible()
+            
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboard.instantiateInitialViewController()
+            self.window?.rootViewController = vc
+        }
+        
+        FIRAuth.auth()?.addStateDidChangeListener { auth, user in
+            if let user = user {
+                // User is signed in.
+                print("user is active" + String(user))
+                
+            } else {
+                // 1. Setup Twitter
+                Twitter.sharedInstance().start(withConsumerKey: Settings.getTwtrKey(), consumerSecret: Settings.getTwtrSecret())
+                // 2. Move the user to Login
+                self.window = UIWindow(frame: UIScreen.main().bounds)
+                self.window?.makeKeyAndVisible()
+                let mainViewController: LoginViewController = LoginViewController(nibName: "LoginViewController", bundle: nil)
+                self.window?.rootViewController = mainViewController
             }
         }
-        //
         return true
+
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -53,4 +95,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
 }
-

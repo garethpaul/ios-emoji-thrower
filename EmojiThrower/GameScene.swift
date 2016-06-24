@@ -51,21 +51,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //MARK: - Set up player sprite
     let player = SKSpriteNode(imageNamed: "player")
     
+    var opponent: UIImage = UIImage()
+    
     var monstersDestroyed = 0
     
     var playerDestroyed = false
     
     let scoreLabel = SKLabelNode(fontNamed: "Sketch3D")
-    let backgroundVelocity : CGFloat = 3.0
+    let backgroundVelocity : CGFloat = 2.0
     
     override func didMove(to view: SKView) {
         // set background color
         self.backgroundColor = SKColor.white()
         self.initializingScrollingBackground()
         // background music
-        let backgroundMusic = SKAudioNode(fileNamed: "background-music-aac.caf")
-        backgroundMusic.autoplayLooped = true
-        addChild(backgroundMusic)
+        //let backgroundMusic = SKAudioNode(fileNamed: "background-music-aac.caf")
+        //backgroundMusic.autoplayLooped = true
+        //addChild(backgroundMusic)
         // set starting position
         player.position = CGPoint(x: size.width * 0.1, y: size.height * 0.5)
         // create sprite
@@ -123,7 +125,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func addMonster() {
         
         // Create sprite
-        let monster = SKSpriteNode(imageNamed: "Goblin")
+        // let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as String
+        // let getImagePath = paths.appending("opponent.png")
+        let imageis: UIImage = opponent
+        let Texture = SKTexture(image: imageis)
+//        let mySprite =
+        
+        let monster = SKSpriteNode(texture: Texture) //SKSpriteNode(imageNamed: "Goblin")
         
         
         // Determine where to spawn the monster along the Y axis
@@ -235,7 +243,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         projectile.run(SKAction.sequence([actionMove, actionMoveDone]))
         
         // Projectile sound effect
-        run(SKAction.playSoundFileNamed("pew-pew-lei.caf", waitForCompletion: false))
+        //run(SKAction.playSoundFileNamed("pew-pew-lei.caf", waitForCompletion: false))
     }
     
     //MARK: - Projectile Collision Actions
@@ -249,14 +257,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // check timer and if end then show end
         
         // keep score
-        if (monstersDestroyed >= 20) {
+        if (monstersDestroyed >= 300) {
             let reveal = SKTransition.flipHorizontal(withDuration: 2)
             let gameOverScene = GameOverScene(size: self.size, won: true)
             self.view?.presentScene(gameOverScene, transition: reveal)
         }
     }
     func monsterDidCollideWithPlayer(_ monster:SKSpriteNode, player:SKSpriteNode) {
-        print("player hit")
         playerDestroyed = true
 
         player.removeFromParent()
@@ -280,9 +287,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             secondBody = contact.bodyA
         }
         
-
-        if ((firstBody.categoryBitMask & PhysicsCategory.Monster != 0) &&
-            (secondBody.categoryBitMask & PhysicsCategory.Projectile != 0)) {
+//
+        if (firstBody.categoryBitMask & PhysicsCategory.Monster != 0) && (secondBody.categoryBitMask & PhysicsCategory.Projectile != 0) {
             projectileDidCollideWithMonster(firstBody.node as! SKSpriteNode, monster: secondBody.node as! SKSpriteNode)
         }
         

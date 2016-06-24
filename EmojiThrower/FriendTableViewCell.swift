@@ -8,13 +8,34 @@
 
 import UIKit
 
-class FriendViewCell: UITableViewCell {
+struct MyModel {
+    let imageUrl: NSURL
+}
 
+class FriendTableViewCell: UITableViewCell {
+
+    @IBOutlet weak var profilePic: UIImageView!
+    @IBOutlet weak var screenName: UILabel!
+    var imageUrl: NSURL!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-    }
 
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.profilePic.image = nil
+        
+    }
+    
+    
+    func setData(f: Friend, completion: (completed: Bool) -> Void) {
+        //
+        self.screenName.text = f.screenname
+    }
+    
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 

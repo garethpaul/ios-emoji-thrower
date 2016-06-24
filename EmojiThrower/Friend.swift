@@ -7,3 +7,15 @@
 //
 
 import Foundation
+
+class Friend: NSObject {
+    
+    // Insert code here to add functionality to your managed object subclass
+    var screenname: String?
+    var profilePic: String?
+    
+    init(screenname: String, profilePic: String) {
+        self.screenname = screenname
+        self.profilePic = profilePic
+    }
+}

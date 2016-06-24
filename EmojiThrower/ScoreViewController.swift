@@ -10,9 +10,22 @@ import UIKit
 
 class ScoreViewController: UIViewController {
 
+    var score: Int?
+    var personImage: UIImage?
+    var opponentFriend: Friend?
+    
+    @IBOutlet weak var person: UIImageView!
+    @IBOutlet weak var scoreLabel: UILabel!
+    @IBOutlet weak var emojiPlacement: UIImageView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        person.image = personImage
+        scoreLabel.font = UIFont(name: "Sketch3D", size: 34)
+        scoreLabel.text = "@" + (opponentFriend?.screenname)! + " was hit " + (self.score?.stringValue)! + " times."
+        
+    
         // Do any additional setup after loading the view.
     }
 
