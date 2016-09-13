@@ -119,8 +119,6 @@ class API: NSObject {
         })
     }
     
-    
-    
 
     
     class func fetchFriends( completion: @escaping (_ friends: [Friend]) -> () = {_ in }) {
@@ -133,10 +131,10 @@ class API: NSObject {
             for friend in snapshot.children.allObjects {
                 print("DB " + String(describing: friend))
                 
-                let f = friend as! [String: String]
+                let f = friend as! FIRDataSnapshot
                 
-                let screenname = f["screename"]
-                let profilePic = f["profile"]
+                let screenname = (f.value as? NSDictionary)?["screenname"] as? String
+                let profilePic = (f.value as? NSDictionary)?["profile"] as? String
                 let newFriend = Friend(screenname: screenname!, profilePic: profilePic!)
                 friends.append(newFriend)
             }

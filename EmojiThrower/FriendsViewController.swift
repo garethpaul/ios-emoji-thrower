@@ -134,11 +134,13 @@ class FriendsViewController: UITableViewController {
     }
 
     
-    // MARK: Prepare to Segue
-    func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        print("preparing to move")
         if(segue.identifier == "playGame") {
             // Move to play game
-            if let gameVC:GameViewController = (segue.destination as! GameViewController){
+            print("moving to play the game")
+            if let gameVC:GameViewController = (segue.destination as? GameViewController){
                 gameVC.opponent = self.o!.resizeImage!.circle!
                 gameVC.opponentFriend = of
             }

@@ -45,7 +45,7 @@ class GameViewController: UIViewController {
     {
         self.gameTime = self.gameTime - 3
         //timerLayer?.removeFromSuperview()
-        let percentage = CGFloat(self.gameTime)/CGFloat(30)
+        let percentage = CGFloat(self.gameTime)/CGFloat(20)
 
         if self.gameTime == 0 {
             self.timer?.invalidate()
@@ -81,7 +81,7 @@ class GameViewController: UIViewController {
         self.timer = nil
     }
     
-    func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if(segue.identifier == "shareGame") {
             if let shareVC:ScoreViewController = (segue.destination as! ScoreViewController){
                 shareVC.score = scene?.monstersDestroyed
