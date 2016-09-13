@@ -38,7 +38,7 @@ class GameViewController: UIViewController {
     
     func transformFromRect(from: CGRect, toRect to: CGRect) -> CGAffineTransform {
         let transform = CGAffineTransform(translationX: to.midX-from.midX, y: to.midY-from.midY)
-        return transform.scaleBy(x: to.width/from.width, y: to.height/from.height)
+        return transform.scaledBy(x: to.width/from.width, y: to.height/from.height)
     }
     
     func countdown()
@@ -81,13 +81,9 @@ class GameViewController: UIViewController {
         self.timer = nil
     }
     
-    override func prefersStatusBarHidden() -> Bool {
-        return true
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
+    func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
         if(segue.identifier == "shareGame") {
-            if let shareVC:ScoreViewController = (segue.destinationViewController as! ScoreViewController){
+            if let shareVC:ScoreViewController = (segue.destination as! ScoreViewController){
                 shareVC.score = scene?.monstersDestroyed
                 shareVC.personImage = self.opponent
                 shareVC.opponentFriend = self.opponentFriend

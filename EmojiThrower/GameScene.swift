@@ -62,7 +62,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func didMove(to view: SKView) {
         // set background color
-        self.backgroundColor = SKColor.white()
+        self.backgroundColor = SKColor.white
         self.initializingScrollingBackground()
         // background music
         //let backgroundMusic = SKAudioNode(fileNamed: "background-music-aac.caf")

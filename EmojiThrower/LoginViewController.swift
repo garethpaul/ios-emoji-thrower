@@ -37,10 +37,10 @@ class LoginViewController: UIViewController {
                     //
                     print("DB: FIRAuth")
                     
-                    let appDelegate = UIApplication.shared().delegate as! AppDelegate
+                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
                     appDelegate.ref?.child("users").child((session?.userName)!).setValue(["user": "active"], withCompletionBlock: { (error, ref) in
                         if error != nil {
-                            print("DB Error " + String(error))
+                            print("DB Error " + String(describing: error))
                         } else {
                             print("DB Data saved")
                         }

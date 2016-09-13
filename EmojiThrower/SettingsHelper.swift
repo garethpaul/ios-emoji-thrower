@@ -26,7 +26,7 @@ class Settings: NSObject {
     
     // MARK: Get the path for the resource
     class func getPath() -> String{
-        let settingsPath = Bundle.main().pathForResource("Config", ofType: "plist")
+        let settingsPath = Bundle.main.path(forResource: "Config", ofType: "plist")
         return settingsPath!
     }
 

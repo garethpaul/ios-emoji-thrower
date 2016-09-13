@@ -42,9 +42,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         */
         
-        if UserDefaults.standard().string(forKey: "username") != nil {
+        if UserDefaults.standard.string(forKey: "username") != nil {
             print("user is active")
-            self.window = UIWindow(frame: UIScreen.main().bounds)
+            self.window = UIWindow(frame: UIScreen.main.bounds)
             self.window?.makeKeyAndVisible()
             
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -55,13 +55,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FIRAuth.auth()?.addStateDidChangeListener { auth, user in
             if let user = user {
                 // User is signed in.
-                print("user is active" + String(user))
+                print("user is active" + String(describing: user))
                 
             } else {
                 // 1. Setup Twitter
                 Twitter.sharedInstance().start(withConsumerKey: Settings.getTwtrKey(), consumerSecret: Settings.getTwtrSecret())
                 // 2. Move the user to Login
-                self.window = UIWindow(frame: UIScreen.main().bounds)
+                self.window = UIWindow(frame: UIScreen.main.bounds)
                 self.window?.makeKeyAndVisible()
                 let mainViewController: LoginViewController = LoginViewController(nibName: "LoginViewController", bundle: nil)
                 self.window?.rootViewController = mainViewController

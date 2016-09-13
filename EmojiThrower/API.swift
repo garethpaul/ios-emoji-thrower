@@ -45,10 +45,10 @@ class API: NSObject {
             }
             
             do {
-                let json = try JSONSerialization.jsonObject(with: data!, options: [])
-                let friends = json["ids"] as! NSArray
+                let json = try JSONSerialization.jsonObject(with: data!, options: []) as! [String:NSArray]
+                let friends = json["ids"]
                 //print(friends)
-                getFriendsDetails(userID: userID, users: friends)
+                getFriendsDetails(userID: userID, users: friends!)
             } catch let jsonError as NSError {
                 print("json error: \(jsonError.localizedDescription)")
             }
@@ -58,7 +58,7 @@ class API: NSObject {
     class func getFriendsDetails(userID: String, users: NSArray) {
         var input: [String] = []
         for item in users {
-            input.append(String(item))
+            input.append(String(describing: item))
         }
         
         let output = chunk(50, input)
@@ -87,7 +87,7 @@ class API: NSObject {
                     }
                     // post friends
                     print("DB saving friends")
-                    print("DB" + String(friends))
+                    print("DB" + String(describing: friends))
                     saveFriends(friends: friends)
                     // get friends
                 } catch let jsonError as NSError {
@@ -103,16 +103,16 @@ class API: NSObject {
     class func saveFriends(friends: [Friend]) {
         var payload = [[String:AnyObject]]()
         for friend in friends {
-            payload.append(["screenname": friend.screenname!, "profile": friend.profilePic!])
+            payload.append(["screenname": friend.screenname! as AnyObject, "profile": friend.profilePic! as AnyObject])
         }
 
         print("DB user " + User.getUsername())
-        let appDelegate = UIApplication.shared().delegate as! AppDelegate
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
         appDelegate.ref?.child("friends").child(User.getUsername()).setValue(payload, withCompletionBlock: { (error, ref) in
             // error
             if error != nil {
-                print("DB payload error " + String(error))
+                print("DB payload error " + String(describing: error))
             } else {
                 print("DB payload success")
             }
@@ -123,24 +123,27 @@ class API: NSObject {
     
 
     
-    class func fetchFriends( completion: (friends: [Friend]) -> () = {_ in }) {
+    class func fetchFriends( completion: @escaping (_ friends: [Friend]) -> () = {_ in }) {
         print("DB fetching friends")
         var friends = [Friend]()
-        let appDelegate = UIApplication.shared().delegate as! AppDelegate
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.ref?.child("friends").child(User.getUsername()).observe(FIRDataEventType.value, with: { (snapshot) in
             // Get user value
             print("DB get user values")
             for friend in snapshot.children.allObjects {
-                print("DB " + String(friend))
-                let screenname = friend.value!["screenname"] as! String
-                let profilePic = friend.value!["profile"] as! String
-                let f = Friend(screenname: screenname, profilePic: profilePic)
-                friends.append(f)
+                print("DB " + String(describing: friend))
+                
+                let f = friend as! [String: String]
+                
+                let screenname = f["screename"]
+                let profilePic = f["profile"]
+                let newFriend = Friend(screenname: screenname!, profilePic: profilePic!)
+                friends.append(newFriend)
             }
-            completion(friends: friends)
+            completion(friends)
         }) { (error) in
             print(error.localizedDescription)
         }
-        print("DB fetchFriends + " + String(friends))
+        print("DB fetchFriends + " + String(describing: friends))
     }
 }

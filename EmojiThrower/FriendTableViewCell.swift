@@ -31,7 +31,7 @@ class FriendTableViewCell: UITableViewCell {
     }
     
     
-    func setData(f: Friend, completion: (completed: Bool) -> Void) {
+    func setData(f: Friend, completion: (_ completed: Bool) -> Void) {
         //
         self.screenName.text = f.screenname
     }

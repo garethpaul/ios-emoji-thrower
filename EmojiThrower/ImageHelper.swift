@@ -37,17 +37,17 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return newImage
     }
-    func setImage(url: String, completion: (image: UIImage) -> Void) {
+    func setImage(url: String, completion: @escaping (_ image: UIImage) -> Void) {
         let imageUrl = NSURL(string: url)
         
         if let image = imageUrl?.cachedImage {
             DispatchQueue.main.async(execute: {
-                completion(image: image)
+                completion(image)
             })
         } else {
             imageUrl?.fetchImage { image in
                 DispatchQueue.main.async(execute: {
-                    completion(image: image)
+                    completion(image)
                 })
             }
         }

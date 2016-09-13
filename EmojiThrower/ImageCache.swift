@@ -11,10 +11,10 @@ import UIKit
 
 public class MyImageCache {
     
-    var sharedCache: Cache<AnyObject, AnyObject>;
+    var sharedCache: NSCache<AnyObject, AnyObject>;
     
     init() {
-        sharedCache = Cache()
+        sharedCache = NSCache()
         sharedCache.name = "MyImageCache"
         sharedCache.countLimit = 200 // Max 200 images in memory.
         sharedCache.totalCostLimit = 100*1024*1024 // Max 100MB used.
@@ -30,22 +30,22 @@ extension NSURL {
     /// You should call this before calling fetchImage.
     var cachedImage: UIImage? {
         return MyImageCache.init().sharedCache.object(
-            forKey: absoluteString!) as? UIImage
+            forKey: absoluteString! as AnyObject) as? UIImage
     }
     
     /// Fetches the image from the network.
     /// Stores it in the cache if successful.
     /// Only calls completion on successful image download.
     /// Completion is called on the main thread.
-    func fetchImage(completion: ImageCacheCompletion) {
-        let task = URLSession.shared().dataTask(with: self as URL) {
+    func fetchImage(completion: @escaping ImageCacheCompletion) {
+        let task = URLSession.shared.dataTask(with: self as URL) {
             data, response, error in
             if error == nil {
                 if let  data = data,
-                    image = UIImage(data: data) {
+                    let image = UIImage(data: data) {
                     MyImageCache.init().sharedCache.setObject(
                         image,
-                        forKey: self.absoluteString!,
+                        forKey: self.absoluteString! as AnyObject,
                         cost: data.count)
 
                     
