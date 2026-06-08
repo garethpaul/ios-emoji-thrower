@@ -43,3 +43,6 @@ opt-in, documented, and unnecessary data collection should be avoided.
 - Analytics or account features unrelated to gameplay
 - Broad Swift migration bundled with gameplay changes
 - Build changes that make the game harder to open in Xcode
+
+This list is a roadmap guardrail, not a permanent rule.
+Strong user demand and strong technical rationale can change it.
