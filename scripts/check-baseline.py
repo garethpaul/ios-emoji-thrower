@@ -1,0 +1,193 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import json
+import plistlib
+import re
+import shutil
+import sys
+import xml.etree.ElementTree as ET
+
+
+ROOT = Path(__file__).resolve().parents[1]
+PLAN = ROOT / "docs/plans/2026-06-08-spritekit-baseline.md"
+
+
+def require(condition, message, failures):
+    if not condition:
+        failures.append(message)
+
+
+def read(relative_path):
+    return (ROOT / relative_path).read_text(encoding="utf-8", errors="replace")
+
+
+def strip_swift_line_comments(text):
+    return "\n".join(line.split("//", 1)[0] for line in text.splitlines())
+
+
+def parse_xml(relative_path, failures):
+    try:
+        ET.parse(str(ROOT / relative_path))
+    except ET.ParseError as error:
+        failures.append(f"{relative_path} is not well-formed XML: {error}")
+
+
+def parse_json(relative_path, failures):
+    try:
+        return json.loads(read(relative_path))
+    except json.JSONDecodeError as error:
+        failures.append(f"{relative_path} is not valid JSON: {error}")
+        return {}
+
+
+def parse_plist(relative_path, failures):
+    try:
+        with (ROOT / relative_path).open("rb") as file:
+            return plistlib.load(file)
+    except Exception as error:
+        failures.append(f"{relative_path} is not a readable plist: {error}")
+        return {}
+
+
+def main():
+    failures = []
+    required_files = [
+        ".gitignore",
+        "CHANGES.md",
+        "Makefile",
+        "README.md",
+        "SECURITY.md",
+        "VISION.md",
+        "EmojiThrower.xcodeproj/project.pbxproj",
+        "EmojiThrower.xcodeproj/project.xcworkspace/contents.xcworkspacedata",
+        "EmojiThrower/Info.plist",
+        "EmojiThrower/AppDelegate.swift",
+        "EmojiThrower/GameScene.swift",
+        "EmojiThrower/GameViewController.swift",
+        "EmojiThrower/GameOverScene.swift",
+        "EmojiThrower/GameScene.sks",
+        "EmojiThrower/Main.storyboard",
+        "EmojiThrower/Base.lproj/LaunchScreen.storyboard",
+        "EmojiThrower/Assets.xcassets/Contents.json",
+        "EmojiThrower/Assets.xcassets/AppIcon.appiconset/Contents.json",
+        "EmojiThrower/Assets.xcassets/bg.imageset/Contents.json",
+        "EmojiThrower/Assets.xcassets/bg.imageset/bg.png",
+        "EmojiThrower/sprites.atlas/player.png",
+        "EmojiThrower/sprites.atlas/player@2x.png",
+        "EmojiThrower/sprites.atlas/projectile.png",
+        "EmojiThrower/sprites.atlas/projectile@2x.png",
+        "EmojiThrower/sprites.atlas/monster.png",
+        "EmojiThrower/sprites.atlas/monster@2x.png",
+        "EmojiThrower/Sounds/background-music-aac.caf",
+        "EmojiThrower/Sounds/pew-pew-lei.caf",
+        "EmojiThrower/Sketch3D.otf",
+        "docs/plans/2026-06-08-spritekit-baseline.md",
+        "docs/readme-overview.svg",
+    ]
+
+    for relative_path in required_files:
+        require((ROOT / relative_path).is_file(), f"Required file missing: {relative_path}", failures)
+
+    for xml_file in [
+        "EmojiThrower.xcodeproj/project.xcworkspace/contents.xcworkspacedata",
+        "EmojiThrower/Main.storyboard",
+        "EmojiThrower/Base.lproj/LaunchScreen.storyboard",
+        "docs/readme-overview.svg",
+    ]:
+        parse_xml(xml_file, failures)
+
+    for json_file in [
+        "EmojiThrower/Assets.xcassets/Contents.json",
+        "EmojiThrower/Assets.xcassets/AppIcon.appiconset/Contents.json",
+        "EmojiThrower/Assets.xcassets/bg.imageset/Contents.json",
+    ]:
+        parse_json(json_file, failures)
+
+    app_plist = parse_plist("EmojiThrower/Info.plist", failures)
+    parse_plist("EmojiThrower/GameScene.sks", failures)
+
+    project = read("EmojiThrower.xcodeproj/project.pbxproj")
+    swift_sources = "\n".join(strip_swift_line_comments(path.read_text(encoding="utf-8", errors="replace"))
+                              for path in sorted((ROOT / "EmojiThrower").glob("*.swift")))
+    game_scene = read("EmojiThrower/GameScene.swift")
+    readme = read("README.md")
+    vision = read("VISION.md")
+    security = read("SECURITY.md")
+    changes = read("CHANGES.md")
+    gitignore = read(".gitignore")
+    plan = PLAN.read_text(encoding="utf-8") if PLAN.exists() else ""
+
+    require("IPHONEOS_DEPLOYMENT_TARGET = 10.0;" in project and "SWIFT_VERSION = 3.0;" in project,
+            "Xcode project must preserve the legacy iOS 10 / Swift 3 settings",
+            failures)
+    for resource in ["Assets.xcassets", "sprites.atlas", "background-music-aac.caf", "pew-pew-lei.caf", "Sketch3D.otf", "GameScene.sks"]:
+        require(resource in project, f"Xcode project must keep resource reference: {resource}", failures)
+    require(app_plist.get("UIAppFonts") == ["Sketch3D.otf"],
+            "Info.plist must register the bundled Sketch3D font",
+            failures)
+    require("Pods" not in project and not (ROOT / "Podfile").exists(),
+            "SpriteKit sample must stay dependency-free unless dependencies are explicitly documented",
+            failures)
+
+    require("class GameScene: SKScene" in game_scene and "SKPhysicsContactDelegate" in game_scene,
+            "GameScene must retain SpriteKit scene and physics contact behavior",
+            failures)
+    require('scoreLabel.text = "Score: \\(monstersDestroyed)"' in game_scene,
+            "GameScene must keep visible score label updates",
+            failures)
+    require("SKAction.playSoundFileNamed" in game_scene and "background-music-aac.caf" in game_scene,
+            "GameScene must keep bundled sound playback references",
+            failures)
+    require("if (offset.x <= 0) { return }" in game_scene and "let direction = offset.normalized()" in game_scene,
+            "GameScene must guard non-forward projectile vectors before normalization",
+            failures)
+    require(not re.search(r"\b(?:print|println|NSLog)\s*\(", swift_sources),
+            "Game sources must not use debug console logging",
+            failures)
+    for forbidden in ["NSURL", "URLSession", "NSURLConnection", "http://", "https://", "upload", "analytics", "NSUserDefaults", "UserDefaults"]:
+        require(forbidden not in swift_sources,
+                f"Game sample must not add network, upload, analytics, or persistence behavior: {forbidden}",
+                failures)
+
+    swift_files = sorted((ROOT / "EmojiThrower").glob("*.swift"))
+    require(len(swift_files) >= 8,
+            "expected Swift source inventory is missing",
+            failures)
+    require("*.local.xcconfig" in gitignore and ".env" in gitignore and "DerivedData" in gitignore,
+            ".gitignore must exclude local config and Xcode build products",
+            failures)
+    require("make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme,
+            "README must document static verification, project usage, and SpriteKit context",
+            failures)
+    require("local game" in readme.lower() and "debug logging" in readme.lower(),
+            "README must document local-only gameplay and debug logging expectations",
+            failures)
+    require("scripts/check-baseline.py" in vision and "asset" in vision.lower(),
+            "VISION must describe the current static SpriteKit baseline",
+            failures)
+    require("debug logging" in security.lower() and "make check" in security,
+            "SECURITY must document debug logging and static baseline guardrails",
+            failures)
+    require("debug console logging" in changes and "projectile" in changes and "make check" in changes,
+            "CHANGES must record the debug logging cleanup, projectile guard, and baseline",
+            failures)
+    require("status: completed" in plan,
+            "plan must be marked completed",
+            failures)
+
+    if shutil.which("xcodebuild"):
+        print("xcodebuild is available; run a scheme-specific Xcode test on macOS before release.")
+    else:
+        print("xcodebuild unavailable; static iOS baseline only.")
+
+    if failures:
+        for failure in failures:
+            print(failure, file=sys.stderr)
+        return 1
+
+    print("ios-emoji-thrower SpriteKit baseline checks passed.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

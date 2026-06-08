@@ -206,8 +206,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Determine offset of touch location to projectile
         let offset = touchLocation - projectile.position
         
-        // Cancel shot if you are shooting down or backwards
-        if (offset.x < 0) { return }
+        // Cancel shots that do not travel forward.
+        if (offset.x <= 0) { return }
         
         // Projectile collision set up
         projectile.physicsBody = SKPhysicsBody(circleOfRadius: projectile.size.width/2)
@@ -241,7 +241,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //MARK: - Projectile Collision Actions
     func projectileDidCollideWithMonster(_ projectile:SKSpriteNode, monster:SKSpriteNode) {
         monstersDestroyed += 1
-        print("\(monstersDestroyed)")
         scoreLabel.text = "Score: \(monstersDestroyed)"
         projectile.removeFromParent()
         monster.removeFromParent()
@@ -256,7 +255,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     func monsterDidCollideWithPlayer(_ monster:SKSpriteNode, player:SKSpriteNode) {
-        print("player hit")
         playerDestroyed = true
 
         player.removeFromParent()

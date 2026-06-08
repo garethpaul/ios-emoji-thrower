@@ -20,10 +20,11 @@ Priority:
 - Keep scene, score, and game-over behavior easy to inspect
 - Maintain asset and sound file alignment with project references
 - Avoid adding account or network behavior without a clear purpose
+- Keep `scripts/check-baseline.py` passing for bundled resources, Xcode
+  metadata, SpriteKit source inventory, local-only gameplay, and debug logging guardrails
 
 Next priorities:
 
-- Add README setup and gameplay verification notes
 - Add tests or manual checks for scene loading and score flow
 - Modernize Swift/project settings in a dedicated pass
 - Document asset provenance for future replacements
@@ -43,6 +44,11 @@ Canonical security policy and reporting:
 
 This is a local game sample. Future networking, accounts, or analytics should be
 opt-in, documented, and unnecessary data collection should be avoided.
+
+Current baseline: `make check` runs `scripts/check-baseline.py` without Xcode.
+It verifies plist/storyboard/asset metadata, bundled resource references,
+SpriteKit scene sources, and local-only gameplay with no debug logging, network,
+analytics, upload, or persistence behavior.
 
 ## What We Will Not Merge (For Now)
 
