@@ -74,4 +74,4 @@ Keep changes small and tied to the project that is already present in this repos
 
 Prior README summary:
 
-> ios-emoji-thrower <!-- README-OVERVIEW-IMAGE --> `garethpaul/ios-emoji-thrower` is a Apple platform application or Swift sample. An Emoji SpriteKit Game
+> ios-emoji-thrower `garethpaul/ios-emoji-thrower` is a Apple platform application or Swift sample. An Emoji SpriteKit Game
