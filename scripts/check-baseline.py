@@ -9,7 +9,8 @@ import xml.etree.ElementTree as ET
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PLAN = ROOT / "docs/plans/2026-06-08-spritekit-baseline.md"
+BASELINE_PLAN = ROOT / "docs/plans/2026-06-08-spritekit-baseline.md"
+IMAGE_GUARD_PLAN = ROOT / "docs/plans/2026-06-08-image-helper-guard.md"
 
 
 def require(condition, message, failures):
@@ -82,6 +83,7 @@ def main():
         "EmojiThrower/Sounds/pew-pew-lei.caf",
         "EmojiThrower/Sketch3D.otf",
         "docs/plans/2026-06-08-spritekit-baseline.md",
+        "docs/plans/2026-06-08-image-helper-guard.md",
         "docs/readme-overview.svg",
     ]
 
@@ -115,7 +117,8 @@ def main():
     security = read("SECURITY.md")
     changes = read("CHANGES.md")
     gitignore = read(".gitignore")
-    plan = PLAN.read_text(encoding="utf-8") if PLAN.exists() else ""
+    baseline_plan = BASELINE_PLAN.read_text(encoding="utf-8") if BASELINE_PLAN.exists() else ""
+    image_guard_plan = IMAGE_GUARD_PLAN.read_text(encoding="utf-8") if IMAGE_GUARD_PLAN.exists() else ""
 
     require("IPHONEOS_DEPLOYMENT_TARGET = 10.0;" in project and "SWIFT_VERSION = 3.0;" in project,
             "Xcode project must preserve the legacy iOS 10 / Swift 3 settings",
@@ -140,6 +143,14 @@ def main():
             failures)
     require("SKAction.playSoundFileNamed" in game_scene and "background-music-aac.caf" in game_scene,
             "GameScene must keep bundled sound playback references",
+            failures)
+    require("guard let originalPicture = UIImage(named: imageName)" in game_scene and
+            "guard let scaledImage = UIGraphicsGetImageFromCurrentImageContext()" in game_scene and
+            "let fallbackImage = SKSpriteNode(imageNamed: imageName)" in game_scene,
+            "roundSquareImage must tolerate missing images and failed image rendering",
+            failures)
+    require("originalPicture!" not in game_scene and "scaledImage!" not in game_scene and "(originalPicture?.size" not in game_scene,
+            "roundSquareImage must not force-unwrap image assets or rendered output",
             failures)
     require("let pointLength = length()" in game_scene and "return CGPoint.zero" in game_scene,
             "CGPoint normalization must handle zero-length vectors",
@@ -174,8 +185,8 @@ def main():
     require("*.local.xcconfig" in gitignore and ".env" in gitignore and "DerivedData" in gitignore,
             ".gitignore must exclude local config and Xcode build products",
             failures)
-    require("make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme,
-            "README must document static verification, project usage, and SpriteKit context",
+    require("make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme and "image" in readme.lower(),
+            "README must document static verification, project usage, SpriteKit context, and image guardrails",
             failures)
     require("local game" in readme.lower() and "debug logging" in readme.lower() and "debug overlays" in readme.lower(),
             "README must document local-only gameplay and debug logging/overlay expectations",
@@ -186,11 +197,11 @@ def main():
     require("debug logging" in security.lower() and "debug overlays" in security.lower() and "make check" in security,
             "SECURITY must document debug logging/overlay and static baseline guardrails",
             failures)
-    require("debug console logging" in changes and "debug overlays" in changes and "player-hit" in changes and "projectile" in changes and "zero-length" in changes and "make check" in changes,
-            "CHANGES must record the debug cleanup, contact handling, vector guard, and baseline",
+    require("debug console logging" in changes and "debug overlays" in changes and "player-hit" in changes and "projectile" in changes and "zero-length" in changes and "image" in changes.lower() and "make check" in changes,
+            "CHANGES must record the debug cleanup, contact handling, vector guard, image guard, and baseline",
             failures)
-    require("status: completed" in plan,
-            "plan must be marked completed",
+    require("status: completed" in baseline_plan and "status: completed" in image_guard_plan,
+            "plans must be marked completed",
             failures)
 
     if shutil.which("xcodebuild"):

@@ -107,19 +107,29 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     //MARK: - Get Profile Picture
     func roundSquareImage(imageName: String) -> SKSpriteNode {
-        let originalPicture = UIImage(named: imageName)
+        guard let originalPicture = UIImage(named: imageName) else {
+            let fallbackImage = SKSpriteNode(imageNamed: imageName)
+            fallbackImage.name = imageName
+            return fallbackImage
+        }
+
         // create the image with rounded corners
-        UIGraphicsBeginImageContextWithOptions(originalPicture!.size, false, 0)
-        let rect = CGRect(x: 0, y: 0, width: originalPicture!.size.width, height: (originalPicture?.size.height)!)
+        UIGraphicsBeginImageContextWithOptions(originalPicture.size, false, 0)
+        defer { UIGraphicsEndImageContext() }
+
+        let rect = CGRect(x: 0, y: 0, width: originalPicture.size.width, height: originalPicture.size.height)
         
         let rectPath : UIBezierPath = UIBezierPath(roundedRect: rect, cornerRadius: 30.0)
         rectPath.addClip()
-        originalPicture!.draw(in: rect)
-        let scaledImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext();
+        originalPicture.draw(in: rect)
+        guard let scaledImage = UIGraphicsGetImageFromCurrentImageContext() else {
+            let fallbackImage = SKSpriteNode(imageNamed: imageName)
+            fallbackImage.name = imageName
+            return fallbackImage
+        }
         
-        let texture = SKTexture(image: scaledImage!)
-        let roundedImage = SKSpriteNode(texture: texture, size: CGSize(width: (originalPicture?.size.width)!, height: (originalPicture?.size.height)!))
+        let texture = SKTexture(image: scaledImage)
+        let roundedImage = SKSpriteNode(texture: texture, size: originalPicture.size)
         roundedImage.name = imageName
         return roundedImage
     }

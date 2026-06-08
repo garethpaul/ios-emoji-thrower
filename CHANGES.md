@@ -7,6 +7,7 @@
 - Initialized visible score text before the first collision.
 - Guarded projectile launches so non-forward taps do not normalize invalid vectors.
 - Made vector normalization return zero for zero-length vectors.
+- Guarded rounded image helper asset loading and rendered image output.
 - Guarded physics contact node casts and restored player-hit handling.
 - Added `make check` and a static SpriteKit baseline for plist/storyboard/asset metadata, bundled resources, Xcode project wiring, source inventory, and local-only gameplay guardrails.
 - Documented the legacy Xcode project, SpriteKit resources, and static verification workflow.
