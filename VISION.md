@@ -1,5 +1,8 @@
 ## iOS Emoji Thrower Vision
 
+This document explains the current state and direction of the project.
+Project overview and developer docs: [`README.md`](README.md)
+
 iOS Emoji Thrower is a Swift SpriteKit game sample with player movement,
 projectiles, scoring, sounds, and multiple scenes.
 
