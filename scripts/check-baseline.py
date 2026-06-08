@@ -135,11 +135,26 @@ def main():
     require('scoreLabel.text = "Score: \\(monstersDestroyed)"' in game_scene,
             "GameScene must keep visible score label updates",
             failures)
+    require('scoreLabel.text = "Score: 0"' in game_scene and "view.frame.width/2" in game_scene,
+            "GameScene must initialize visible score text without force-unwrapping self.view",
+            failures)
     require("SKAction.playSoundFileNamed" in game_scene and "background-music-aac.caf" in game_scene,
             "GameScene must keep bundled sound playback references",
             failures)
     require("if (offset.x <= 0) { return }" in game_scene and "let direction = offset.normalized()" in game_scene,
             "GameScene must guard non-forward projectile vectors before normalization",
+            failures)
+    require("projectileDidCollideWithMonster(projectile, monster: monster)" in game_scene and
+            "monsterDidCollideWithPlayer(monster, player: player)" in game_scene and
+            "as? SKSpriteNode" in game_scene,
+            "GameScene must guard physics contact casts and handle projectile/player contacts",
+            failures)
+    game_view_controller = read("EmojiThrower/GameViewController.swift")
+    require("guard let skView = view as? SKView" in game_view_controller,
+            "GameViewController must guard the SpriteKit view cast",
+            failures)
+    require("showsFPS = false" in game_view_controller and "showsNodeCount = false" in game_view_controller,
+            "GameViewController must keep SpriteKit debug overlays disabled",
             failures)
     require(not re.search(r"\b(?:print|println|NSLog)\s*\(", swift_sources),
             "Game sources must not use debug console logging",
@@ -159,17 +174,17 @@ def main():
     require("make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme,
             "README must document static verification, project usage, and SpriteKit context",
             failures)
-    require("local game" in readme.lower() and "debug logging" in readme.lower(),
-            "README must document local-only gameplay and debug logging expectations",
+    require("local game" in readme.lower() and "debug logging" in readme.lower() and "debug overlays" in readme.lower(),
+            "README must document local-only gameplay and debug logging/overlay expectations",
             failures)
     require("scripts/check-baseline.py" in vision and "asset" in vision.lower(),
             "VISION must describe the current static SpriteKit baseline",
             failures)
-    require("debug logging" in security.lower() and "make check" in security,
-            "SECURITY must document debug logging and static baseline guardrails",
+    require("debug logging" in security.lower() and "debug overlays" in security.lower() and "make check" in security,
+            "SECURITY must document debug logging/overlay and static baseline guardrails",
             failures)
-    require("debug console logging" in changes and "projectile" in changes and "make check" in changes,
-            "CHANGES must record the debug logging cleanup, projectile guard, and baseline",
+    require("debug console logging" in changes and "debug overlays" in changes and "player-hit" in changes and "projectile" in changes and "make check" in changes,
+            "CHANGES must record the debug cleanup, contact handling, projectile guard, and baseline",
             failures)
     require("status: completed" in plan,
             "plan must be marked completed",

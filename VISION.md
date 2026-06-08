@@ -21,7 +21,8 @@ Priority:
 - Maintain asset and sound file alignment with project references
 - Avoid adding account or network behavior without a clear purpose
 - Keep `scripts/check-baseline.py` passing for bundled resources, Xcode
-  metadata, SpriteKit source inventory, local-only gameplay, and debug logging guardrails
+  metadata, SpriteKit source inventory, local-only gameplay, contact handling,
+  and debug logging/overlay guardrails
 
 Next priorities:
 

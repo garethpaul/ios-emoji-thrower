@@ -75,6 +75,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - Review changes touching mobile permissions or privacy-sensitive device data; examples from the scan include EmojiThrower/GameScene.swift.
 - Review changes touching file, media, JSON, XML, CSV, OCR, or data parsing; examples from the scan include EmojiThrower/GameScene.swift, EmojiThrower/Info.plist.
 - Debug logging from launch and gameplay paths should stay removed; score should remain visible in-game rather than printed to the console.
+- Runtime debug overlays should stay disabled outside explicit troubleshooting builds.
 - Resource changes should keep image, sound, font, scene, and Xcode project references aligned.
 
 ## Maintenance Notes

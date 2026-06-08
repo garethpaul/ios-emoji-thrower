@@ -87,8 +87,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 ])
             ))
         scoreLabel.fontSize = 50
-        scoreLabel.position = CGPoint(x: (self.view?.frame.width)!/2, y: (self.view?.frame.height)!-40)
+        scoreLabel.position = CGPoint(x: view.frame.width/2, y: view.frame.height-40)
         scoreLabel.fontColor = #colorLiteral(red: 0.137254902, green: 0.137254902, blue: 0.3450980392, alpha: 1)
+        scoreLabel.text = "Score: 0"
         addChild(scoreLabel)
     }
     //MARK: - Create a random number
@@ -281,7 +282,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
         if ((firstBody.categoryBitMask & PhysicsCategory.Monster != 0) &&
             (secondBody.categoryBitMask & PhysicsCategory.Projectile != 0)) {
-            projectileDidCollideWithMonster(firstBody.node as! SKSpriteNode, monster: secondBody.node as! SKSpriteNode)
+            guard let monster = firstBody.node as? SKSpriteNode,
+                let projectile = secondBody.node as? SKSpriteNode else {
+                    return
+            }
+            projectileDidCollideWithMonster(projectile, monster: monster)
+        }
+
+        if ((firstBody.categoryBitMask & PhysicsCategory.Monster != 0) &&
+            (secondBody.categoryBitMask & PhysicsCategory.Player != 0)) {
+            guard let monster = firstBody.node as? SKSpriteNode,
+                let player = secondBody.node as? SKSpriteNode else {
+                    return
+            }
+            monsterDidCollideWithPlayer(monster, player: player)
         }
         
     }
