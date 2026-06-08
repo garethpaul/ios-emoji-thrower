@@ -10,7 +10,7 @@ status: completed
 
 - Remove launch/gameplay debug console logging while keeping visible score behavior in the scene.
 - Disable SpriteKit debug overlays in the main game view.
-- Guard projectile launches before vector normalization.
+- Guard projectile launches and zero-length vector normalization.
 - Guard physics contact casts and keep player-hit handling wired.
 - Add a local `make check` baseline for Xcode metadata, plist/storyboard/asset JSON, source inventory, bundled resources, and local-only gameplay guardrails.
 - Keep the game dependency-free and free of network, analytics, account, or upload behavior.

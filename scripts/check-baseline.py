@@ -141,6 +141,9 @@ def main():
     require("SKAction.playSoundFileNamed" in game_scene and "background-music-aac.caf" in game_scene,
             "GameScene must keep bundled sound playback references",
             failures)
+    require("let pointLength = length()" in game_scene and "return CGPoint.zero" in game_scene,
+            "CGPoint normalization must handle zero-length vectors",
+            failures)
     require("if (offset.x <= 0) { return }" in game_scene and "let direction = offset.normalized()" in game_scene,
             "GameScene must guard non-forward projectile vectors before normalization",
             failures)
@@ -183,8 +186,8 @@ def main():
     require("debug logging" in security.lower() and "debug overlays" in security.lower() and "make check" in security,
             "SECURITY must document debug logging/overlay and static baseline guardrails",
             failures)
-    require("debug console logging" in changes and "debug overlays" in changes and "player-hit" in changes and "projectile" in changes and "make check" in changes,
-            "CHANGES must record the debug cleanup, contact handling, projectile guard, and baseline",
+    require("debug console logging" in changes and "debug overlays" in changes and "player-hit" in changes and "projectile" in changes and "zero-length" in changes and "make check" in changes,
+            "CHANGES must record the debug cleanup, contact handling, vector guard, and baseline",
             failures)
     require("status: completed" in plan,
             "plan must be marked completed",

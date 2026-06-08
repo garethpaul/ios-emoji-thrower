@@ -32,7 +32,11 @@ extension CGPoint {
     }
     
     func normalized() -> CGPoint {
-        return self / length()
+        let pointLength = length()
+        if pointLength == 0 {
+            return CGPoint.zero
+        }
+        return self / pointLength
     }
 }
 
