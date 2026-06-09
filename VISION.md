@@ -52,8 +52,8 @@ opt-in, documented, and unnecessary data collection should be avoided.
 Current baseline: `make check` runs `scripts/check-baseline.py` without Xcode.
 It verifies plist/storyboard/asset metadata, bundled resource references,
 SpriteKit scene sources, image helper fallbacks, game-over transition guards,
-spawn lifecycle guards, and local-only gameplay with no debug logging, network,
-analytics, upload, or persistence behavior.
+spawn lifecycle guards, background scroll movement, and local-only gameplay with
+no debug logging, network, analytics, upload, or persistence behavior.
 
 ## What We Will Not Merge (For Now)
 

@@ -190,7 +190,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.enumerateChildNodes(withName: "background", using: { (node, stop) -> Void in
             if let bg = node as? SKSpriteNode {
                 bg.size = self.frame.size
-                bg.position = CGPoint(x: 0 - self.backgroundVelocity, y: bg.position.y)
+                bg.position = CGPoint(x: bg.position.x - self.backgroundVelocity, y: bg.position.y)
                 bg.zPosition = -13
                 // Checks if bg node is completely scrolled off the screen, if yes, then puts it at the end of the other node.
                 if bg.position.x <= -bg.size.width {
