@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE_PLAN = ROOT / "docs/plans/2026-06-08-spritekit-baseline.md"
+MAKE_GATES_PLAN = ROOT / "docs/plans/2026-06-09-make-gate-aliases.md"
 IMAGE_GUARD_PLAN = ROOT / "docs/plans/2026-06-08-image-helper-guard.md"
 GAME_OVER_PLAN = ROOT / "docs/plans/2026-06-08-game-over-transition-guard.md"
 SPAWN_LIFECYCLE_PLAN = ROOT / "docs/plans/2026-06-08-spawn-lifecycle-guard.md"
@@ -88,6 +89,7 @@ def main():
         "EmojiThrower/Sounds/pew-pew-lei.caf",
         "EmojiThrower/Sketch3D.otf",
         "docs/plans/2026-06-08-spritekit-baseline.md",
+        "docs/plans/2026-06-09-make-gate-aliases.md",
         "docs/plans/2026-06-08-image-helper-guard.md",
         "docs/plans/2026-06-08-game-over-transition-guard.md",
         "docs/plans/2026-06-08-spawn-lifecycle-guard.md",
@@ -127,7 +129,9 @@ def main():
     security = read("SECURITY.md")
     changes = read("CHANGES.md")
     gitignore = read(".gitignore")
+    makefile = read("Makefile")
     baseline_plan = BASELINE_PLAN.read_text(encoding="utf-8") if BASELINE_PLAN.exists() else ""
+    make_gates_plan = MAKE_GATES_PLAN.read_text(encoding="utf-8") if MAKE_GATES_PLAN.exists() else ""
     image_guard_plan = IMAGE_GUARD_PLAN.read_text(encoding="utf-8") if IMAGE_GUARD_PLAN.exists() else ""
     game_over_plan = GAME_OVER_PLAN.read_text(encoding="utf-8") if GAME_OVER_PLAN.exists() else ""
     spawn_lifecycle_plan = SPAWN_LIFECYCLE_PLAN.read_text(encoding="utf-8") if SPAWN_LIFECYCLE_PLAN.exists() else ""
@@ -244,7 +248,10 @@ def main():
     require("*.local.xcconfig" in gitignore and ".env" in gitignore and "DerivedData" in gitignore,
             ".gitignore must exclude local config and Xcode build products",
             failures)
-    require("make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme and
+    require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
+            "Makefile must expose lint, test, and build aliases for the local baseline",
+            failures)
+    require("make lint" in readme and "make test" in readme and "make build" in readme and "make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme and
             "image" in readme.lower() and "game-over" in readme.lower() and "spawn" in readme.lower() and
             "background scroll" in readme.lower() and "collision handler" in readme.lower() and "contact delegate" in readme.lower(),
             "README must document static verification, project usage, SpriteKit context, collision handler guardrails, and image guardrails",
@@ -252,7 +259,7 @@ def main():
     require("local game" in readme.lower() and "debug logging" in readme.lower() and "debug overlays" in readme.lower(),
             "README must document local-only gameplay and debug logging/overlay expectations",
             failures)
-    require("scripts/check-baseline.py" in vision and "asset" in vision.lower() and
+    require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and "make build" in vision and "asset" in vision.lower() and
             "game-over" in vision.lower() and "spawn" in vision.lower() and
             "background scroll" in vision.lower() and "collision handler" in vision.lower() and "contact delegate" in vision.lower(),
             "VISION must describe the current static SpriteKit baseline",
@@ -264,7 +271,7 @@ def main():
             failures)
     require("debug console logging" in changes and "debug overlays" in changes and "player-hit" in changes and
             "projectile" in changes and "zero-length" in changes and "image" in changes.lower() and
-            "game-over" in changes.lower() and "spawn" in changes.lower() and "background scroll" in changes.lower() and "make check" in changes,
+            "game-over" in changes.lower() and "spawn" in changes.lower() and "background scroll" in changes.lower() and "make check" in changes and "make lint" in changes and "make test" in changes and "make build" in changes,
             "CHANGES must record the debug cleanup, contact handling, vector guard, image guard, game-over guard, spawn guard, and baseline",
             failures)
     require("collision handler" in changes.lower(),
@@ -276,6 +283,9 @@ def main():
     require("status: completed" in baseline_plan and "status: completed" in image_guard_plan and
             "status: completed" in game_over_plan and "status: completed" in spawn_lifecycle_plan,
             "plans must be marked completed",
+            failures)
+    require("status: completed" in make_gates_plan,
+            "make gate aliases plan must be marked completed",
             failures)
     require("status: completed" in background_scroll_plan,
             "background scroll position plan must be marked completed",

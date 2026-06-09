@@ -28,6 +28,8 @@ Priority:
 - Keep `scripts/check-baseline.py` passing for bundled resources, Xcode
   metadata, SpriteKit source inventory, local-only gameplay, contact handling,
   and debug logging/overlay guardrails
+- Keep `make lint`, `make test`, `make build`, and `make check` available as
+  local verification gates
 
 Next priorities:
 
@@ -51,12 +53,13 @@ Canonical security policy and reporting:
 This is a local game sample. Future networking, accounts, or analytics should be
 opt-in, documented, and unnecessary data collection should be avoided.
 
-Current baseline: `make check` runs `scripts/check-baseline.py` without Xcode.
-It verifies plist/storyboard/asset metadata, bundled resource references,
-SpriteKit scene sources, image helper fallbacks, game-over transition guards,
-collision handler game-over guards, contact delegate cleanup, spawn lifecycle
-guards, background scroll movement, and local-only gameplay with no debug
-logging, network, analytics, upload, or persistence behavior.
+Current baseline: `make lint`, `make test`, `make build`, and `make check` run
+`scripts/check-baseline.py` without Xcode. It verifies plist/storyboard/asset
+metadata, bundled resource references, SpriteKit scene sources, image helper
+fallbacks, game-over transition guards, collision handler game-over guards,
+contact delegate cleanup, spawn lifecycle guards, background scroll movement,
+and local-only gameplay with no debug logging, network, analytics, upload, or
+persistence behavior.
 
 ## What We Will Not Merge (For Now)
 

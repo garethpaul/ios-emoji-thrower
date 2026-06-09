@@ -2,6 +2,8 @@
 
 ## 2026-06-09
 
+- Added local `make lint`, `make test`, and `make build` gate aliases for the
+  static SpriteKit baseline.
 - Cleared the physics contact delegate before game-over scene transitions so
   late SpriteKit contacts do not keep dispatching into the old scene.
 
