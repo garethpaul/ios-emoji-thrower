@@ -50,6 +50,7 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 - Open `EmojiThrower.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
 - The game uses SpriteKit scene logic, bundled image resources, sound files, and `Sketch3D.otf`.
 - Win and loss paths share a guarded game-over presenter so contacts do not trigger repeated scene transitions.
+- Collision handlers ignore late callbacks after game-over presentation begins.
 - Enemy spawning is keyed and stopped when game-over presentation starts.
 - Background scroll movement advances from each node's current position.
 - This is a local game sample. Do not add accounts, analytics, persistence, upload, or network behavior without a dedicated design and security review.
@@ -62,7 +63,7 @@ Run the local static baseline:
 make check
 ```
 
-The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, validates the binary SpriteKit scene plist, checks Xcode resource references, verifies the Swift source inventory, and guards against image-helper force unwraps, repeated game-over transitions, late spawn actions, broken background scroll movement, debug logging, network, analytics, upload, or persistence behavior.
+The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, validates the binary SpriteKit scene plist, checks Xcode resource references, verifies the Swift source inventory, and guards against image-helper force unwraps, repeated game-over transitions, late collision handler mutations, late spawn actions, broken background scroll movement, debug logging, network, analytics, upload, or persistence behavior.
 
 For full legacy verification on macOS, use Xcode's test action or `xcodebuild test` with the appropriate scheme and destination.
 
@@ -87,6 +88,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.
 - See `docs/plans/2026-06-09-background-scroll-position.md` for the background scroll position guardrail.
+- See `docs/plans/2026-06-09-collision-handler-game-over-guard.md` for the collision handler guardrail.
 - Run `make check` before pushing changes to Swift sources, plist/storyboard files, SpriteKit assets, sounds, fonts, Xcode metadata, or gameplay/privacy documentation.
 
 ## Contributing

@@ -10,6 +10,7 @@
 - Guarded rounded image helper asset loading and rendered image output.
 - Guarded physics contact node casts and restored player-hit handling.
 - Added a guarded game-over presenter so win/loss contacts cannot trigger repeated transitions.
+- Guarded collision handlers so late callbacks cannot mutate score or player state after game over starts.
 - Keyed the enemy spawn action and stopped it when game-over presentation starts.
 - Fixed background scroll movement so nodes advance from their current position.
 - Added `make check` and a static SpriteKit baseline for plist/storyboard/asset metadata, bundled resources, Xcode project wiring, source inventory, and local-only gameplay guardrails.

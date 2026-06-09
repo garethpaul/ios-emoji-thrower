@@ -21,6 +21,7 @@ Priority:
 - Maintain asset and sound file alignment with project references
 - Keep optional image helper rendering tolerant of missing assets
 - Keep game-over transitions guarded against repeated contact handling
+- Keep collision handlers from mutating score or player state after game over
 - Stop enemy spawning as soon as game-over presentation starts
 - Avoid adding account or network behavior without a clear purpose
 - Keep `scripts/check-baseline.py` passing for bundled resources, Xcode
@@ -52,8 +53,9 @@ opt-in, documented, and unnecessary data collection should be avoided.
 Current baseline: `make check` runs `scripts/check-baseline.py` without Xcode.
 It verifies plist/storyboard/asset metadata, bundled resource references,
 SpriteKit scene sources, image helper fallbacks, game-over transition guards,
-spawn lifecycle guards, background scroll movement, and local-only gameplay with
-no debug logging, network, analytics, upload, or persistence behavior.
+collision handler game-over guards, spawn lifecycle guards, background scroll
+movement, and local-only gameplay with no debug logging, network, analytics,
+upload, or persistence behavior.
 
 ## What We Will Not Merge (For Now)
 

@@ -266,6 +266,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     //MARK: - Projectile Collision Actions
     func projectileDidCollideWithMonster(_ projectile:SKSpriteNode, monster:SKSpriteNode) {
+        if gameIsOver { return }
+
         monstersDestroyed += 1
         scoreLabel.text = "Score: \(monstersDestroyed)"
         projectile.removeFromParent()
@@ -280,6 +282,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     func monsterDidCollideWithPlayer(_ monster:SKSpriteNode, player:SKSpriteNode) {
+        if gameIsOver { return }
+
         playerDestroyed = true
 
         player.removeFromParent()

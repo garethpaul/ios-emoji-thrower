@@ -31,7 +31,7 @@ Helpful reports include:
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.
 - This should remain a local game sample. Treat new accounts, analytics, persistence, upload, networking, or telemetry as security-sensitive until the data flow and user value are documented.
 - Debug logging and runtime debug overlays should stay removed from normal gameplay paths; use visible in-game state for score feedback instead of console output.
-- `make check` runs a static baseline that guards bundled resource references, image helper fallbacks, spawn lifecycle guards, background scroll movement, plist/storyboard metadata, Xcode project wiring, source inventory, debug logging, and local-only gameplay behavior when Xcode is unavailable.
+- `make check` runs a static baseline that guards bundled resource references, image helper fallbacks, collision handler game-over guards, spawn lifecycle guards, background scroll movement, plist/storyboard metadata, Xcode project wiring, source inventory, debug logging, and local-only gameplay behavior when Xcode is unavailable.
 
 ## Mobile Privacy Notes
 
