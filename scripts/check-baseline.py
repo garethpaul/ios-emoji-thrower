@@ -15,6 +15,7 @@ GAME_OVER_PLAN = ROOT / "docs/plans/2026-06-08-game-over-transition-guard.md"
 SPAWN_LIFECYCLE_PLAN = ROOT / "docs/plans/2026-06-08-spawn-lifecycle-guard.md"
 BACKGROUND_SCROLL_PLAN = ROOT / "docs/plans/2026-06-09-background-scroll-position.md"
 COLLISION_HANDLER_PLAN = ROOT / "docs/plans/2026-06-09-collision-handler-game-over-guard.md"
+CONTACT_DELEGATE_PLAN = ROOT / "docs/plans/2026-06-09-contact-delegate-game-over-guard.md"
 
 
 def require(condition, message, failures):
@@ -92,6 +93,7 @@ def main():
         "docs/plans/2026-06-08-spawn-lifecycle-guard.md",
         "docs/plans/2026-06-09-background-scroll-position.md",
         "docs/plans/2026-06-09-collision-handler-game-over-guard.md",
+        "docs/plans/2026-06-09-contact-delegate-game-over-guard.md",
         "docs/readme-overview.svg",
     ]
 
@@ -131,6 +133,7 @@ def main():
     spawn_lifecycle_plan = SPAWN_LIFECYCLE_PLAN.read_text(encoding="utf-8") if SPAWN_LIFECYCLE_PLAN.exists() else ""
     background_scroll_plan = BACKGROUND_SCROLL_PLAN.read_text(encoding="utf-8") if BACKGROUND_SCROLL_PLAN.exists() else ""
     collision_handler_plan = COLLISION_HANDLER_PLAN.read_text(encoding="utf-8") if COLLISION_HANDLER_PLAN.exists() else ""
+    contact_delegate_plan = CONTACT_DELEGATE_PLAN.read_text(encoding="utf-8") if CONTACT_DELEGATE_PLAN.exists() else ""
 
     require("IPHONEOS_DEPLOYMENT_TARGET = 10.0;" in project and "SWIFT_VERSION = 3.0;" in project,
             "Xcode project must preserve the legacy iOS 10 / Swift 3 settings",
@@ -193,6 +196,14 @@ def main():
             "gameIsOver = true" in game_scene,
             "GameScene must guard repeated game-over transition handling",
             failures)
+    present_game_over_index = game_scene.find("func presentGameOver")
+    contact_delegate_clear_index = game_scene.find("physicsWorld.contactDelegate = nil", present_game_over_index)
+    present_scene_index = game_scene.find("presentScene", present_game_over_index)
+    require("physicsWorld.contactDelegate = self" in game_scene and
+            present_game_over_index != -1 and contact_delegate_clear_index != -1 and
+            present_scene_index != -1 and contact_delegate_clear_index < present_scene_index,
+            "GameScene must clear the physics contact delegate before presenting game over",
+            failures)
     require("presentGameOver(won: true, transition: reveal)" in game_scene and
             "presentGameOver(won: false, transition: reveal)" in game_scene,
             "GameScene win and loss paths must use the guarded game-over presenter",
@@ -235,7 +246,7 @@ def main():
             failures)
     require("make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme and
             "image" in readme.lower() and "game-over" in readme.lower() and "spawn" in readme.lower() and
-            "background scroll" in readme.lower() and "collision handler" in readme.lower(),
+            "background scroll" in readme.lower() and "collision handler" in readme.lower() and "contact delegate" in readme.lower(),
             "README must document static verification, project usage, SpriteKit context, collision handler guardrails, and image guardrails",
             failures)
     require("local game" in readme.lower() and "debug logging" in readme.lower() and "debug overlays" in readme.lower(),
@@ -243,12 +254,12 @@ def main():
             failures)
     require("scripts/check-baseline.py" in vision and "asset" in vision.lower() and
             "game-over" in vision.lower() and "spawn" in vision.lower() and
-            "background scroll" in vision.lower() and "collision handler" in vision.lower(),
+            "background scroll" in vision.lower() and "collision handler" in vision.lower() and "contact delegate" in vision.lower(),
             "VISION must describe the current static SpriteKit baseline",
             failures)
     require("debug logging" in security.lower() and "debug overlays" in security.lower() and
             "spawn" in security.lower() and "background scroll" in security.lower() and
-            "collision handler" in security.lower() and "make check" in security,
+            "collision handler" in security.lower() and "contact delegate" in security.lower() and "make check" in security,
             "SECURITY must document debug logging/overlay and static baseline guardrails",
             failures)
     require("debug console logging" in changes and "debug overlays" in changes and "player-hit" in changes and
@@ -259,6 +270,9 @@ def main():
     require("collision handler" in changes.lower(),
             "CHANGES must record the collision handler game-over guard",
             failures)
+    require("contact delegate" in changes.lower(),
+            "CHANGES must record the contact delegate game-over guard",
+            failures)
     require("status: completed" in baseline_plan and "status: completed" in image_guard_plan and
             "status: completed" in game_over_plan and "status: completed" in spawn_lifecycle_plan,
             "plans must be marked completed",
@@ -268,6 +282,9 @@ def main():
             failures)
     require("status: completed" in collision_handler_plan,
             "collision handler game-over guard plan must be marked completed",
+            failures)
+    require("status: completed" in contact_delegate_plan,
+            "contact delegate game-over guard plan must be marked completed",
             failures)
 
     if shutil.which("xcodebuild"):

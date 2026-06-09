@@ -260,6 +260,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if gameIsOver { return }
         gameIsOver = true
         removeAction(forKey: "monsterSpawn")
+        physicsWorld.contactDelegate = nil
         let gameOverScene = GameOverScene(size: self.size, won: won)
         self.view?.presentScene(gameOverScene, transition: transition)
     }

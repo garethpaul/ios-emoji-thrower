@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-09
+
+- Cleared the physics contact delegate before game-over scene transitions so
+  late SpriteKit contacts do not keep dispatching into the old scene.
+
 ## 2026-06-08
 
 - Removed launch and gameplay debug console logging while preserving in-game score updates.
