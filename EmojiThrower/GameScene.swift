@@ -202,8 +202,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func update(_ currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
-        
-        //self.moveBackground()
+        if !gameIsOver {
+            moveBackground()
+        }
     }
     
     

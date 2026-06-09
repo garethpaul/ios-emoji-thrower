@@ -6,6 +6,8 @@
   static SpriteKit baseline.
 - Cleared the physics contact delegate before game-over scene transitions so
   late SpriteKit contacts do not keep dispatching into the old scene.
+- Enabled per-frame background scroll updates until game-over presentation
+  starts.
 
 ## 2026-06-08
 

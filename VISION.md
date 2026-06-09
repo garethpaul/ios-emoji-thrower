@@ -24,6 +24,7 @@ Priority:
 - Keep collision handlers from mutating score or player state after game over
 - Clear the physics contact delegate before game-over scene transitions
 - Stop enemy spawning as soon as game-over presentation starts
+- Keep background scroll movement running per-frame until game over
 - Avoid adding account or network behavior without a clear purpose
 - Keep `scripts/check-baseline.py` passing for bundled resources, Xcode
   metadata, SpriteKit source inventory, local-only gameplay, contact handling,
@@ -57,9 +58,9 @@ Current baseline: `make lint`, `make test`, `make build`, and `make check` run
 `scripts/check-baseline.py` without Xcode. It verifies plist/storyboard/asset
 metadata, bundled resource references, SpriteKit scene sources, image helper
 fallbacks, game-over transition guards, collision handler game-over guards,
-contact delegate cleanup, spawn lifecycle guards, background scroll movement,
-and local-only gameplay with no debug logging, network, analytics, upload, or
-persistence behavior.
+contact delegate cleanup, spawn lifecycle guards, per-frame background scroll
+movement, and local-only gameplay with no debug logging, network, analytics,
+upload, or persistence behavior.
 
 ## What We Will Not Merge (For Now)
 

@@ -56,7 +56,8 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 - Collision handlers ignore late callbacks after game-over presentation begins.
 - The game-over presenter clears the physics contact delegate before scene transition.
 - Enemy spawning is keyed and stopped when game-over presentation starts.
-- Background scroll movement advances from each node's current position.
+- Background scroll movement advances per-frame from each node's current
+  position until game over.
 - This is a local game sample. Do not add accounts, analytics, persistence, upload, or network behavior without a dedicated design and security review.
 
 ## Testing and Verification
@@ -74,7 +75,7 @@ The `lint`, `test`, and `build` targets intentionally alias the static baseline
 on hosts without the legacy Xcode toolchain, so the standard local gate commands
 stay available while preserving the single source of truth.
 
-The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, validates the binary SpriteKit scene plist, checks Xcode resource references, verifies the Swift source inventory, and guards against image-helper force unwraps, repeated game-over transitions, late collision handler mutations, uncleared contact delegate callbacks, late spawn actions, broken background scroll movement, debug logging, network, analytics, upload, or persistence behavior.
+The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, validates the binary SpriteKit scene plist, checks Xcode resource references, verifies the Swift source inventory, and guards against image-helper force unwraps, repeated game-over transitions, late collision handler mutations, uncleared contact delegate callbacks, late spawn actions, broken per-frame background scroll movement, debug logging, network, analytics, upload, or persistence behavior.
 
 For full legacy verification on macOS, use Xcode's test action or `xcodebuild test` with the appropriate scheme and destination.
 
@@ -99,6 +100,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.
 - See `docs/plans/2026-06-09-background-scroll-position.md` for the background scroll position guardrail.
+- See `docs/plans/2026-06-09-background-scroll-update.md` for the per-frame background scroll guardrail.
 - See `docs/plans/2026-06-09-collision-handler-game-over-guard.md` for the collision handler guardrail.
 - See `docs/plans/2026-06-09-contact-delegate-game-over-guard.md` for the contact delegate game-over guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
