@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE_PLAN = ROOT / "docs/plans/2026-06-08-spritekit-baseline.md"
 IMAGE_GUARD_PLAN = ROOT / "docs/plans/2026-06-08-image-helper-guard.md"
+GAME_OVER_PLAN = ROOT / "docs/plans/2026-06-08-game-over-transition-guard.md"
 
 
 def require(condition, message, failures):
@@ -84,6 +85,7 @@ def main():
         "EmojiThrower/Sketch3D.otf",
         "docs/plans/2026-06-08-spritekit-baseline.md",
         "docs/plans/2026-06-08-image-helper-guard.md",
+        "docs/plans/2026-06-08-game-over-transition-guard.md",
         "docs/readme-overview.svg",
     ]
 
@@ -119,6 +121,7 @@ def main():
     gitignore = read(".gitignore")
     baseline_plan = BASELINE_PLAN.read_text(encoding="utf-8") if BASELINE_PLAN.exists() else ""
     image_guard_plan = IMAGE_GUARD_PLAN.read_text(encoding="utf-8") if IMAGE_GUARD_PLAN.exists() else ""
+    game_over_plan = GAME_OVER_PLAN.read_text(encoding="utf-8") if GAME_OVER_PLAN.exists() else ""
 
     require("IPHONEOS_DEPLOYMENT_TARGET = 10.0;" in project and "SWIFT_VERSION = 3.0;" in project,
             "Xcode project must preserve the legacy iOS 10 / Swift 3 settings",
@@ -163,6 +166,16 @@ def main():
             "as? SKSpriteNode" in game_scene,
             "GameScene must guard physics contact casts and handle projectile/player contacts",
             failures)
+    require("var gameIsOver = false" in game_scene and
+            "func presentGameOver(won: Bool, transition: SKTransition)" in game_scene and
+            "if gameIsOver { return }" in game_scene and
+            "gameIsOver = true" in game_scene,
+            "GameScene must guard repeated game-over transition handling",
+            failures)
+    require("presentGameOver(won: true, transition: reveal)" in game_scene and
+            "presentGameOver(won: false, transition: reveal)" in game_scene,
+            "GameScene win and loss paths must use the guarded game-over presenter",
+            failures)
     game_view_controller = read("EmojiThrower/GameViewController.swift")
     require("guard let skView = view as? SKView" in game_view_controller,
             "GameViewController must guard the SpriteKit view cast",
@@ -185,22 +198,26 @@ def main():
     require("*.local.xcconfig" in gitignore and ".env" in gitignore and "DerivedData" in gitignore,
             ".gitignore must exclude local config and Xcode build products",
             failures)
-    require("make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme and "image" in readme.lower(),
-            "README must document static verification, project usage, SpriteKit context, and image guardrails",
+    require("make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme and
+            "image" in readme.lower() and "game-over" in readme.lower(),
+            "README must document static verification, project usage, SpriteKit context, game-over guardrails, and image guardrails",
             failures)
     require("local game" in readme.lower() and "debug logging" in readme.lower() and "debug overlays" in readme.lower(),
             "README must document local-only gameplay and debug logging/overlay expectations",
             failures)
-    require("scripts/check-baseline.py" in vision and "asset" in vision.lower(),
+    require("scripts/check-baseline.py" in vision and "asset" in vision.lower() and "game-over" in vision.lower(),
             "VISION must describe the current static SpriteKit baseline",
             failures)
     require("debug logging" in security.lower() and "debug overlays" in security.lower() and "make check" in security,
             "SECURITY must document debug logging/overlay and static baseline guardrails",
             failures)
-    require("debug console logging" in changes and "debug overlays" in changes and "player-hit" in changes and "projectile" in changes and "zero-length" in changes and "image" in changes.lower() and "make check" in changes,
-            "CHANGES must record the debug cleanup, contact handling, vector guard, image guard, and baseline",
+    require("debug console logging" in changes and "debug overlays" in changes and "player-hit" in changes and
+            "projectile" in changes and "zero-length" in changes and "image" in changes.lower() and
+            "game-over" in changes.lower() and "make check" in changes,
+            "CHANGES must record the debug cleanup, contact handling, vector guard, image guard, game-over guard, and baseline",
             failures)
-    require("status: completed" in baseline_plan and "status: completed" in image_guard_plan,
+    require("status: completed" in baseline_plan and "status: completed" in image_guard_plan and
+            "status: completed" in game_over_plan,
             "plans must be marked completed",
             failures)
 

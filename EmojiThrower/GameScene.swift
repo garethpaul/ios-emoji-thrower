@@ -58,6 +58,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var monstersDestroyed = 0
     
     var playerDestroyed = false
+    var gameIsOver = false
     
     let scoreLabel = SKLabelNode(fontNamed: "Sketch3D")
     let backgroundVelocity : CGFloat = 3.0
@@ -207,6 +208,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     //MARK: - Projectile Launching Function
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if gameIsOver { return }
         
         // Choose one of the touches to work with
         guard let touch = touches.first else {
@@ -252,6 +254,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Projectile sound effect
         run(SKAction.playSoundFileNamed("pew-pew-lei.caf", waitForCompletion: false))
     }
+
+    func presentGameOver(won: Bool, transition: SKTransition) {
+        if gameIsOver { return }
+        gameIsOver = true
+        let gameOverScene = GameOverScene(size: self.size, won: won)
+        self.view?.presentScene(gameOverScene, transition: transition)
+    }
     
     //MARK: - Projectile Collision Actions
     func projectileDidCollideWithMonster(_ projectile:SKSpriteNode, monster:SKSpriteNode) {
@@ -265,8 +274,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // keep score
         if (monstersDestroyed >= 20) {
             let reveal = SKTransition.flipHorizontal(withDuration: 2)
-            let gameOverScene = GameOverScene(size: self.size, won: true)
-            self.view?.presentScene(gameOverScene, transition: reveal)
+            presentGameOver(won: true, transition: reveal)
         }
     }
     func monsterDidCollideWithPlayer(_ monster:SKSpriteNode, player:SKSpriteNode) {
@@ -276,12 +284,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         if playerDestroyed == true {
             let reveal = SKTransition.flipVertical(withDuration: 2)
-            let gameOverScene = GameOverScene(size: self.size, won: false)
-            self.view?.presentScene(gameOverScene, transition: reveal)
+            presentGameOver(won: false, transition: reveal)
         }
     }
     //MARK: - Contact Delegate Methods
     func didBegin(_ contact: SKPhysicsContact) {
+        if gameIsOver { return }
         
         var firstBody: SKPhysicsBody
         var secondBody: SKPhysicsBody

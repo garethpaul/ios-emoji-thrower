@@ -20,6 +20,7 @@ Priority:
 - Keep scene, score, and game-over behavior easy to inspect
 - Maintain asset and sound file alignment with project references
 - Keep optional image helper rendering tolerant of missing assets
+- Keep game-over transitions guarded against repeated contact handling
 - Avoid adding account or network behavior without a clear purpose
 - Keep `scripts/check-baseline.py` passing for bundled resources, Xcode
   metadata, SpriteKit source inventory, local-only gameplay, contact handling,
@@ -49,8 +50,9 @@ opt-in, documented, and unnecessary data collection should be avoided.
 
 Current baseline: `make check` runs `scripts/check-baseline.py` without Xcode.
 It verifies plist/storyboard/asset metadata, bundled resource references,
-SpriteKit scene sources, image helper fallbacks, and local-only gameplay with no
-debug logging, network, analytics, upload, or persistence behavior.
+SpriteKit scene sources, image helper fallbacks, game-over transition guards,
+and local-only gameplay with no debug logging, network, analytics, upload, or
+persistence behavior.
 
 ## What We Will Not Merge (For Now)
 
