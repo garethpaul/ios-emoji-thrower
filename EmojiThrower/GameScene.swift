@@ -90,7 +90,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 SKAction.run(addMonster),
                 SKAction.wait(forDuration: 1.0)
                 ])
-            ))
+            ), withKey: "monsterSpawn")
         scoreLabel.fontSize = 50
         scoreLabel.position = CGPoint(x: view.frame.width/2, y: view.frame.height-40)
         scoreLabel.fontColor = #colorLiteral(red: 0.137254902, green: 0.137254902, blue: 0.3450980392, alpha: 1)
@@ -137,6 +137,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     //MARK: - Create Monster Sprite
     func addMonster() {
+        if gameIsOver { return }
         
         // Create sprite
         let monster = SKSpriteNode(imageNamed: "Goblin")
@@ -258,6 +259,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func presentGameOver(won: Bool, transition: SKTransition) {
         if gameIsOver { return }
         gameIsOver = true
+        removeAction(forKey: "monsterSpawn")
         let gameOverScene = GameOverScene(size: self.size, won: won)
         self.view?.presentScene(gameOverScene, transition: transition)
     }

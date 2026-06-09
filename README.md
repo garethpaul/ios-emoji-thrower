@@ -50,6 +50,7 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 - Open `EmojiThrower.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
 - The game uses SpriteKit scene logic, bundled image resources, sound files, and `Sketch3D.otf`.
 - Win and loss paths share a guarded game-over presenter so contacts do not trigger repeated scene transitions.
+- Enemy spawning is keyed and stopped when game-over presentation starts.
 - This is a local game sample. Do not add accounts, analytics, persistence, upload, or network behavior without a dedicated design and security review.
 
 ## Testing and Verification
@@ -60,7 +61,7 @@ Run the local static baseline:
 make check
 ```
 
-The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, validates the binary SpriteKit scene plist, checks Xcode resource references, verifies the Swift source inventory, and guards against image-helper force unwraps, repeated game-over transitions, debug logging, network, analytics, upload, or persistence behavior.
+The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, validates the binary SpriteKit scene plist, checks Xcode resource references, verifies the Swift source inventory, and guards against image-helper force unwraps, repeated game-over transitions, late spawn actions, debug logging, network, analytics, upload, or persistence behavior.
 
 For full legacy verification on macOS, use Xcode's test action or `xcodebuild test` with the appropriate scheme and destination.
 
