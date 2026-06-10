@@ -21,6 +21,7 @@ Priority:
 - Maintain asset and sound file alignment with project references
 - Keep optional image helper rendering tolerant of missing assets
 - Keep game-over transitions guarded against repeated contact handling
+- Keep delayed game-over restarts tied to the current SpriteKit scene
 - Keep collision handlers from mutating score or player state after game over
 - Clear the physics contact delegate before game-over scene transitions
 - Stop enemy spawning as soon as game-over presentation starts
@@ -57,10 +58,10 @@ opt-in, documented, and unnecessary data collection should be avoided.
 Current baseline: `make lint`, `make test`, `make build`, and `make check` run
 `scripts/check-baseline.py` without Xcode. It verifies plist/storyboard/asset
 metadata, bundled resource references, SpriteKit scene sources, image helper
-fallbacks, game-over transition guards, collision handler game-over guards,
-contact delegate cleanup, spawn lifecycle guards, per-frame background scroll
-movement, and local-only gameplay with no debug logging, network, analytics,
-upload, or persistence behavior.
+fallbacks, game-over transition guards, game-over restart handling, collision
+handler game-over guards, contact delegate cleanup, spawn lifecycle guards,
+per-frame background scroll movement, and local-only gameplay with no debug
+logging, network, analytics, upload, or persistence behavior.
 
 ## What We Will Not Merge (For Now)
 

@@ -53,6 +53,7 @@ The checked-in project has no external dependency manifest. Use Xcode for full b
 - Open `EmojiThrower.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
 - The game uses SpriteKit scene logic, bundled image resources, sound files, and `Sketch3D.otf`.
 - Win and loss paths share a guarded game-over presenter so contacts do not trigger repeated scene transitions.
+- Game-over restarts confirm the current scene before presenting a fresh game scene.
 - Collision handlers ignore late callbacks after game-over presentation begins.
 - The game-over presenter clears the physics contact delegate before scene transition.
 - Enemy spawning is keyed and stopped when game-over presentation starts.
@@ -75,7 +76,7 @@ The `lint`, `test`, and `build` targets intentionally alias the static baseline
 on hosts without the legacy Xcode toolchain, so the standard local gate commands
 stay available while preserving the single source of truth.
 
-The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, validates the binary SpriteKit scene plist, checks Xcode resource references, verifies the Swift source inventory, and guards against image-helper force unwraps, repeated game-over transitions, late collision handler mutations, uncleared contact delegate callbacks, late spawn actions, broken per-frame background scroll movement, debug logging, network, analytics, upload, or persistence behavior.
+The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, validates the binary SpriteKit scene plist, checks Xcode resource references, verifies the Swift source inventory, and guards against image-helper force unwraps, repeated game-over transitions, unguarded game-over restarts, late collision handler mutations, uncleared contact delegate callbacks, late spawn actions, broken per-frame background scroll movement, debug logging, network, analytics, upload, or persistence behavior.
 
 For full legacy verification on macOS, use Xcode's test action or `xcodebuild test` with the appropriate scheme and destination.
 
@@ -103,6 +104,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-09-background-scroll-update.md` for the per-frame background scroll guardrail.
 - See `docs/plans/2026-06-09-collision-handler-game-over-guard.md` for the collision handler guardrail.
 - See `docs/plans/2026-06-09-contact-delegate-game-over-guard.md` for the contact delegate game-over guardrail.
+- See `docs/plans/2026-06-10-game-over-restart-guard.md` for the game-over restart guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, plist/storyboard files, SpriteKit assets, sounds, fonts, Xcode metadata, or gameplay/privacy documentation.
 

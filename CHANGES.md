@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-10
+
+- Guarded delayed game-over restarts so only the current game-over scene can
+  present a restarted game scene, using the same resize mode as initial launch.
+
 ## 2026-06-09
 
 - Added local `make lint`, `make test`, and `make build` gate aliases for the

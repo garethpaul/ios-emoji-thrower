@@ -26,11 +26,21 @@ class GameOverScene: SKScene {
             SKAction.wait(forDuration: 3.0),
             SKAction.run() {
                 let reveal = SKTransition.flipHorizontal(withDuration: 0.2)
-                let scene = GameScene(size: size)
-                self.view?.presentScene(scene, transition:reveal)
+                self.restartGame(size: size, transition: reveal)
             }
             ]))
         
+    }
+
+    func restartGame(size: CGSize, transition: SKTransition) -> Bool {
+        guard let view = self.view, view.scene === self else {
+            return false
+        }
+
+        let scene = GameScene(size: size)
+        scene.scaleMode = .resizeFill
+        view.presentScene(scene, transition: transition)
+        return true
     }
     
     required init(coder aDecoder: NSCoder) {

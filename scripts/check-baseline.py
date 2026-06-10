@@ -18,6 +18,7 @@ BACKGROUND_SCROLL_PLAN = ROOT / "docs/plans/2026-06-09-background-scroll-positio
 COLLISION_HANDLER_PLAN = ROOT / "docs/plans/2026-06-09-collision-handler-game-over-guard.md"
 CONTACT_DELEGATE_PLAN = ROOT / "docs/plans/2026-06-09-contact-delegate-game-over-guard.md"
 BACKGROUND_UPDATE_PLAN = ROOT / "docs/plans/2026-06-09-background-scroll-update.md"
+GAME_OVER_RESTART_PLAN = ROOT / "docs/plans/2026-06-10-game-over-restart-guard.md"
 
 
 def require(condition, message, failures):
@@ -98,6 +99,7 @@ def main():
         "docs/plans/2026-06-09-collision-handler-game-over-guard.md",
         "docs/plans/2026-06-09-contact-delegate-game-over-guard.md",
         "docs/plans/2026-06-09-background-scroll-update.md",
+        "docs/plans/2026-06-10-game-over-restart-guard.md",
         "docs/readme-overview.svg",
     ]
 
@@ -141,6 +143,7 @@ def main():
     collision_handler_plan = COLLISION_HANDLER_PLAN.read_text(encoding="utf-8") if COLLISION_HANDLER_PLAN.exists() else ""
     contact_delegate_plan = CONTACT_DELEGATE_PLAN.read_text(encoding="utf-8") if CONTACT_DELEGATE_PLAN.exists() else ""
     background_update_plan = BACKGROUND_UPDATE_PLAN.read_text(encoding="utf-8") if BACKGROUND_UPDATE_PLAN.exists() else ""
+    game_over_restart_plan = GAME_OVER_RESTART_PLAN.read_text(encoding="utf-8") if GAME_OVER_RESTART_PLAN.exists() else ""
 
     require("IPHONEOS_DEPLOYMENT_TARGET = 10.0;" in project and "SWIFT_VERSION = 3.0;" in project,
             "Xcode project must preserve the legacy iOS 10 / Swift 3 settings",
@@ -243,6 +246,14 @@ def main():
     require("showsFPS = false" in game_view_controller and "showsNodeCount = false" in game_view_controller,
             "GameViewController must keep SpriteKit debug overlays disabled",
             failures)
+    game_over_scene = read("EmojiThrower/GameOverScene.swift")
+    require("func restartGame(size: CGSize, transition: SKTransition) -> Bool" in game_over_scene and
+            "guard let view = self.view, view.scene === self else" in game_over_scene and
+            "scene.scaleMode = .resizeFill" in game_over_scene and
+            "view.presentScene(scene, transition: transition)" in game_over_scene and
+            "self.restartGame(size: size, transition: reveal)" in game_over_scene,
+            "GameOverScene must guard delayed restarts and keep restart scale mode aligned",
+            failures)
     require(not re.search(r"\b(?:print|println|NSLog)\s*\(", swift_sources),
             "Game sources must not use debug console logging",
             failures)
@@ -263,7 +274,8 @@ def main():
             failures)
     require("make lint" in readme and "make test" in readme and "make build" in readme and "make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme and
             "image" in readme.lower() and "game-over" in readme.lower() and "spawn" in readme.lower() and
-            "background scroll" in readme.lower() and "per-frame" in readme.lower() and "collision handler" in readme.lower() and "contact delegate" in readme.lower(),
+            "background scroll" in readme.lower() and "per-frame" in readme.lower() and "collision handler" in readme.lower() and
+            "contact delegate" in readme.lower() and "restart" in readme.lower(),
             "README must document static verification, project usage, SpriteKit context, collision handler guardrails, and image guardrails",
             failures)
     require("local game" in readme.lower() and "debug logging" in readme.lower() and "debug overlays" in readme.lower(),
@@ -271,17 +283,20 @@ def main():
             failures)
     require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and "make build" in vision and "asset" in vision.lower() and
             "game-over" in vision.lower() and "spawn" in vision.lower() and
-            "background scroll" in vision.lower() and "per-frame" in vision.lower() and "collision handler" in vision.lower() and "contact delegate" in vision.lower(),
+            "background scroll" in vision.lower() and "per-frame" in vision.lower() and "collision handler" in vision.lower() and
+            "contact delegate" in vision.lower() and "restart" in vision.lower(),
             "VISION must describe the current static SpriteKit baseline",
             failures)
     require("debug logging" in security.lower() and "debug overlays" in security.lower() and
             "spawn" in security.lower() and "background scroll" in security.lower() and "per-frame" in security.lower() and
-            "collision handler" in security.lower() and "contact delegate" in security.lower() and "make check" in security,
+            "collision handler" in security.lower() and "contact delegate" in security.lower() and
+            "restart" in security.lower() and "make check" in security,
             "SECURITY must document debug logging/overlay and static baseline guardrails",
             failures)
     require("debug console logging" in changes and "debug overlays" in changes and "player-hit" in changes and
             "projectile" in changes and "zero-length" in changes and "image" in changes.lower() and
-            "game-over" in changes.lower() and "spawn" in changes.lower() and "background scroll" in changes.lower() and "per-frame" in changes.lower() and "make check" in changes and "make lint" in changes and "make test" in changes and "make build" in changes,
+            "game-over" in changes.lower() and "restart" in changes.lower() and "spawn" in changes.lower() and
+            "background scroll" in changes.lower() and "per-frame" in changes.lower() and "make check" in changes and "make lint" in changes and "make test" in changes and "make build" in changes,
             "CHANGES must record the debug cleanup, contact handling, vector guard, image guard, game-over guard, spawn guard, and baseline",
             failures)
     require("collision handler" in changes.lower(),
@@ -308,6 +323,9 @@ def main():
             failures)
     require("status: completed" in background_update_plan,
             "background scroll update plan must be marked completed",
+            failures)
+    require("status: completed" in game_over_restart_plan,
+            "game-over restart guard plan must be marked completed",
             failures)
 
     if shutil.which("xcodebuild"):
