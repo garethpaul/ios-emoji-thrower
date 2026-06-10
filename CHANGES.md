@@ -2,6 +2,12 @@
 
 ## 2026-06-10
 
+- Migrated the SpriteKit target from Swift 3 to Swift 5.
+- Raised the deployment target from iOS 10 to iOS 12.
+- Replaced the `arc4random` float conversion with bounded
+  `CGFloat.random(in:)` generation.
+- Upgraded Xcode-enabled validation from project parsing to an unsigned iOS
+  Simulator build.
 - Guarded delayed game-over restarts so only the current game-over scene can
   present a restarted game scene, using the same resize mode as initial launch.
 - Added pinned, read-only macOS CI for the canonical `make check` baseline.

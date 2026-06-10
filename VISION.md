@@ -32,13 +32,14 @@ Priority:
   and debug logging/overlay guardrails
 - Keep `make lint`, `make test`, `make build`, and `make check` available as
   local verification gates
-- Keep pinned macOS CI parsing `EmojiThrower.xcodeproj` through the canonical
-  `make check` gate
+- Keep the game target on Swift 5 with the iOS 12 deployment target
+- Keep pinned macOS CI compiling an unsigned simulator build through the
+  canonical `make check` gate
 
 Next priorities:
 
 - Add tests or manual checks for scene loading and score flow
-- Modernize Swift/project settings in a dedicated pass
+- Add focused logic tests when the SpriteKit scene gains a test target
 - Document asset provenance for future replacements
 
 Contribution rules:
@@ -64,8 +65,8 @@ fallbacks, game-over transition guards, game-over restart handling, collision
 handler game-over guards, contact delegate cleanup, spawn lifecycle guards,
 per-frame background scroll movement, and local-only gameplay with no debug
 logging, network, analytics, upload, or persistence behavior.
-On macOS, the baseline should parse the Xcode project without rendering frames,
-playing audio, simulating physics, or running gameplay.
+On macOS, the baseline should compile an unsigned simulator build without
+rendering frames, playing audio, simulating physics, or running gameplay.
 
 ## What We Will Not Merge (For Now)
 

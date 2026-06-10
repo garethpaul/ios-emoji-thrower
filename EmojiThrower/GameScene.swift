@@ -65,7 +65,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func didMove(to view: SKView) {
         // set background color
-        self.backgroundColor = SKColor.white()
+        self.backgroundColor = .white
         self.initializingScrollingBackground()
         // background music
         let backgroundMusic = SKAudioNode(fileNamed: "background-music-aac.caf")
@@ -98,12 +98,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(scoreLabel)
     }
     //MARK: - Create a random number
-    func random() -> CGFloat {
-        return CGFloat(Float(arc4random()) / 0xFFFFFFFF)
-    }
-    // sets parameters of the random number
     func random(min: CGFloat, max: CGFloat) -> CGFloat {
-        return random() * (max - min) + min
+        return CGFloat.random(in: min...max)
     }
     
     //MARK: - Get Profile Picture

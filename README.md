@@ -72,18 +72,19 @@ make build
 make check
 ```
 
-The `lint`, `test`, and `build` targets intentionally alias the static baseline
-on hosts without the legacy Xcode toolchain, so the standard local gate commands
+The `lint`, `test`, and `build` targets intentionally alias the canonical baseline
+on hosts without Xcode, so the standard local gate commands
 stay available while preserving the single source of truth.
 
 The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, validates the binary SpriteKit scene plist, checks Xcode resource references, verifies the Swift source inventory, and guards against image-helper force unwraps, repeated game-over transitions, unguarded game-over restarts, late collision handler mutations, uncleared contact delegate callbacks, late spawn actions, broken per-frame background scroll movement, debug logging, network, analytics, upload, or persistence behavior.
 
 The pinned GitHub Actions check runs `make check` on `macos-15`. When Xcode is
-available, the baseline also runs `xcodebuild -list` against
-`EmojiThrower.xcodeproj` to verify project-file integrity. It does not execute
-SpriteKit gameplay, render frames, play audio, or run physics simulation.
+available, the baseline also compiles an unsigned Swift 5 Debug build for the
+iOS Simulator. It does not launch SpriteKit gameplay, render frames, play audio,
+or run physics simulation.
 
-For full legacy verification on macOS, use Xcode's test action or `xcodebuild test` with the appropriate scheme and destination.
+For runtime verification on macOS, launch the game in a simulator and exercise
+projectiles, collisions, game-over transitions, and restart behavior.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
 

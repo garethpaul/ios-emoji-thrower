@@ -21,6 +21,7 @@ CONTACT_DELEGATE_PLAN = ROOT / "docs/plans/2026-06-09-contact-delegate-game-over
 BACKGROUND_UPDATE_PLAN = ROOT / "docs/plans/2026-06-09-background-scroll-update.md"
 GAME_OVER_RESTART_PLAN = ROOT / "docs/plans/2026-06-10-game-over-restart-guard.md"
 HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
+SWIFT_5_BUILD_PLAN = ROOT / "docs/plans/2026-06-10-swift-5-spritekit-build.md"
 
 
 def require(condition, message, failures):
@@ -104,6 +105,7 @@ def main():
         "docs/plans/2026-06-09-background-scroll-update.md",
         "docs/plans/2026-06-10-game-over-restart-guard.md",
         "docs/plans/2026-06-10-hosted-project-validation.md",
+        "docs/plans/2026-06-10-swift-5-spritekit-build.md",
         "docs/readme-overview.svg",
     ]
 
@@ -149,10 +151,17 @@ def main():
     background_update_plan = BACKGROUND_UPDATE_PLAN.read_text(encoding="utf-8") if BACKGROUND_UPDATE_PLAN.exists() else ""
     game_over_restart_plan = GAME_OVER_RESTART_PLAN.read_text(encoding="utf-8") if GAME_OVER_RESTART_PLAN.exists() else ""
     hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
+    swift_5_build_plan = SWIFT_5_BUILD_PLAN.read_text(encoding="utf-8") if SWIFT_5_BUILD_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
-    require("IPHONEOS_DEPLOYMENT_TARGET = 10.0;" in project and "SWIFT_VERSION = 3.0;" in project,
-            "Xcode project must preserve the legacy iOS 10 / Swift 3 settings",
+    require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
+            "IPHONEOS_DEPLOYMENT_TARGET = 10.0;" not in project and
+            project.count("SWIFT_VERSION = 5.0;") == 2 and
+            "SWIFT_VERSION = 3.0;" not in project,
+            "Xcode project must use Swift 5 with the iOS 12 deployment target",
+            failures)
+    require("[UIApplication.LaunchOptionsKey: Any]?" in swift_sources,
+            "AppDelegate must use the Swift 5 launch-options signature",
             failures)
     for resource in ["Assets.xcassets", "sprites.atlas", "background-music-aac.caf", "pew-pew-lei.caf", "Sketch3D.otf", "GameScene.sks"]:
         require(resource in project, f"Xcode project must keep resource reference: {resource}", failures)
@@ -174,6 +183,9 @@ def main():
             failures)
     require("SKAction.playSoundFileNamed" in game_scene and "background-music-aac.caf" in game_scene,
             "GameScene must keep bundled sound playback references",
+            failures)
+    require("CGFloat.random(in: min...max)" in game_scene and "arc4random" not in game_scene,
+            "GameScene must use Swift bounded random generation",
             failures)
     add_monster_index = game_scene.find("func addMonster()")
     spawn_guard_index = game_scene.find("if gameIsOver { return }", add_monster_index)
@@ -336,6 +348,9 @@ def main():
     require("status: completed" in hosted_validation_plan and "make check" in hosted_validation_plan,
             "hosted project validation plan must be completed and document make check",
             failures)
+    require("status: completed" in swift_5_build_plan and "simulator" in swift_5_build_plan.lower(),
+            "Swift 5 SpriteKit build plan must be completed and document simulator verification",
+            failures)
     require("permissions:\n  contents: read" in workflow,
             "Check workflow must use read-only repository permissions",
             failures)
@@ -350,14 +365,22 @@ def main():
 
     if shutil.which("xcodebuild"):
         result = subprocess.run(
-            ["xcodebuild", "-list", "-project", "EmojiThrower.xcodeproj"],
+            [
+                "xcodebuild",
+                "-project", "EmojiThrower.xcodeproj",
+                "-target", "EmojiThrower",
+                "-configuration", "Debug",
+                "-sdk", "iphonesimulator",
+                "CODE_SIGNING_ALLOWED=NO",
+                "build",
+            ],
             cwd=ROOT,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             text=True,
         )
         require(result.returncode == 0,
-                "xcodebuild could not parse EmojiThrower.xcodeproj: " + result.stderr.strip(),
+                "xcodebuild could not compile EmojiThrower for the simulator: " + result.stdout.strip(),
                 failures)
     else:
         print("xcodebuild unavailable; static iOS baseline only.")
