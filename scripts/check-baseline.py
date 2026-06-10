@@ -4,6 +4,7 @@ import json
 import plistlib
 import re
 import shutil
+import subprocess
 import sys
 import xml.etree.ElementTree as ET
 
@@ -19,6 +20,7 @@ COLLISION_HANDLER_PLAN = ROOT / "docs/plans/2026-06-09-collision-handler-game-ov
 CONTACT_DELEGATE_PLAN = ROOT / "docs/plans/2026-06-09-contact-delegate-game-over-guard.md"
 BACKGROUND_UPDATE_PLAN = ROOT / "docs/plans/2026-06-09-background-scroll-update.md"
 GAME_OVER_RESTART_PLAN = ROOT / "docs/plans/2026-06-10-game-over-restart-guard.md"
+HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
 
 
 def require(condition, message, failures):
@@ -62,6 +64,7 @@ def main():
     failures = []
     required_files = [
         ".gitignore",
+        ".github/workflows/check.yml",
         "CHANGES.md",
         "Makefile",
         "README.md",
@@ -100,6 +103,7 @@ def main():
         "docs/plans/2026-06-09-contact-delegate-game-over-guard.md",
         "docs/plans/2026-06-09-background-scroll-update.md",
         "docs/plans/2026-06-10-game-over-restart-guard.md",
+        "docs/plans/2026-06-10-hosted-project-validation.md",
         "docs/readme-overview.svg",
     ]
 
@@ -144,6 +148,8 @@ def main():
     contact_delegate_plan = CONTACT_DELEGATE_PLAN.read_text(encoding="utf-8") if CONTACT_DELEGATE_PLAN.exists() else ""
     background_update_plan = BACKGROUND_UPDATE_PLAN.read_text(encoding="utf-8") if BACKGROUND_UPDATE_PLAN.exists() else ""
     game_over_restart_plan = GAME_OVER_RESTART_PLAN.read_text(encoding="utf-8") if GAME_OVER_RESTART_PLAN.exists() else ""
+    hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
+    workflow = read(".github/workflows/check.yml")
 
     require("IPHONEOS_DEPLOYMENT_TARGET = 10.0;" in project and "SWIFT_VERSION = 3.0;" in project,
             "Xcode project must preserve the legacy iOS 10 / Swift 3 settings",
@@ -327,9 +333,32 @@ def main():
     require("status: completed" in game_over_restart_plan,
             "game-over restart guard plan must be marked completed",
             failures)
+    require("status: completed" in hosted_validation_plan and "make check" in hosted_validation_plan,
+            "hosted project validation plan must be completed and document make check",
+            failures)
+    require("permissions:\n  contents: read" in workflow,
+            "Check workflow must use read-only repository permissions",
+            failures)
+    require("cancel-in-progress: true" in workflow and "runs-on: macos-15" in workflow and
+            "timeout-minutes: 10" in workflow,
+            "Check workflow must bound duplicate and long-running macOS jobs",
+            failures)
+    require("actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" in workflow and
+            "run: make check" in workflow,
+            "Check workflow must pin checkout and run the canonical baseline",
+            failures)
 
     if shutil.which("xcodebuild"):
-        print("xcodebuild is available; run a scheme-specific Xcode test on macOS before release.")
+        result = subprocess.run(
+            ["xcodebuild", "-list", "-project", "EmojiThrower.xcodeproj"],
+            cwd=ROOT,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        require(result.returncode == 0,
+                "xcodebuild could not parse EmojiThrower.xcodeproj: " + result.stderr.strip(),
+                failures)
     else:
         print("xcodebuild unavailable; static iOS baseline only.")
 

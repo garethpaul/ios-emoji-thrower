@@ -4,6 +4,9 @@
 
 - Guarded delayed game-over restarts so only the current game-over scene can
   present a restarted game scene, using the same resize mode as initial launch.
+- Added pinned, read-only macOS CI for the canonical `make check` baseline.
+- Made Xcode-enabled checks parse `EmojiThrower.xcodeproj` without running
+  SpriteKit gameplay, rendering, audio, or physics simulation.
 
 ## 2026-06-09
 

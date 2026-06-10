@@ -32,6 +32,8 @@ Priority:
   and debug logging/overlay guardrails
 - Keep `make lint`, `make test`, `make build`, and `make check` available as
   local verification gates
+- Keep pinned macOS CI parsing `EmojiThrower.xcodeproj` through the canonical
+  `make check` gate
 
 Next priorities:
 
@@ -62,6 +64,8 @@ fallbacks, game-over transition guards, game-over restart handling, collision
 handler game-over guards, contact delegate cleanup, spawn lifecycle guards,
 per-frame background scroll movement, and local-only gameplay with no debug
 logging, network, analytics, upload, or persistence behavior.
+On macOS, the baseline should parse the Xcode project without rendering frames,
+playing audio, simulating physics, or running gameplay.
 
 ## What We Will Not Merge (For Now)
 
