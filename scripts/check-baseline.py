@@ -20,8 +20,35 @@ COLLISION_HANDLER_PLAN = ROOT / "docs/plans/2026-06-09-collision-handler-game-ov
 CONTACT_DELEGATE_PLAN = ROOT / "docs/plans/2026-06-09-contact-delegate-game-over-guard.md"
 BACKGROUND_UPDATE_PLAN = ROOT / "docs/plans/2026-06-09-background-scroll-update.md"
 GAME_OVER_RESTART_PLAN = ROOT / "docs/plans/2026-06-10-game-over-restart-guard.md"
+CI_PLAN = ROOT / "docs/plans/2026-06-10-ci-baseline.md"
 HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
 SWIFT_5_BUILD_PLAN = ROOT / "docs/plans/2026-06-10-swift-5-spritekit-build.md"
+EXPECTED_WORKFLOW = """name: Check
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  baseline:
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+        with:
+          persist-credentials: false
+      - name: Validate project and SpriteKit baseline
+        run: make check
+"""
 
 
 def require(condition, message, failures):
@@ -66,6 +93,8 @@ def main():
     required_files = [
         ".gitignore",
         ".github/workflows/check.yml",
+        ".github/CODEOWNERS",
+        "AGENTS.md",
         "CHANGES.md",
         "Makefile",
         "README.md",
@@ -104,6 +133,7 @@ def main():
         "docs/plans/2026-06-09-contact-delegate-game-over-guard.md",
         "docs/plans/2026-06-09-background-scroll-update.md",
         "docs/plans/2026-06-10-game-over-restart-guard.md",
+        "docs/plans/2026-06-10-ci-baseline.md",
         "docs/plans/2026-06-10-hosted-project-validation.md",
         "docs/plans/2026-06-10-swift-5-spritekit-build.md",
         "docs/readme-overview.svg",
@@ -140,6 +170,9 @@ def main():
     changes = read("CHANGES.md")
     gitignore = read(".gitignore")
     makefile = read("Makefile")
+    workflow = read(".github/workflows/check.yml")
+    codeowners = read(".github/CODEOWNERS")
+    agent_guidance = read("AGENTS.md")
     baseline_plan = BASELINE_PLAN.read_text(encoding="utf-8") if BASELINE_PLAN.exists() else ""
     make_gates_plan = MAKE_GATES_PLAN.read_text(encoding="utf-8") if MAKE_GATES_PLAN.exists() else ""
     image_guard_plan = IMAGE_GUARD_PLAN.read_text(encoding="utf-8") if IMAGE_GUARD_PLAN.exists() else ""
@@ -150,6 +183,7 @@ def main():
     contact_delegate_plan = CONTACT_DELEGATE_PLAN.read_text(encoding="utf-8") if CONTACT_DELEGATE_PLAN.exists() else ""
     background_update_plan = BACKGROUND_UPDATE_PLAN.read_text(encoding="utf-8") if BACKGROUND_UPDATE_PLAN.exists() else ""
     game_over_restart_plan = GAME_OVER_RESTART_PLAN.read_text(encoding="utf-8") if GAME_OVER_RESTART_PLAN.exists() else ""
+    ci_plan = CI_PLAN.read_text(encoding="utf-8") if CI_PLAN.exists() else ""
     hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
     swift_5_build_plan = SWIFT_5_BUILD_PLAN.read_text(encoding="utf-8") if SWIFT_5_BUILD_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
@@ -293,7 +327,7 @@ def main():
     require("make lint" in readme and "make test" in readme and "make build" in readme and "make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme and
             "image" in readme.lower() and "game-over" in readme.lower() and "spawn" in readme.lower() and
             "background scroll" in readme.lower() and "per-frame" in readme.lower() and "collision handler" in readme.lower() and
-            "contact delegate" in readme.lower() and "restart" in readme.lower(),
+            "contact delegate" in readme.lower() and "restart" in readme.lower() and "GitHub Actions" in readme,
             "README must document static verification, project usage, SpriteKit context, collision handler guardrails, and image guardrails",
             failures)
     require("local game" in readme.lower() and "debug logging" in readme.lower() and "debug overlays" in readme.lower(),
@@ -302,13 +336,13 @@ def main():
     require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and "make build" in vision and "asset" in vision.lower() and
             "game-over" in vision.lower() and "spawn" in vision.lower() and
             "background scroll" in vision.lower() and "per-frame" in vision.lower() and "collision handler" in vision.lower() and
-            "contact delegate" in vision.lower() and "restart" in vision.lower(),
+            "contact delegate" in vision.lower() and "restart" in vision.lower() and "GitHub Actions" in vision,
             "VISION must describe the current static SpriteKit baseline",
             failures)
     require("debug logging" in security.lower() and "debug overlays" in security.lower() and
             "spawn" in security.lower() and "background scroll" in security.lower() and "per-frame" in security.lower() and
             "collision handler" in security.lower() and "contact delegate" in security.lower() and
-            "restart" in security.lower() and "make check" in security,
+            "restart" in security.lower() and "make check" in security and "GitHub Actions" in security,
             "SECURITY must document debug logging/overlay and static baseline guardrails",
             failures)
     require("debug console logging" in changes and "debug overlays" in changes and "player-hit" in changes and
@@ -322,6 +356,9 @@ def main():
             failures)
     require("contact delegate" in changes.lower(),
             "CHANGES must record the contact delegate game-over guard",
+            failures)
+    require("GitHub Actions" in changes,
+            "CHANGES must record the GitHub Actions baseline",
             failures)
     require("status: completed" in baseline_plan and "status: completed" in image_guard_plan and
             "status: completed" in game_over_plan and "status: completed" in spawn_lifecycle_plan,
@@ -345,22 +382,31 @@ def main():
     require("status: completed" in game_over_restart_plan,
             "game-over restart guard plan must be marked completed",
             failures)
+    require("status: completed" in ci_plan and "make check" in ci_plan and
+            "simulator" in ci_plan.lower(),
+            "CI baseline plan must record completed status and make check verification",
+            failures)
     require("status: completed" in hosted_validation_plan and "make check" in hosted_validation_plan,
             "hosted project validation plan must be completed and document make check",
             failures)
     require("status: completed" in swift_5_build_plan and "simulator" in swift_5_build_plan.lower(),
             "Swift 5 SpriteKit build plan must be completed and document simulator verification",
             failures)
-    require("permissions:\n  contents: read" in workflow,
-            "Check workflow must use read-only repository permissions",
+    workflow_files = sorted(
+        str(path.relative_to(ROOT))
+        for path in (ROOT / ".github/workflows").rglob("*")
+        if path.is_file()
+    )
+    require(workflow == EXPECTED_WORKFLOW and
+            workflow_files == [".github/workflows/check.yml"],
+            "GitHub Actions must match the sole reviewed macOS baseline workflow",
             failures)
-    require("cancel-in-progress: true" in workflow and "runs-on: macos-15" in workflow and
-            "timeout-minutes: 10" in workflow,
-            "Check workflow must bound duplicate and long-running macOS jobs",
+    require(codeowners.strip() == "* @garethpaul",
+            "CODEOWNERS must assign repository-wide ownership to @garethpaul",
             failures)
-    require("actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" in workflow and
-            "run: make check" in workflow,
-            "Check workflow must pin checkout and run the canonical baseline",
+    require("Swift 5" in agent_guidance and "iOS 12" in agent_guidance and
+            "make check" in agent_guidance and "SpriteKit" in agent_guidance,
+            "AGENTS guidance must document the current SpriteKit toolchain and gate",
             failures)
 
     if shutil.which("xcodebuild"):

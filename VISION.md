@@ -33,8 +33,8 @@ Priority:
 - Keep `make lint`, `make test`, `make build`, and `make check` available as
   local verification gates
 - Keep the game target on Swift 5 with the iOS 12 deployment target
-- Keep pinned macOS CI compiling an unsigned simulator build through the
-  canonical `make check` gate
+- Keep pinned macOS GitHub Actions CI compiling an unsigned simulator build
+  through the canonical `make check` gate
 
 Next priorities:
 
@@ -47,6 +47,8 @@ Contribution rules:
 - One PR = one focused gameplay, asset, build, or documentation change.
 - Verify the game launches and plays after scene or asset changes.
 - Keep generated build products and signing files out of git.
+- Keep `.github/workflows/check.yml` aligned with the static SpriteKit baseline
+  until a macOS/Xcode job is documented.
 - Include screenshots or notes for visible gameplay changes.
 
 ## Security

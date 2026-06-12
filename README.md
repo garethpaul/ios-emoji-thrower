@@ -5,7 +5,8 @@
 
 ## Overview
 
-`garethpaul/ios-emoji-thrower` is an Apple platform application or Swift sample. An Emoji SpriteKit Game
+`garethpaul/ios-emoji-thrower` is a Swift 5 SpriteKit game sample in which the
+player launches emoji projectiles at moving targets.
 
 This README is based on the checked-in source, manifests, scripts, and repository metadata on the `master` branch. The project language mix found during review was: Swift (9).
 
@@ -13,7 +14,7 @@ This README is based on the checked-in source, manifests, scripts, and repositor
 
 - `CHANGES.md` - concise history of maintenance changes
 - `README.md` - project overview and local usage notes
-- `EmojiThrower` - source or example code
+- `EmojiThrower` - Swift gameplay source, scenes, assets, sounds, and app metadata
 - `EmojiThrower.xcodeproj` - Xcode project file
 - `Makefile` - local verification entry point
 - `SECURITY.md` - security reporting and disclosure guidance
@@ -46,7 +47,9 @@ make build
 make check
 ```
 
-The checked-in project has no external dependency manifest. Use Xcode for full builds and `make check` for static verification on hosts without Xcode.
+The checked-in project has no external dependency manifest. Use Xcode for
+interactive builds; `make check` runs static verification everywhere and an
+unsigned simulator build when Xcode is available.
 
 ## Running or Using the Project
 
@@ -71,6 +74,9 @@ make test
 make build
 make check
 ```
+
+GitHub Actions runs `make check` through `.github/workflows/check.yml` on
+pushes, pull requests, and manual dispatches.
 
 The `lint`, `test`, and `build` targets intentionally alias the canonical baseline
 on hosts without Xcode, so the standard local gate commands
@@ -103,7 +109,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 
 ## Maintenance Notes
 
-- This looks like an Apple platform project or sample. Xcode, Swift, CocoaPods, and deployment target versions may need to match the original project era.
+- This is an Apple platform sample. Keep Xcode, Swift, and the deployment target
+  aligned with the checked-in project settings.
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.
 - See `docs/plans/2026-06-09-background-scroll-position.md` for the background scroll position guardrail.
@@ -112,6 +119,11 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-09-contact-delegate-game-over-guard.md` for the contact delegate game-over guardrail.
 - See `docs/plans/2026-06-10-game-over-restart-guard.md` for the game-over restart guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
+- See `docs/plans/2026-06-10-ci-baseline.md` for the GitHub Actions baseline.
+- See `docs/plans/2026-06-10-hosted-project-validation.md` for the hosted Xcode
+  validation boundary.
+- See `docs/plans/2026-06-10-swift-5-spritekit-build.md` for the Swift 5
+  simulator-build migration.
 - Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, plist/storyboard files, SpriteKit assets, sounds, fonts, Xcode metadata, or gameplay/privacy documentation.
 
 ## Contributing
