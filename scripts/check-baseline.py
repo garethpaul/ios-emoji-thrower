@@ -61,6 +61,14 @@ def read(relative_path):
     return (ROOT / relative_path).read_text(encoding="utf-8", errors="replace")
 
 
+def markdown_section(text, heading):
+    match = re.search(
+        rf"(?ms)^## {re.escape(heading)}\s*$\n(.*?)(?=^## |\Z)",
+        text,
+    )
+    return match.group(1).strip() if match else ""
+
+
 def strip_swift_line_comments(text):
     return "\n".join(line.split("//", 1)[0] for line in text.splitlines())
 
@@ -403,9 +411,39 @@ def main():
     require("status: completed" in swift_5_build_plan and "simulator" in swift_5_build_plan.lower(),
             "Swift 5 SpriteKit build plan must be completed and document simulator verification",
             failures)
-    require("status: completed" in duplicate_contact_plan and "mutations" in duplicate_contact_plan.lower(),
-            "duplicate projectile contact plan must record completed mutation verification",
+    duplicate_contact_status = re.findall(
+        r"(?mi)^status:\s*(.+?)\s*$", duplicate_contact_plan
+    )
+    duplicate_contact_work = markdown_section(duplicate_contact_plan, "Work Completed")
+    duplicate_contact_verification = markdown_section(
+        duplicate_contact_plan, "Verification Completed"
+    )
+    require(duplicate_contact_status == ["completed"] and duplicate_contact_work,
+            "duplicate projectile contact plan must record one completed status and completed work",
             failures)
+    require(duplicate_contact_verification and
+            not re.search(r"(?i)\b(?:pending|todo|tbd|not run)\b", duplicate_contact_verification),
+            "duplicate projectile contact plan must record finished verification without pending markers",
+            failures)
+    for evidence in [
+        "make check",
+        "make lint",
+        "make test",
+        "make build",
+        "python3 -m py_compile scripts/check-baseline.py",
+        "git diff --check",
+        "27394998651",
+        "27395002711",
+        "27395075194",
+        "27402323210",
+        "560e645d46cd073f7d062719c486e022e0d79611",
+        "8ce9716ffb4a523612fad6a401a326b2d17b22ac",
+        "guard projectile.parent === self, monster.parent === self else { return }",
+        "monstersDestroyed += 1",
+    ]:
+        require(evidence in duplicate_contact_verification,
+                f"duplicate projectile contact plan must preserve verification evidence: {evidence}",
+                failures)
     workflow_files = sorted(
         str(path.relative_to(ROOT))
         for path in (ROOT / ".github/workflows").rglob("*")
