@@ -23,6 +23,7 @@ GAME_OVER_RESTART_PLAN = ROOT / "docs/plans/2026-06-10-game-over-restart-guard.m
 CI_PLAN = ROOT / "docs/plans/2026-06-10-ci-baseline.md"
 HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
 SWIFT_5_BUILD_PLAN = ROOT / "docs/plans/2026-06-10-swift-5-spritekit-build.md"
+DUPLICATE_CONTACT_PLAN = ROOT / "docs/plans/2026-06-12-projectile-duplicate-contact-guard.md"
 EXPECTED_WORKFLOW = """name: Check
 
 on:
@@ -136,6 +137,7 @@ def main():
         "docs/plans/2026-06-10-ci-baseline.md",
         "docs/plans/2026-06-10-hosted-project-validation.md",
         "docs/plans/2026-06-10-swift-5-spritekit-build.md",
+        "docs/plans/2026-06-12-projectile-duplicate-contact-guard.md",
         "docs/readme-overview.svg",
     ]
 
@@ -186,6 +188,7 @@ def main():
     ci_plan = CI_PLAN.read_text(encoding="utf-8") if CI_PLAN.exists() else ""
     hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
     swift_5_build_plan = SWIFT_5_BUILD_PLAN.read_text(encoding="utf-8") if SWIFT_5_BUILD_PLAN.exists() else ""
+    duplicate_contact_plan = DUPLICATE_CONTACT_PLAN.read_text(encoding="utf-8") if DUPLICATE_CONTACT_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
@@ -279,10 +282,18 @@ def main():
             failures)
     projectile_collision_index = game_scene.find("func projectileDidCollideWithMonster")
     projectile_guard_index = game_scene.find("if gameIsOver { return }", projectile_collision_index)
+    projectile_active_node_guard_index = game_scene.find("guard projectile.parent === self, monster.parent === self else { return }", projectile_collision_index)
+    projectile_remove_index = game_scene.find("projectile.removeFromParent()", projectile_collision_index)
+    monster_remove_index = game_scene.find("monster.removeFromParent()", projectile_collision_index)
     projectile_score_index = game_scene.find("monstersDestroyed += 1", projectile_collision_index)
     require(projectile_collision_index != -1 and projectile_guard_index != -1 and
             projectile_score_index != -1 and projectile_guard_index < projectile_score_index,
             "Projectile collision handler must ignore late contacts before mutating score",
+            failures)
+    require(projectile_active_node_guard_index != -1 and
+            projectile_guard_index < projectile_active_node_guard_index < projectile_remove_index and
+            projectile_remove_index < projectile_score_index and monster_remove_index < projectile_score_index,
+            "Projectile collisions must require active nodes and remove them before mutating score",
             failures)
     player_collision_index = game_scene.find("func monsterDidCollideWithPlayer")
     player_guard_index = game_scene.find("if gameIsOver { return }", player_collision_index)
@@ -391,6 +402,9 @@ def main():
             failures)
     require("status: completed" in swift_5_build_plan and "simulator" in swift_5_build_plan.lower(),
             "Swift 5 SpriteKit build plan must be completed and document simulator verification",
+            failures)
+    require("status: completed" in duplicate_contact_plan and "mutations" in duplicate_contact_plan.lower(),
+            "duplicate projectile contact plan must record completed mutation verification",
             failures)
     workflow_files = sorted(
         str(path.relative_to(ROOT))

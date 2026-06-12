@@ -1,6 +1,6 @@
 # Projectile Duplicate Contact Guard
 
-status: planned
+status: completed
 
 ## Context
 
@@ -9,7 +9,7 @@ one physics step. `projectileDidCollideWithMonster` increments score before
 checking whether the projectile or monster was already removed, so one shot can
 score more than once when contacts overlap.
 
-## Scope
+## Completed Scope
 
 - Require both collision nodes to remain attached to the active scene before
   mutating score.
