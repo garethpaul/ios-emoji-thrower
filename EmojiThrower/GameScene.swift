@@ -265,11 +265,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //MARK: - Projectile Collision Actions
     func projectileDidCollideWithMonster(_ projectile:SKSpriteNode, monster:SKSpriteNode) {
         if gameIsOver { return }
+        guard projectile.parent === self, monster.parent === self else { return }
 
-        monstersDestroyed += 1
-        scoreLabel.text = "Score: \(monstersDestroyed)"
         projectile.removeFromParent()
         monster.removeFromParent()
+        monstersDestroyed += 1
+        scoreLabel.text = "Score: \(monstersDestroyed)"
         
         // check timer and if end then show end
         

@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-12
+
+- Prevented duplicate queued projectile contacts from scoring after either
+  collision node has already left the active scene.
+
 ## 2026-06-10
 
 - Migrated the SpriteKit target from Swift 3 to Swift 5.
