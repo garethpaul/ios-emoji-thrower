@@ -32,6 +32,7 @@ Priority:
   and debug logging/overlay guardrails
 - Keep `make lint`, `make test`, `make build`, and `make check` available as
   local verification gates
+- Keep GitHub Actions running the static `make check` baseline before review
 
 Next priorities:
 
@@ -44,6 +45,8 @@ Contribution rules:
 - One PR = one focused gameplay, asset, build, or documentation change.
 - Verify the game launches and plays after scene or asset changes.
 - Keep generated build products and signing files out of git.
+- Keep `.github/workflows/check.yml` aligned with the static SpriteKit baseline
+  until a macOS/Xcode job is documented.
 - Include screenshots or notes for visible gameplay changes.
 
 ## Security
