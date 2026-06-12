@@ -16,14 +16,16 @@ player launches emoji projectiles at moving targets.
 ## Development commands
 
 - Install dependencies: no repository-specific install command is documented.
-- Full baseline: `make check`
+- Full baseline: `make check` (includes an unsigned simulator build when Xcode
+  is available)
 - Local Apple development: `open EmojiThrower.xcodeproj`
 - If a command above skips because a platform toolchain is missing, verify on a machine with that SDK before claiming platform behavior is tested.
 
 ## Coding conventions
 
 - Language mix noted in the README: Swift (9).
-- Preserve legacy Xcode project settings and signing assumptions unless the change is explicitly about modernization.
+- Preserve the checked-in Swift 5, iOS 12, Xcode, and signing assumptions unless
+  the change is explicitly about modernization.
 
 ## Testing guidance
 
@@ -36,7 +38,8 @@ player launches emoji projectiles at moving targets.
 - Keep diffs focused on the requested repository and avoid unrelated modernization or formatting churn.
 - Preserve public APIs, sample behavior, file formats, and documented environment variables unless the task explicitly changes them.
 - Update tests, README notes, or docs/plans when behavior, security posture, or validation commands change.
-- Call out skipped platform validation, legacy toolchain assumptions, and any risky files touched in the final summary.
+- Call out skipped platform validation, Apple toolchain assumptions, and any
+  risky files touched in the final summary.
 
 ## Safety and gotchas
 

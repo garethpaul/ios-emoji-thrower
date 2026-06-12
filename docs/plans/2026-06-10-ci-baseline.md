@@ -1,6 +1,6 @@
 # iOS Emoji Thrower CI Baseline
 
-## Status: Completed
+status: completed
 
 ## Context
 
@@ -12,14 +12,16 @@ before review.
 ## Objectives
 
 - Run the existing `make check` wrapper in GitHub Actions.
-- Keep the hosted job independent of Xcode and simulator availability.
+- Run the canonical gate on macOS so current Xcode compiles the game target.
 - Make the workflow presence part of the static baseline contract.
 
 ## Work Completed
 
 - Added `.github/workflows/check.yml` to run `make check` on pushes, pull
   requests, and manual dispatches.
-- Set up Python 3.12 for the static checker.
+- Integrated the static checker with the pinned, least-privilege macOS gate.
+- Compile an unsigned Swift 5 Debug build for the iOS Simulator when Xcode is
+  available, without launching gameplay.
 - Extended `scripts/check-baseline.py` to require the CI workflow and this
   completed plan.
 - Updated README, VISION, SECURITY, and CHANGES with the CI baseline.
@@ -30,7 +32,7 @@ before review.
 - `python3 scripts/check-baseline.py`
 - `git diff --check`
 
-## Follow-Up Candidates
+## Boundary
 
-- Add a macOS/Xcode build or simulator smoke job once the supported Xcode and
-  scheme baseline are documented.
+The hosted build does not launch gameplay, render SpriteKit frames, play audio,
+run physics simulation, sign an app, or replace interactive simulator testing.

@@ -2,12 +2,20 @@
 
 ## 2026-06-10
 
-- Added a GitHub Actions check workflow that runs the existing static
-  `make check` baseline on pushes, pull requests, and manual dispatches.
+- Migrated the SpriteKit target from Swift 3 to Swift 5.
+- Raised the deployment target from iOS 10 to iOS 12.
+- Replaced the `arc4random` float conversion with bounded
+  `CGFloat.random(in:)` generation.
+- Upgraded Xcode-enabled validation from project parsing to an unsigned iOS
+  Simulator build.
 - Added a static guard requiring the CI workflow and completed CI baseline plan
   to remain checked in.
 - Guarded delayed game-over restarts so only the current game-over scene can
   present a restarted game scene, using the same resize mode as initial launch.
+- Added pinned, read-only macOS GitHub Actions CI for the canonical `make check`
+  baseline.
+- Made Xcode-enabled checks parse `EmojiThrower.xcodeproj` without running
+  SpriteKit gameplay, rendering, audio, or physics simulation.
 
 ## 2026-06-09
 

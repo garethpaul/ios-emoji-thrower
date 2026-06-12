@@ -4,6 +4,7 @@ import json
 import plistlib
 import re
 import shutil
+import subprocess
 import sys
 import xml.etree.ElementTree as ET
 
@@ -20,6 +21,34 @@ CONTACT_DELEGATE_PLAN = ROOT / "docs/plans/2026-06-09-contact-delegate-game-over
 BACKGROUND_UPDATE_PLAN = ROOT / "docs/plans/2026-06-09-background-scroll-update.md"
 GAME_OVER_RESTART_PLAN = ROOT / "docs/plans/2026-06-10-game-over-restart-guard.md"
 CI_PLAN = ROOT / "docs/plans/2026-06-10-ci-baseline.md"
+HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
+SWIFT_5_BUILD_PLAN = ROOT / "docs/plans/2026-06-10-swift-5-spritekit-build.md"
+EXPECTED_WORKFLOW = """name: Check
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  baseline:
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+        with:
+          persist-credentials: false
+      - name: Validate project and SpriteKit baseline
+        run: make check
+"""
 
 
 def require(condition, message, failures):
@@ -63,12 +92,14 @@ def main():
     failures = []
     required_files = [
         ".gitignore",
+        ".github/workflows/check.yml",
+        ".github/CODEOWNERS",
+        "AGENTS.md",
         "CHANGES.md",
         "Makefile",
         "README.md",
         "SECURITY.md",
         "VISION.md",
-        ".github/workflows/check.yml",
         "EmojiThrower.xcodeproj/project.pbxproj",
         "EmojiThrower.xcodeproj/project.xcworkspace/contents.xcworkspacedata",
         "EmojiThrower/Info.plist",
@@ -103,6 +134,8 @@ def main():
         "docs/plans/2026-06-09-background-scroll-update.md",
         "docs/plans/2026-06-10-game-over-restart-guard.md",
         "docs/plans/2026-06-10-ci-baseline.md",
+        "docs/plans/2026-06-10-hosted-project-validation.md",
+        "docs/plans/2026-06-10-swift-5-spritekit-build.md",
         "docs/readme-overview.svg",
     ]
 
@@ -138,6 +171,8 @@ def main():
     gitignore = read(".gitignore")
     makefile = read("Makefile")
     workflow = read(".github/workflows/check.yml")
+    codeowners = read(".github/CODEOWNERS")
+    agent_guidance = read("AGENTS.md")
     baseline_plan = BASELINE_PLAN.read_text(encoding="utf-8") if BASELINE_PLAN.exists() else ""
     make_gates_plan = MAKE_GATES_PLAN.read_text(encoding="utf-8") if MAKE_GATES_PLAN.exists() else ""
     image_guard_plan = IMAGE_GUARD_PLAN.read_text(encoding="utf-8") if IMAGE_GUARD_PLAN.exists() else ""
@@ -149,9 +184,18 @@ def main():
     background_update_plan = BACKGROUND_UPDATE_PLAN.read_text(encoding="utf-8") if BACKGROUND_UPDATE_PLAN.exists() else ""
     game_over_restart_plan = GAME_OVER_RESTART_PLAN.read_text(encoding="utf-8") if GAME_OVER_RESTART_PLAN.exists() else ""
     ci_plan = CI_PLAN.read_text(encoding="utf-8") if CI_PLAN.exists() else ""
+    hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
+    swift_5_build_plan = SWIFT_5_BUILD_PLAN.read_text(encoding="utf-8") if SWIFT_5_BUILD_PLAN.exists() else ""
+    workflow = read(".github/workflows/check.yml")
 
-    require("IPHONEOS_DEPLOYMENT_TARGET = 10.0;" in project and "SWIFT_VERSION = 3.0;" in project,
-            "Xcode project must preserve the legacy iOS 10 / Swift 3 settings",
+    require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
+            "IPHONEOS_DEPLOYMENT_TARGET = 10.0;" not in project and
+            project.count("SWIFT_VERSION = 5.0;") == 2 and
+            "SWIFT_VERSION = 3.0;" not in project,
+            "Xcode project must use Swift 5 with the iOS 12 deployment target",
+            failures)
+    require("[UIApplication.LaunchOptionsKey: Any]?" in swift_sources,
+            "AppDelegate must use the Swift 5 launch-options signature",
             failures)
     for resource in ["Assets.xcassets", "sprites.atlas", "background-music-aac.caf", "pew-pew-lei.caf", "Sketch3D.otf", "GameScene.sks"]:
         require(resource in project, f"Xcode project must keep resource reference: {resource}", failures)
@@ -173,6 +217,9 @@ def main():
             failures)
     require("SKAction.playSoundFileNamed" in game_scene and "background-music-aac.caf" in game_scene,
             "GameScene must keep bundled sound playback references",
+            failures)
+    require("CGFloat.random(in: min...max)" in game_scene and "arc4random" not in game_scene,
+            "GameScene must use Swift bounded random generation",
             failures)
     add_monster_index = game_scene.find("func addMonster()")
     spawn_guard_index = game_scene.find("if gameIsOver { return }", add_monster_index)
@@ -313,9 +360,6 @@ def main():
     require("GitHub Actions" in changes,
             "CHANGES must record the GitHub Actions baseline",
             failures)
-    require("uses: actions/checkout@v4" in workflow and "uses: actions/setup-python@v5" in workflow and "run: make check" in workflow,
-            "GitHub Actions workflow must set up Python and run make check",
-            failures)
     require("status: completed" in baseline_plan and "status: completed" in image_guard_plan and
             "status: completed" in game_over_plan and "status: completed" in spawn_lifecycle_plan,
             "plans must be marked completed",
@@ -338,12 +382,52 @@ def main():
     require("status: completed" in game_over_restart_plan,
             "game-over restart guard plan must be marked completed",
             failures)
-    require("Status: Completed" in ci_plan and "make check" in ci_plan,
+    require("status: completed" in ci_plan and "make check" in ci_plan and
+            "simulator" in ci_plan.lower(),
             "CI baseline plan must record completed status and make check verification",
+            failures)
+    require("status: completed" in hosted_validation_plan and "make check" in hosted_validation_plan,
+            "hosted project validation plan must be completed and document make check",
+            failures)
+    require("status: completed" in swift_5_build_plan and "simulator" in swift_5_build_plan.lower(),
+            "Swift 5 SpriteKit build plan must be completed and document simulator verification",
+            failures)
+    workflow_files = sorted(
+        str(path.relative_to(ROOT))
+        for path in (ROOT / ".github/workflows").rglob("*")
+        if path.is_file()
+    )
+    require(workflow == EXPECTED_WORKFLOW and
+            workflow_files == [".github/workflows/check.yml"],
+            "GitHub Actions must match the sole reviewed macOS baseline workflow",
+            failures)
+    require(codeowners.strip() == "* @garethpaul",
+            "CODEOWNERS must assign repository-wide ownership to @garethpaul",
+            failures)
+    require("Swift 5" in agent_guidance and "iOS 12" in agent_guidance and
+            "make check" in agent_guidance and "SpriteKit" in agent_guidance,
+            "AGENTS guidance must document the current SpriteKit toolchain and gate",
             failures)
 
     if shutil.which("xcodebuild"):
-        print("xcodebuild is available; run a scheme-specific Xcode test on macOS before release.")
+        result = subprocess.run(
+            [
+                "xcodebuild",
+                "-project", "EmojiThrower.xcodeproj",
+                "-target", "EmojiThrower",
+                "-configuration", "Debug",
+                "-sdk", "iphonesimulator",
+                "CODE_SIGNING_ALLOWED=NO",
+                "build",
+            ],
+            cwd=ROOT,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        require(result.returncode == 0,
+                "xcodebuild could not compile EmojiThrower for the simulator: " + result.stdout.strip(),
+                failures)
     else:
         print("xcodebuild unavailable; static iOS baseline only.")
 
