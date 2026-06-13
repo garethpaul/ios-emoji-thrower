@@ -115,6 +115,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
         return random(min: minY, max: maxY)
     }
+
+    func projectileDirection(offset: CGPoint) -> CGPoint? {
+        guard offset.x.isFinite, offset.y.isFinite, offset.x > 0 else {
+            return nil
+        }
+
+        let offsetLength = offset.length()
+        guard offsetLength.isFinite, offsetLength > 0 else {
+            return nil
+        }
+
+        let direction = offset / offsetLength
+        guard direction.x.isFinite, direction.y.isFinite else {
+            return nil
+        }
+
+        return direction
+    }
     
     //MARK: - Get Profile Picture
     func roundSquareImage(imageName: String) -> SKSpriteNode {
@@ -237,8 +255,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Determine offset of touch location to projectile
         let offset = touchLocation - projectile.position
         
-        // Cancel shots that do not travel forward.
-        if (offset.x <= 0) { return }
+        guard let direction = projectileDirection(offset: offset) else {
+            return
+        }
         
         // Projectile collision set up
         projectile.physicsBody = SKPhysicsBody(circleOfRadius: projectile.size.width/2)
@@ -250,9 +269,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         // Add projectile after double-checking direction of shot
         addChild(projectile)
-        
-        // Get the direction of where to shoot
-        let direction = offset.normalized()
         
         // Make it shoot far enough to be guaranteed off screen
         let shootDistance = direction * 1000

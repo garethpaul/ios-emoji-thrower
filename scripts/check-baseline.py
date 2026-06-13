@@ -25,6 +25,7 @@ HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation
 SWIFT_5_BUILD_PLAN = ROOT / "docs/plans/2026-06-10-swift-5-spritekit-build.md"
 DUPLICATE_CONTACT_PLAN = ROOT / "docs/plans/2026-06-12-projectile-duplicate-contact-guard.md"
 UNDERSIZED_SPAWN_PLAN = ROOT / "docs/plans/2026-06-13-undersized-scene-spawn-guard.md"
+FINITE_TOUCH_VECTOR_PLAN = ROOT / "docs/plans/2026-06-13-finite-projectile-touch-vector.md"
 EXPECTED_WORKFLOW = """name: Check
 
 on:
@@ -148,6 +149,7 @@ def main():
         "docs/plans/2026-06-10-swift-5-spritekit-build.md",
         "docs/plans/2026-06-12-projectile-duplicate-contact-guard.md",
         "docs/plans/2026-06-13-undersized-scene-spawn-guard.md",
+        "docs/plans/2026-06-13-finite-projectile-touch-vector.md",
         "docs/readme-overview.svg",
     ]
 
@@ -200,6 +202,7 @@ def main():
     swift_5_build_plan = SWIFT_5_BUILD_PLAN.read_text(encoding="utf-8") if SWIFT_5_BUILD_PLAN.exists() else ""
     duplicate_contact_plan = DUPLICATE_CONTACT_PLAN.read_text(encoding="utf-8") if DUPLICATE_CONTACT_PLAN.exists() else ""
     undersized_spawn_plan = UNDERSIZED_SPAWN_PLAN.read_text(encoding="utf-8") if UNDERSIZED_SPAWN_PLAN.exists() else ""
+    finite_touch_vector_plan = FINITE_TOUCH_VECTOR_PLAN.read_text(encoding="utf-8") if FINITE_TOUCH_VECTOR_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
@@ -286,8 +289,43 @@ def main():
     require("let pointLength = length()" in game_scene and "return CGPoint.zero" in game_scene,
             "CGPoint normalization must handle zero-length vectors",
             failures)
-    require("if (offset.x <= 0) { return }" in game_scene and "let direction = offset.normalized()" in game_scene,
-            "GameScene must guard non-forward projectile vectors before normalization",
+    projectile_direction_index = game_scene.find(
+        "func projectileDirection(offset: CGPoint) -> CGPoint?"
+    )
+    projectile_direction_end = game_scene.find(
+        "func roundSquareImage", projectile_direction_index
+    )
+    projectile_direction_body = game_scene[
+        projectile_direction_index:projectile_direction_end
+    ]
+    touches_ended_index = game_scene.find("override func touchesEnded")
+    touch_direction_guard_index = game_scene.find(
+        "guard let direction = projectileDirection(offset: offset) else",
+        touches_ended_index,
+    )
+    projectile_physics_index = game_scene.find(
+        "projectile.physicsBody =", touches_ended_index
+    )
+    projectile_add_index = game_scene.find("addChild(projectile)", touches_ended_index)
+    projectile_sound_index = game_scene.find(
+        "SKAction.playSoundFileNamed", touches_ended_index
+    )
+    require(projectile_direction_index != -1 and
+            "offset.x.isFinite" in projectile_direction_body and
+            "offset.y.isFinite" in projectile_direction_body and
+            "offset.x > 0" in projectile_direction_body and
+            "offsetLength.isFinite" in projectile_direction_body and
+            "offsetLength > 0" in projectile_direction_body and
+            "direction.x.isFinite" in projectile_direction_body and
+            "direction.y.isFinite" in projectile_direction_body,
+            "GameScene must reject non-finite, non-forward, and overflowed projectile vectors",
+            failures)
+    require(touches_ended_index != -1 and touch_direction_guard_index != -1 and
+            projectile_physics_index != -1 and projectile_add_index != -1 and
+            projectile_sound_index != -1 and
+            touch_direction_guard_index < projectile_physics_index <
+            projectile_add_index < projectile_sound_index,
+            "GameScene must validate projectile direction before physics, insertion, and sound",
             failures)
     require("projectileDidCollideWithMonster(projectile, monster: monster)" in game_scene and
             "monsterDidCollideWithPlayer(monster, player: player)" in game_scene and
@@ -399,6 +437,12 @@ def main():
             "make lint" in changes and "make test" in changes and "make build" in changes,
             "CHANGES must record the debug cleanup, contact handling, vector guard, image guard, game-over guard, spawn guard, and baseline",
             failures)
+    require("non-finite touch vectors" in readme.lower() and
+            "non-finite touch vectors" in security.lower() and
+            "non-finite touch vectors" in vision.lower() and
+            "non-finite touch vectors" in changes.lower(),
+            "Docs must record finite projectile touch-vector validation",
+            failures)
     require("collision handler" in changes.lower(),
             "CHANGES must record the collision handler game-over guard",
             failures)
@@ -444,6 +488,31 @@ def main():
             "All four Make gates" in undersized_spawn_plan and
             "hostile mutations" in undersized_spawn_plan.lower(),
             "undersized scene spawn plan must record completed status and verification",
+            failures)
+    finite_touch_statuses = re.findall(
+        r"^status: .+$", finite_touch_vector_plan, flags=re.MULTILINE
+    )
+    finite_touch_sections = finite_touch_vector_plan.split(
+        "## Verification Completed\n", 1
+    )
+    finite_touch_verification = (
+        finite_touch_sections[1] if len(finite_touch_sections) == 2 else ""
+    )
+    finite_touch_required_evidence = (
+        "All four Make gates",
+        "`xcodebuild` was",
+        "python3 -m py_compile scripts/check-baseline.py",
+        "plist, XML, and workflow YAML parsing",
+        "git diff --check",
+        "Seven isolated hostile mutations",
+    )
+    require(finite_touch_statuses == ["status: completed"]
+            and all(item in finite_touch_verification
+                    for item in finite_touch_required_evidence)
+            and re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                          finite_touch_verification,
+                          re.IGNORECASE) is None,
+            "finite projectile touch-vector plan must record completed status and actual local verification",
             failures)
     duplicate_contact_status = re.findall(
         r"(?mi)^status:\s*(.+?)\s*$", duplicate_contact_plan
