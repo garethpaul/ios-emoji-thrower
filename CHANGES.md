@@ -2,6 +2,8 @@
 
 ## 2026-06-13
 
+- Made all Make verification aliases location-independent when invoked through
+  an absolute Makefile path.
 - Rejected non-finite touch vectors before projectile physics, insertion,
   movement, or sound effects.
 - Skipped enemy spawning for invalid or undersized scene geometry before
