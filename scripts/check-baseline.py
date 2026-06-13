@@ -26,6 +26,7 @@ SWIFT_5_BUILD_PLAN = ROOT / "docs/plans/2026-06-10-swift-5-spritekit-build.md"
 DUPLICATE_CONTACT_PLAN = ROOT / "docs/plans/2026-06-12-projectile-duplicate-contact-guard.md"
 UNDERSIZED_SPAWN_PLAN = ROOT / "docs/plans/2026-06-13-undersized-scene-spawn-guard.md"
 FINITE_TOUCH_VECTOR_PLAN = ROOT / "docs/plans/2026-06-13-finite-projectile-touch-vector.md"
+LOCATION_INDEPENDENT_MAKE_PLAN = ROOT / "docs/plans/2026-06-13-location-independent-make.md"
 EXPECTED_WORKFLOW = """name: Check
 
 on:
@@ -150,6 +151,7 @@ def main():
         "docs/plans/2026-06-12-projectile-duplicate-contact-guard.md",
         "docs/plans/2026-06-13-undersized-scene-spawn-guard.md",
         "docs/plans/2026-06-13-finite-projectile-touch-vector.md",
+        "docs/plans/2026-06-13-location-independent-make.md",
         "docs/readme-overview.svg",
     ]
 
@@ -203,6 +205,7 @@ def main():
     duplicate_contact_plan = DUPLICATE_CONTACT_PLAN.read_text(encoding="utf-8") if DUPLICATE_CONTACT_PLAN.exists() else ""
     undersized_spawn_plan = UNDERSIZED_SPAWN_PLAN.read_text(encoding="utf-8") if UNDERSIZED_SPAWN_PLAN.exists() else ""
     finite_touch_vector_plan = FINITE_TOUCH_VECTOR_PLAN.read_text(encoding="utf-8") if FINITE_TOUCH_VECTOR_PLAN.exists() else ""
+    location_independent_make_plan = LOCATION_INDEPENDENT_MAKE_PLAN.read_text(encoding="utf-8") if LOCATION_INDEPENDENT_MAKE_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
@@ -402,8 +405,12 @@ def main():
     require("*.local.xcconfig" in gitignore and ".env" in gitignore and "DerivedData" in gitignore,
             ".gitignore must exclude local config and Xcode build products",
             failures)
-    require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
-            "Makefile must expose lint, test, and build aliases for the local baseline",
+    require(".PHONY: build check lint test" in makefile and
+            "ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile and
+            "lint test build: check" in makefile and
+            'python3 "$(ROOT)/scripts/check-baseline.py"' in makefile and
+            "python3 scripts/check-baseline.py" not in makefile,
+            "Makefile must expose location-independent lint, test, build, and check aliases",
             failures)
     require("make lint" in readme and "make test" in readme and "make build" in readme and "make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme and
             "image" in readme.lower() and "game-over" in readme.lower() and "spawn" in readme.lower() and
@@ -442,6 +449,10 @@ def main():
             "non-finite touch vectors" in vision.lower() and
             "non-finite touch vectors" in changes.lower(),
             "Docs must record finite projectile touch-vector validation",
+            failures)
+    require("absolute makefile path" in readme.lower() and
+            "location-independent" in changes.lower(),
+            "README and CHANGES must document location-independent Make verification",
             failures)
     require("collision handler" in changes.lower(),
             "CHANGES must record the collision handler game-over guard",
@@ -488,6 +499,24 @@ def main():
             "All four Make gates" in undersized_spawn_plan and
             "hostile mutations" in undersized_spawn_plan.lower(),
             "undersized scene spawn plan must record completed status and verification",
+            failures)
+    location_make_statuses = re.findall(
+        r"^status: .+$", location_independent_make_plan, flags=re.MULTILINE
+    )
+    location_make_verification = markdown_section(
+        location_independent_make_plan, "Verification Completed"
+    )
+    require(location_make_statuses == ["status: completed"] and
+            "All four Make gates passed from the checkout" in location_make_verification and
+            "All four Make gates passed from `/tmp` through the absolute Makefile path" in location_make_verification and
+            "python3 -m py_compile scripts/check-baseline.py" in location_make_verification and
+            "git diff --check" in location_make_verification and
+            "`xcodebuild` was unavailable" in location_make_verification and
+            "Five isolated hostile mutations were rejected" in location_make_verification and
+            re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                      location_make_verification,
+                      re.IGNORECASE) is None,
+            "location-independent Make plan must record completed status and actual local verification",
             failures)
     finite_touch_statuses = re.findall(
         r"^status: .+$", finite_touch_vector_plan, flags=re.MULTILINE
