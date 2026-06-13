@@ -2,6 +2,8 @@
 
 ## 2026-06-13
 
+- Rejected non-finite touch vectors before projectile physics, insertion,
+  movement, or sound effects.
 - Skipped enemy spawning for invalid or undersized scene geometry before
   constructing a closed random range or adding the SpriteKit node.
 

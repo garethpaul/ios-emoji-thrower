@@ -27,6 +27,7 @@ Priority:
 - Stop enemy spawning as soon as game-over presentation starts
 - Skip enemy spawning when invalid or undersized scene geometry cannot contain
   the monster sprite
+- Reject non-finite touch vectors before projectile side effects
 - Keep background scroll movement running per-frame until game over
 - Avoid adding account or network behavior without a clear purpose
 - Keep `scripts/check-baseline.py` passing for bundled resources, Xcode

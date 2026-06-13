@@ -1,6 +1,6 @@
 # Finite Projectile Touch Vector Guard
 
-status: planned
+status: completed
 
 ## Context
 
@@ -40,3 +40,30 @@ before the projectile is removed.
 - Hostile mutations must reject missing component or length finiteness checks,
   acceptance of non-forward vectors, direction validation after node insertion,
   stale plan status, and missing verification evidence.
+
+## Work Completed
+
+- Added a pure optional direction helper that rejects non-finite components,
+  non-forward offsets, and zero, non-finite, or overflowed lengths.
+- Required the normalized direction itself to remain finite before returning it.
+- Moved direction validation before projectile physics, node insertion,
+  movement, and sound effects.
+- Documented the finite touch-vector boundary without changing gameplay tuning,
+  resources, project files, or workflow policy.
+
+## Verification Completed
+
+- All four Make gates passed locally and reported that `xcodebuild` was
+  unavailable, so only the static iOS baseline ran on this host.
+- `python3 -m py_compile scripts/check-baseline.py`, plist, XML, and workflow YAML parsing,
+  and `git diff --check` passed.
+- Seven isolated hostile mutations were rejected: removed horizontal component
+  finiteness, removed vertical component finiteness, removed length finiteness,
+  accepted non-forward vectors, validated after node insertion, stale plan
+  status, and missing verification evidence.
+- Exact-base comparison confirmed project files, bundled resources, and hosted
+  workflow configuration remained unchanged.
+- Intended-file generated-artifact, secret-pattern, and forbidden data-flow
+  scans passed.
+- Hosted macOS simulator compilation and code-scanning evidence is recorded
+  separately after push; this plan claims only completed local static evidence.
