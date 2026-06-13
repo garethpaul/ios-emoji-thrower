@@ -106,6 +106,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - Debug logging from launch and gameplay paths should stay removed; score should remain visible in-game rather than printed to the console.
 - Runtime debug overlays should stay disabled outside explicit troubleshooting builds.
 - Resource changes should keep image, sound, font, scene, and Xcode project references aligned, with fallback behavior for optional image helper rendering.
+- Enemy spawning skips invalid or undersized scene geometry before constructing
+  a random range or adding a SpriteKit node.
 
 ## Maintenance Notes
 
@@ -118,6 +120,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-09-collision-handler-game-over-guard.md` for the collision handler guardrail.
 - See `docs/plans/2026-06-09-contact-delegate-game-over-guard.md` for the contact delegate game-over guardrail.
 - See `docs/plans/2026-06-10-game-over-restart-guard.md` for the game-over restart guardrail.
+- See `docs/plans/2026-06-13-undersized-scene-spawn-guard.md` for the enemy
+  spawn geometry guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - See `docs/plans/2026-06-10-ci-baseline.md` for the GitHub Actions baseline.
 - See `docs/plans/2026-06-10-hosted-project-validation.md` for the hosted Xcode

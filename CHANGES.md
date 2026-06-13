@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-13
+
+- Skipped enemy spawning for invalid or undersized scene geometry before
+  constructing a closed random range or adding the SpriteKit node.
+
 ## 2026-06-12
 
 - Prevented duplicate queued projectile contacts from scoring after either

@@ -1,6 +1,6 @@
 # Undersized Scene Spawn Guard
 
-status: planned
+status: completed
 
 ## Context
 
@@ -52,16 +52,24 @@ crashing the local game loop.
 - Do not add persistence, telemetry, networking, analytics, or a new test target.
 - Do not claim interactive gameplay validation without Xcode.
 
-## Verification
+## Work Completed
 
-- `make lint`
-- `make test`
-- `make build`
-- `make check`
-- `python3 -m py_compile scripts/check-baseline.py`
-- Parse plist, storyboard, workspace, project, and workflow metadata with all
-  available local parsers.
-- `git diff --check`
-- Hostile mutations removing finite, positive, or ordered-range validation,
-  optional failure, guard-before-add ordering, plan status, or verification
-  evidence must be rejected.
+- Added an optional spawn-Y helper that rejects non-finite, non-positive, and
+  undersized scene geometry before constructing a closed random range.
+- Guarded the helper result before the monster enters the scene or receives
+  physics and movement behavior.
+- Added method-scoped static contracts and documented the boundary.
+
+## Verification Completed
+
+- All four Make gates, `make lint`, `make test`, `make build`, and `make check`,
+  passed against the complete static baseline.
+- `python3 -m py_compile scripts/check-baseline.py`, plist parsing, storyboard
+  and workspace XML parsing, workflow YAML parsing, and `git diff --check`
+  passed.
+- Eight hostile mutations removing either finite check, the positive-height
+  check, ordered-range validation, the optional helper contract,
+  guard-before-add ordering, completed plan status, or verification evidence
+  were rejected.
+- The local environment did not provide `xcodebuild`, so interactive SpriteKit
+  gameplay, rendering, audio, and physics execution were not claimed.

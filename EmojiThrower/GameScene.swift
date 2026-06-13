@@ -101,6 +101,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func random(min: CGFloat, max: CGFloat) -> CGFloat {
         return CGFloat.random(in: min...max)
     }
+
+    func monsterSpawnY(spriteHeight: CGFloat) -> CGFloat? {
+        guard spriteHeight.isFinite, size.height.isFinite, spriteHeight > 0 else {
+            return nil
+        }
+
+        let minY = spriteHeight / 2
+        let maxY = size.height - minY
+        guard minY <= maxY else {
+            return nil
+        }
+
+        return random(min: minY, max: maxY)
+    }
     
     //MARK: - Get Profile Picture
     func roundSquareImage(imageName: String) -> SKSpriteNode {
@@ -140,7 +154,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         
         // Determine where to spawn the monster along the Y axis
-        let actualY = random(min: monster.size.height/2, max: size.height - monster.size.height/2)
+        guard let actualY = monsterSpawnY(spriteHeight: monster.size.height) else {
+            return
+        }
         
         // Position the monster slightly off-screen along the right edge,
         // and along a random position along the Y axis as calculated above

@@ -24,6 +24,7 @@ CI_PLAN = ROOT / "docs/plans/2026-06-10-ci-baseline.md"
 HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
 SWIFT_5_BUILD_PLAN = ROOT / "docs/plans/2026-06-10-swift-5-spritekit-build.md"
 DUPLICATE_CONTACT_PLAN = ROOT / "docs/plans/2026-06-12-projectile-duplicate-contact-guard.md"
+UNDERSIZED_SPAWN_PLAN = ROOT / "docs/plans/2026-06-13-undersized-scene-spawn-guard.md"
 EXPECTED_WORKFLOW = """name: Check
 
 on:
@@ -146,6 +147,7 @@ def main():
         "docs/plans/2026-06-10-hosted-project-validation.md",
         "docs/plans/2026-06-10-swift-5-spritekit-build.md",
         "docs/plans/2026-06-12-projectile-duplicate-contact-guard.md",
+        "docs/plans/2026-06-13-undersized-scene-spawn-guard.md",
         "docs/readme-overview.svg",
     ]
 
@@ -197,6 +199,7 @@ def main():
     hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
     swift_5_build_plan = SWIFT_5_BUILD_PLAN.read_text(encoding="utf-8") if SWIFT_5_BUILD_PLAN.exists() else ""
     duplicate_contact_plan = DUPLICATE_CONTACT_PLAN.read_text(encoding="utf-8") if DUPLICATE_CONTACT_PLAN.exists() else ""
+    undersized_spawn_plan = UNDERSIZED_SPAWN_PLAN.read_text(encoding="utf-8") if UNDERSIZED_SPAWN_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
@@ -235,11 +238,32 @@ def main():
     add_monster_index = game_scene.find("func addMonster()")
     spawn_guard_index = game_scene.find("if gameIsOver { return }", add_monster_index)
     create_enemy_index = game_scene.find("let monster = SKSpriteNode", add_monster_index)
+    spawn_y_index = game_scene.find("func monsterSpawnY(spriteHeight: CGFloat) -> CGFloat?")
+    next_helper_index = game_scene.find("func roundSquareImage", spawn_y_index)
+    spawn_y_body = game_scene[spawn_y_index:next_helper_index]
+    spawn_y_guard_index = game_scene.find(
+        "guard let actualY = monsterSpawnY(spriteHeight: monster.size.height) else",
+        add_monster_index,
+    )
+    add_child_index = game_scene.find("addChild(monster)", add_monster_index)
     require('withKey: "monsterSpawn"' in game_scene and 'removeAction(forKey: "monsterSpawn")' in game_scene,
             "GameScene must run enemy spawning with a key and remove it when game-over presentation starts",
             failures)
     require(add_monster_index != -1 and spawn_guard_index != -1 and spawn_guard_index < create_enemy_index,
             "GameScene must guard enemy spawning after game over before creating sprites",
+            failures)
+    require(spawn_y_index != -1 and next_helper_index != -1 and
+            "guard spriteHeight.isFinite, size.height.isFinite, spriteHeight > 0 else" in spawn_y_body and
+            "let minY = spriteHeight / 2" in spawn_y_body and
+            "let maxY = size.height - minY" in spawn_y_body and
+            "guard minY <= maxY else" in spawn_y_body and
+            "return random(min: minY, max: maxY)" in spawn_y_body,
+            "monsterSpawnY must reject invalid geometry before constructing the closed random range",
+            failures)
+    require(spawn_y_guard_index != -1 and add_child_index != -1 and
+            create_enemy_index < spawn_y_guard_index < add_child_index and
+            "random(min: monster.size.height/2" not in game_scene,
+            "addMonster must skip invalid spawn geometry before adding the monster",
             failures)
     require("guard let originalPicture = UIImage(named: imageName)" in game_scene and
             "guard let scaledImage = UIGraphicsGetImageFromCurrentImageContext()" in game_scene and
@@ -346,7 +370,8 @@ def main():
     require("make lint" in readme and "make test" in readme and "make build" in readme and "make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme and
             "image" in readme.lower() and "game-over" in readme.lower() and "spawn" in readme.lower() and
             "background scroll" in readme.lower() and "per-frame" in readme.lower() and "collision handler" in readme.lower() and
-            "contact delegate" in readme.lower() and "restart" in readme.lower() and "GitHub Actions" in readme,
+            "contact delegate" in readme.lower() and "restart" in readme.lower() and
+            "undersized scene" in readme.lower() and "GitHub Actions" in readme,
             "README must document static verification, project usage, SpriteKit context, collision handler guardrails, and image guardrails",
             failures)
     require("local game" in readme.lower() and "debug logging" in readme.lower() and "debug overlays" in readme.lower(),
@@ -355,19 +380,23 @@ def main():
     require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and "make build" in vision and "asset" in vision.lower() and
             "game-over" in vision.lower() and "spawn" in vision.lower() and
             "background scroll" in vision.lower() and "per-frame" in vision.lower() and "collision handler" in vision.lower() and
-            "contact delegate" in vision.lower() and "restart" in vision.lower() and "GitHub Actions" in vision,
+            "contact delegate" in vision.lower() and "restart" in vision.lower() and
+            "undersized scene" in vision.lower() and "GitHub Actions" in vision,
             "VISION must describe the current static SpriteKit baseline",
             failures)
     require("debug logging" in security.lower() and "debug overlays" in security.lower() and
             "spawn" in security.lower() and "background scroll" in security.lower() and "per-frame" in security.lower() and
             "collision handler" in security.lower() and "contact delegate" in security.lower() and
-            "restart" in security.lower() and "make check" in security and "GitHub Actions" in security,
+            "restart" in security.lower() and "undersized scene" in security.lower() and
+            "make check" in security and "GitHub Actions" in security,
             "SECURITY must document debug logging/overlay and static baseline guardrails",
             failures)
     require("debug console logging" in changes and "debug overlays" in changes and "player-hit" in changes and
             "projectile" in changes and "zero-length" in changes and "image" in changes.lower() and
             "game-over" in changes.lower() and "restart" in changes.lower() and "spawn" in changes.lower() and
-            "background scroll" in changes.lower() and "per-frame" in changes.lower() and "make check" in changes and "make lint" in changes and "make test" in changes and "make build" in changes,
+            "background scroll" in changes.lower() and "per-frame" in changes.lower() and
+            "undersized scene" in changes.lower() and "make check" in changes and
+            "make lint" in changes and "make test" in changes and "make build" in changes,
             "CHANGES must record the debug cleanup, contact handling, vector guard, image guard, game-over guard, spawn guard, and baseline",
             failures)
     require("collision handler" in changes.lower(),
@@ -410,6 +439,11 @@ def main():
             failures)
     require("status: completed" in swift_5_build_plan and "simulator" in swift_5_build_plan.lower(),
             "Swift 5 SpriteKit build plan must be completed and document simulator verification",
+            failures)
+    require("status: completed" in undersized_spawn_plan and
+            "All four Make gates" in undersized_spawn_plan and
+            "hostile mutations" in undersized_spawn_plan.lower(),
+            "undersized scene spawn plan must record completed status and verification",
             failures)
     duplicate_contact_status = re.findall(
         r"(?mi)^status:\s*(.+?)\s*$", duplicate_contact_plan
