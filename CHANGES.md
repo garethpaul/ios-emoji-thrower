@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-14
+
+- Ignored queued player contacts after either collision node has already left
+  the active scene.
+
 ## 2026-06-13
 
 - Made all Make verification aliases location-independent when invoked through

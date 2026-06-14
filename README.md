@@ -82,7 +82,7 @@ The `lint`, `test`, and `build` targets intentionally alias the canonical baseli
 on hosts without Xcode, so the standard local gate commands
 stay available while preserving the single source of truth.
 
-The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, validates the binary SpriteKit scene plist, checks Xcode resource references, verifies the Swift source inventory, and guards against image-helper force unwraps, non-finite touch vectors, repeated game-over transitions, unguarded game-over restarts, late collision handler mutations, uncleared contact delegate callbacks, late spawn actions, broken per-frame background scroll movement, debug logging, network, analytics, upload, or persistence behavior.
+The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, validates the binary SpriteKit scene plist, checks Xcode resource references, verifies the Swift source inventory, and guards against image-helper force unwraps, non-finite touch vectors, repeated game-over transitions, unguarded game-over restarts, stale collision nodes, late collision handler mutations, uncleared contact delegate callbacks, late spawn actions, broken per-frame background scroll movement, debug logging, network, analytics, upload, or persistence behavior.
 
 The pinned GitHub Actions check runs `make check` on `macos-15`. When Xcode is
 available, the baseline also compiles an unsigned Swift 5 Debug build for the
@@ -122,6 +122,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-10-game-over-restart-guard.md` for the game-over restart guardrail.
 - See `docs/plans/2026-06-13-undersized-scene-spawn-guard.md` for the enemy
   spawn geometry guardrail.
+- See `docs/plans/2026-06-14-stale-player-contact-guard.md` for the stale player
+  collision guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - See `docs/plans/2026-06-10-ci-baseline.md` for the GitHub Actions baseline.
 - See `docs/plans/2026-06-10-hosted-project-validation.md` for the hosted Xcode

@@ -1,6 +1,6 @@
 # Stale Player Contact Guard
 
-status: planned
+status: completed
 
 ## Context
 
@@ -40,3 +40,24 @@ though that monster is no longer active in the scene.
   ordering, checker discovery, plan status, and verification evidence.
 - Audit the exact diff, generated artifacts, and intended files for secret
   patterns before committing.
+
+## Work Completed
+
+- Required both collision nodes to remain attached to the active scene before
+  the player collision handler mutates state or presents the loss scene.
+- Extended the static baseline with guard-presence and ordering assertions.
+- Updated the README and changelog to describe the stale-contact boundary.
+
+## Verification Completed
+
+- All four Make gates passed from the checkout and reported that `xcodebuild` was unavailable,
+  so this Linux host exercised the complete static baseline.
+- The full gate passed from an external directory through the absolute Makefile path.
+- `python3 -m py_compile scripts/check-baseline.py`, shell syntax, plist, XML,
+  project, and workflow parsing, and `git diff --check` passed.
+- Five isolated hostile mutations were rejected: missing active-node guard,
+  late guard ordering, missing plan discovery, stale plan status, and missing
+  verification evidence.
+- Exact intended-file generated-artifact and secret-pattern audits passed.
+- Hosted macOS simulator compilation and code-scanning evidence is recorded
+  separately after push; this plan claims only completed local evidence.

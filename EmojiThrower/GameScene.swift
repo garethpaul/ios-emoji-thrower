@@ -314,6 +314,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     func monsterDidCollideWithPlayer(_ monster:SKSpriteNode, player:SKSpriteNode) {
         if gameIsOver { return }
+        guard monster.parent === self, player.parent === self else { return }
 
         playerDestroyed = true
 

@@ -27,6 +27,7 @@ DUPLICATE_CONTACT_PLAN = ROOT / "docs/plans/2026-06-12-projectile-duplicate-cont
 UNDERSIZED_SPAWN_PLAN = ROOT / "docs/plans/2026-06-13-undersized-scene-spawn-guard.md"
 FINITE_TOUCH_VECTOR_PLAN = ROOT / "docs/plans/2026-06-13-finite-projectile-touch-vector.md"
 LOCATION_INDEPENDENT_MAKE_PLAN = ROOT / "docs/plans/2026-06-13-location-independent-make.md"
+STALE_PLAYER_CONTACT_PLAN = ROOT / "docs/plans/2026-06-14-stale-player-contact-guard.md"
 EXPECTED_WORKFLOW = """name: Check
 
 on:
@@ -152,6 +153,7 @@ def main():
         "docs/plans/2026-06-13-undersized-scene-spawn-guard.md",
         "docs/plans/2026-06-13-finite-projectile-touch-vector.md",
         "docs/plans/2026-06-13-location-independent-make.md",
+        "docs/plans/2026-06-14-stale-player-contact-guard.md",
         "docs/readme-overview.svg",
     ]
 
@@ -206,6 +208,7 @@ def main():
     undersized_spawn_plan = UNDERSIZED_SPAWN_PLAN.read_text(encoding="utf-8") if UNDERSIZED_SPAWN_PLAN.exists() else ""
     finite_touch_vector_plan = FINITE_TOUCH_VECTOR_PLAN.read_text(encoding="utf-8") if FINITE_TOUCH_VECTOR_PLAN.exists() else ""
     location_independent_make_plan = LOCATION_INDEPENDENT_MAKE_PLAN.read_text(encoding="utf-8") if LOCATION_INDEPENDENT_MAKE_PLAN.exists() else ""
+    stale_player_contact_plan = STALE_PLAYER_CONTACT_PLAN.read_text(encoding="utf-8") if STALE_PLAYER_CONTACT_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
@@ -370,10 +373,17 @@ def main():
             failures)
     player_collision_index = game_scene.find("func monsterDidCollideWithPlayer")
     player_guard_index = game_scene.find("if gameIsOver { return }", player_collision_index)
+    player_active_node_guard_index = game_scene.find("guard monster.parent === self, player.parent === self else { return }", player_collision_index)
     player_destroyed_index = game_scene.find("playerDestroyed = true", player_collision_index)
+    player_remove_index = game_scene.find("player.removeFromParent()", player_collision_index)
     require(player_collision_index != -1 and player_guard_index != -1 and
             player_destroyed_index != -1 and player_guard_index < player_destroyed_index,
             "Player collision handler must ignore late contacts before mutating player state",
+            failures)
+    require(player_active_node_guard_index != -1 and
+            player_guard_index < player_active_node_guard_index < player_destroyed_index and
+            player_active_node_guard_index < player_remove_index,
+            "Player collisions must require active nodes before mutating player state",
             failures)
     game_view_controller = read("EmojiThrower/GameViewController.swift")
     require("guard let skView = view as? SKView" in game_view_controller,
@@ -542,6 +552,23 @@ def main():
                           finite_touch_verification,
                           re.IGNORECASE) is None,
             "finite projectile touch-vector plan must record completed status and actual local verification",
+            failures)
+    stale_player_contact_statuses = re.findall(
+        r"^status: .+$", stale_player_contact_plan, flags=re.MULTILINE
+    )
+    stale_player_contact_verification = markdown_section(
+        stale_player_contact_plan, "Verification Completed"
+    )
+    require(stale_player_contact_statuses == ["status: completed"] and
+            "All four Make gates" in stale_player_contact_verification and
+            "absolute Makefile path" in stale_player_contact_verification and
+            "Five isolated hostile mutations" in stale_player_contact_verification and
+            "git diff --check" in stale_player_contact_verification and
+            "`xcodebuild` was unavailable" in stale_player_contact_verification and
+            re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                      stale_player_contact_verification,
+                      re.IGNORECASE) is None,
+            "stale player contact plan must record completed status and actual local verification",
             failures)
     duplicate_contact_status = re.findall(
         r"(?mi)^status:\s*(.+?)\s*$", duplicate_contact_plan
