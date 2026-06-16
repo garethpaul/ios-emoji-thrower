@@ -40,7 +40,10 @@ expectPoint(
     y: -0.8,
     "negative vertical offsets preserve direction"
 )
-expectNil(ProjectileMath.direction(offset: .zero), "zero-length offsets are rejected")
+expectNil(
+    ProjectileMath.direction(offset: CGPoint(x: 0.0, y: 0.0)),
+    "zero-length offsets are rejected"
+)
 expectNil(ProjectileMath.direction(offset: CGPoint(x: -1.0, y: 0.0)), "backward offsets are rejected")
 expectNil(ProjectileMath.direction(offset: CGPoint(x: .nan, y: 1.0)), "NaN horizontal offsets are rejected")
 expectNil(ProjectileMath.direction(offset: CGPoint(x: 1.0, y: .nan)), "NaN vertical offsets are rejected")

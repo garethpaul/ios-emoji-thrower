@@ -346,6 +346,7 @@ def main():
     for fragment in [
         "if !actual.x.isFinite || !actual.y.isFinite",
         "CGPoint(x: 3.0, y: 4.0)",
+        "CGPoint(x: 0.0, y: 0.0)",
         "CGPoint(x: -1.0, y: 0.0)",
         "CGPoint(x: .nan, y: 1.0)",
         "CGFloat.greatestFiniteMagnitude",
