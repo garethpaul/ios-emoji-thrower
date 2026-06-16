@@ -117,21 +117,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     func projectileDirection(offset: CGPoint) -> CGPoint? {
-        guard offset.x.isFinite, offset.y.isFinite, offset.x > 0 else {
-            return nil
-        }
-
-        let offsetLength = offset.length()
-        guard offsetLength.isFinite, offsetLength > 0 else {
-            return nil
-        }
-
-        let direction = offset / offsetLength
-        guard direction.x.isFinite, direction.y.isFinite else {
-            return nil
-        }
-
-        return direction
+        return ProjectileMath.direction(offset: offset)
     }
     
     //MARK: - Get Profile Picture

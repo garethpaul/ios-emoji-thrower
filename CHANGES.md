@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-16
+
+- Added executable Swift tests for projectile direction normalization using the
+  same finite-vector implementation as the SpriteKit scene.
+
 ## 2026-06-14
 
 - Ignored queued player contacts after either collision node has already left

@@ -23,13 +23,14 @@ player launches emoji projectiles at moving targets.
 
 ## Coding conventions
 
-- Language mix noted in the README: Swift (9).
+- Language mix noted in the README: Swift (10).
 - Preserve the checked-in Swift 5, iOS 12, Xcode, and signing assumptions unless
   the change is explicitly about modernization.
 
 ## Testing guidance
 
-- No dedicated test files were detected; treat `make check` as the minimum baseline.
+- `make check` compiles and runs the shared projectile-math harness when
+  `swiftc` is available; hosted macOS is the authoritative execution boundary.
 - Start with the narrowest relevant test or Make target, then run `make check` before handing off if the change is not documentation-only.
 - Keep README verification notes in sync when commands, fixtures, or supported toolchains change.
 

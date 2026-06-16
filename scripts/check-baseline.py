@@ -28,6 +28,7 @@ UNDERSIZED_SPAWN_PLAN = ROOT / "docs/plans/2026-06-13-undersized-scene-spawn-gua
 FINITE_TOUCH_VECTOR_PLAN = ROOT / "docs/plans/2026-06-13-finite-projectile-touch-vector.md"
 LOCATION_INDEPENDENT_MAKE_PLAN = ROOT / "docs/plans/2026-06-13-location-independent-make.md"
 STALE_PLAYER_CONTACT_PLAN = ROOT / "docs/plans/2026-06-14-stale-player-contact-guard.md"
+PROJECTILE_TEST_PLAN = ROOT / "docs/plans/2026-06-16-executable-projectile-math-tests.md"
 EXPECTED_WORKFLOW = """name: Check
 
 on:
@@ -118,6 +119,7 @@ def main():
         "EmojiThrower/Info.plist",
         "EmojiThrower/AppDelegate.swift",
         "EmojiThrower/GameScene.swift",
+        "EmojiThrower/ProjectileMath.swift",
         "EmojiThrower/GameViewController.swift",
         "EmojiThrower/GameOverScene.swift",
         "EmojiThrower/GameScene.sks",
@@ -154,7 +156,10 @@ def main():
         "docs/plans/2026-06-13-finite-projectile-touch-vector.md",
         "docs/plans/2026-06-13-location-independent-make.md",
         "docs/plans/2026-06-14-stale-player-contact-guard.md",
+        "docs/plans/2026-06-16-executable-projectile-math-tests.md",
         "docs/readme-overview.svg",
+        "Tests/ProjectileMathTests/main.swift",
+        "scripts/run-projectile-math-tests.sh",
     ]
 
     for relative_path in required_files:
@@ -182,6 +187,9 @@ def main():
     swift_sources = "\n".join(strip_swift_line_comments(path.read_text(encoding="utf-8", errors="replace"))
                               for path in sorted((ROOT / "EmojiThrower").glob("*.swift")))
     game_scene = read("EmojiThrower/GameScene.swift")
+    projectile_math = read("EmojiThrower/ProjectileMath.swift")
+    projectile_tests = read("Tests/ProjectileMathTests/main.swift")
+    projectile_test_runner = read("scripts/run-projectile-math-tests.sh")
     readme = read("README.md")
     vision = read("VISION.md")
     security = read("SECURITY.md")
@@ -209,6 +217,7 @@ def main():
     finite_touch_vector_plan = FINITE_TOUCH_VECTOR_PLAN.read_text(encoding="utf-8") if FINITE_TOUCH_VECTOR_PLAN.exists() else ""
     location_independent_make_plan = LOCATION_INDEPENDENT_MAKE_PLAN.read_text(encoding="utf-8") if LOCATION_INDEPENDENT_MAKE_PLAN.exists() else ""
     stale_player_contact_plan = STALE_PLAYER_CONTACT_PLAN.read_text(encoding="utf-8") if STALE_PLAYER_CONTACT_PLAN.exists() else ""
+    projectile_test_plan = PROJECTILE_TEST_PLAN.read_text(encoding="utf-8") if PROJECTILE_TEST_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
@@ -222,6 +231,10 @@ def main():
             failures)
     for resource in ["Assets.xcassets", "sprites.atlas", "background-music-aac.caf", "pew-pew-lei.caf", "Sketch3D.otf", "GameScene.sks"]:
         require(resource in project, f"Xcode project must keep resource reference: {resource}", failures)
+    require(project.count("ProjectileMath.swift in Sources") == 2 and
+            "path = ProjectileMath.swift;" in project,
+            "Xcode project must compile shared projectile math in the app target",
+            failures)
     require(app_plist.get("UIAppFonts") == ["Sketch3D.otf"],
             "Info.plist must register the bundled Sketch3D font",
             failures)
@@ -317,15 +330,38 @@ def main():
         "SKAction.playSoundFileNamed", touches_ended_index
     )
     require(projectile_direction_index != -1 and
-            "offset.x.isFinite" in projectile_direction_body and
-            "offset.y.isFinite" in projectile_direction_body and
-            "offset.x > 0" in projectile_direction_body and
-            "offsetLength.isFinite" in projectile_direction_body and
-            "offsetLength > 0" in projectile_direction_body and
-            "direction.x.isFinite" in projectile_direction_body and
-            "direction.y.isFinite" in projectile_direction_body,
-            "GameScene must reject non-finite, non-forward, and overflowed projectile vectors",
+            "return ProjectileMath.direction(offset: offset)" in projectile_direction_body,
+            "GameScene must delegate projectile validation to shared executable math",
             failures)
+    for fragment in [
+        "guard offset.x.isFinite, offset.y.isFinite, offset.x > 0",
+        "let offsetLength = sqrt(offset.x * offset.x + offset.y * offset.y)",
+        "guard offsetLength.isFinite, offsetLength > 0",
+        "let direction = CGPoint(x: offset.x / offsetLength, y: offset.y / offsetLength)",
+        "guard direction.x.isFinite, direction.y.isFinite",
+    ]:
+        require(fragment in projectile_math,
+                f"shared projectile math must preserve finite-vector contract: {fragment}",
+                failures)
+    for fragment in [
+        "if !actual.x.isFinite || !actual.y.isFinite",
+        "CGPoint(x: 3.0, y: 4.0)",
+        "CGPoint(x: -1.0, y: 0.0)",
+        "CGPoint(x: .nan, y: 1.0)",
+        "CGFloat.greatestFiniteMagnitude",
+    ]:
+        require(fragment in projectile_tests,
+                f"executable projectile behavior coverage is missing: {fragment}",
+                failures)
+    for fragment in [
+        '"$SWIFTC"',
+        '"$ROOT/EmojiThrower/ProjectileMath.swift"',
+        '"$ROOT/Tests/ProjectileMathTests/main.swift"',
+        '"$BUILD_DIR/projectile-math-tests"',
+    ]:
+        require(fragment in projectile_test_runner,
+                f"projectile behavior test runner is missing: {fragment}",
+                failures)
     require(touches_ended_index != -1 and touch_direction_guard_index != -1 and
             projectile_physics_index != -1 and projectile_add_index != -1 and
             projectile_sound_index != -1 and
@@ -416,11 +452,22 @@ def main():
             ".gitignore must exclude local config and Xcode build products",
             failures)
     require(".PHONY: build check lint test" in makefile and
+            "SWIFTC ?= swiftc" in makefile and
             "ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile and
             "lint test build: check" in makefile and
+            '"$(ROOT)/scripts/run-projectile-math-tests.sh"' in makefile and
             'python3 "$(ROOT)/scripts/check-baseline.py"' in makefile and
             "python3 scripts/check-baseline.py" not in makefile,
             "Makefile must expose location-independent lint, test, build, and check aliases",
+            failures)
+    require("Status: Completed" in projectile_test_plan and
+            "make check" in projectile_test_plan and
+            "hostile mutations" in projectile_test_plan.lower(),
+            "executable projectile math plan must preserve completed verification evidence",
+            failures)
+    require("docs/plans/2026-06-16-executable-projectile-math-tests.md" in readme and
+            "executable Swift" in readme,
+            "README must document executable projectile math coverage",
             failures)
     require("make lint" in readme and "make test" in readme and "make build" in readme and "make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme and
             "image" in readme.lower() and "game-over" in readme.lower() and "spawn" in readme.lower() and

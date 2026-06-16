@@ -8,7 +8,7 @@
 `garethpaul/ios-emoji-thrower` is a Swift 5 SpriteKit game sample in which the
 player launches emoji projectiles at moving targets.
 
-This README is based on the checked-in source, manifests, scripts, and repository metadata on the `master` branch. The project language mix found during review was: Swift (9).
+This README is based on the checked-in source, manifests, scripts, and repository metadata on the `master` branch. The project language mix found during review was: Swift (10).
 
 ## Repository Contents
 
@@ -82,7 +82,15 @@ The `lint`, `test`, and `build` targets intentionally alias the canonical baseli
 on hosts without Xcode, so the standard local gate commands
 stay available while preserving the single source of truth.
 
-The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, validates the binary SpriteKit scene plist, checks Xcode resource references, verifies the Swift source inventory, and guards against image-helper force unwraps, non-finite touch vectors, repeated game-over transitions, unguarded game-over restarts, stale collision nodes, late collision handler mutations, uncleared contact delegate callbacks, late spawn actions, broken per-frame background scroll movement, debug logging, network, analytics, upload, or persistence behavior.
+The baseline runs executable Swift projectile-math tests when `swiftc` is
+available, then runs `scripts/check-baseline.py`. It parses
+plist/storyboard/asset metadata, validates the binary SpriteKit scene plist,
+checks Xcode resource references, verifies the Swift source inventory, and
+guards against image-helper force unwraps, non-finite touch vectors, repeated
+game-over transitions, unguarded game-over restarts, stale collision nodes,
+late collision handler mutations, uncleared contact delegate callbacks, late
+spawn actions, broken per-frame background scroll movement, debug logging,
+network, analytics, upload, or persistence behavior.
 
 The pinned GitHub Actions check runs `make check` on `macos-15`. When Xcode is
 available, the baseline also compiles an unsigned Swift 5 Debug build for the
@@ -124,6 +132,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   spawn geometry guardrail.
 - See `docs/plans/2026-06-14-stale-player-contact-guard.md` for the stale player
   collision guardrail.
+- See `docs/plans/2026-06-16-executable-projectile-math-tests.md` for the shared
+  projectile validation and executable Swift behavioral gate.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - See `docs/plans/2026-06-10-ci-baseline.md` for the GitHub Actions baseline.
 - See `docs/plans/2026-06-10-hosted-project-validation.md` for the hosted Xcode
