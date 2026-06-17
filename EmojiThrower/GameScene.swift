@@ -244,6 +244,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         guard let direction = projectileDirection(offset: offset) else {
             return
         }
+        guard let projectileTravelDistance = ProjectileMath.exitDistance(
+            sceneSize: size,
+            projectileSize: projectile.size
+        ) else {
+            return
+        }
         
         // Projectile collision set up
         projectile.physicsBody = SKPhysicsBody(circleOfRadius: projectile.size.width/2)
@@ -256,8 +262,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Add projectile after double-checking direction of shot
         addChild(projectile)
         
-        // Make it shoot far enough to be guaranteed off screen
-        let shootDistance = direction * 1000
+        // Make it shoot far enough to move the whole node off screen.
+        let shootDistance = direction * projectileTravelDistance
         
         // Add the shoot amount to the current position
         let realDest = shootDistance + projectile.position

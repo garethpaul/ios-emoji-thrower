@@ -62,6 +62,8 @@ unsigned simulator build when Xcode is available.
 - Enemy spawning is keyed and stopped when game-over presentation starts.
 - Background scroll movement advances per-frame from each node's current
   position until game over.
+- Projectile launches use a scene-aware exit distance so the whole node clears
+  wide and tall scene bounds before its movement action completes.
 - This is a local game sample. Do not add accounts, analytics, persistence, upload, or network behavior without a dedicated design and security review.
 
 ## Testing and Verification
@@ -91,6 +93,8 @@ game-over transitions, unguarded game-over restarts, stale collision nodes,
 late collision handler mutations, uncleared contact delegate callbacks, late
 spawn actions, broken per-frame background scroll movement, debug logging,
 network, analytics, upload, or persistence behavior.
+The executable harness covers both finite direction normalization and
+scene-aware projectile travel for wide, tall, invalid, and overflowing geometry.
 
 The pinned GitHub Actions check runs `make check` on `macos-15`. When Xcode is
 available, the baseline also compiles an unsigned Swift 5 Debug build for the
@@ -134,6 +138,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   collision guardrail.
 - See `docs/plans/2026-06-16-executable-projectile-math-tests.md` for the shared
   projectile validation and executable Swift behavioral gate.
+- See `docs/plans/2026-06-17-020-fix-scene-aware-projectile-distance-plan.md`
+  for the scene-aware exit distance and invalid-geometry guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - See `docs/plans/2026-06-10-ci-baseline.md` for the GitHub Actions baseline.
 - See `docs/plans/2026-06-10-hosted-project-validation.md` for the hosted Xcode

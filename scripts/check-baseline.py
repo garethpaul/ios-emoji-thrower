@@ -29,6 +29,7 @@ FINITE_TOUCH_VECTOR_PLAN = ROOT / "docs/plans/2026-06-13-finite-projectile-touch
 LOCATION_INDEPENDENT_MAKE_PLAN = ROOT / "docs/plans/2026-06-13-location-independent-make.md"
 STALE_PLAYER_CONTACT_PLAN = ROOT / "docs/plans/2026-06-14-stale-player-contact-guard.md"
 PROJECTILE_TEST_PLAN = ROOT / "docs/plans/2026-06-16-executable-projectile-math-tests.md"
+SCENE_AWARE_DISTANCE_PLAN = ROOT / "docs/plans/2026-06-17-020-fix-scene-aware-projectile-distance-plan.md"
 EXPECTED_WORKFLOW = """name: Check
 
 on:
@@ -157,6 +158,7 @@ def main():
         "docs/plans/2026-06-13-location-independent-make.md",
         "docs/plans/2026-06-14-stale-player-contact-guard.md",
         "docs/plans/2026-06-16-executable-projectile-math-tests.md",
+        "docs/plans/2026-06-17-020-fix-scene-aware-projectile-distance-plan.md",
         "docs/readme-overview.svg",
         "Tests/ProjectileMathTests/main.swift",
         "scripts/run-projectile-math-tests.sh",
@@ -218,6 +220,7 @@ def main():
     location_independent_make_plan = LOCATION_INDEPENDENT_MAKE_PLAN.read_text(encoding="utf-8") if LOCATION_INDEPENDENT_MAKE_PLAN.exists() else ""
     stale_player_contact_plan = STALE_PLAYER_CONTACT_PLAN.read_text(encoding="utf-8") if STALE_PLAYER_CONTACT_PLAN.exists() else ""
     projectile_test_plan = PROJECTILE_TEST_PLAN.read_text(encoding="utf-8") if PROJECTILE_TEST_PLAN.exists() else ""
+    scene_aware_distance_plan = SCENE_AWARE_DISTANCE_PLAN.read_text(encoding="utf-8") if SCENE_AWARE_DISTANCE_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
@@ -329,6 +332,10 @@ def main():
     projectile_sound_index = game_scene.find(
         "SKAction.playSoundFileNamed", touches_ended_index
     )
+    projectile_distance_guard_index = game_scene.find(
+        "guard let projectileTravelDistance = ProjectileMath.exitDistance(",
+        touches_ended_index,
+    )
     require(projectile_direction_index != -1 and
             "return ProjectileMath.direction(offset: offset)" in projectile_direction_body,
             "GameScene must delegate projectile validation to shared executable math",
@@ -344,6 +351,20 @@ def main():
                 f"shared projectile math must preserve finite-vector contract: {fragment}",
                 failures)
     for fragment in [
+        "static func exitDistance(sceneSize: CGSize, projectileSize: CGSize) -> CGFloat?",
+        "sceneSize.width.isFinite, sceneSize.height.isFinite",
+        "sceneSize.width > 0, sceneSize.height > 0",
+        "projectileSize.width.isFinite, projectileSize.height.isFinite",
+        "projectileSize.width >= 0, projectileSize.height >= 0",
+        "let sceneDiagonal = hypot(sceneSize.width, sceneSize.height)",
+        "let projectileClearance = max(projectileSize.width, projectileSize.height)",
+        "let distance = sceneDiagonal + projectileClearance",
+        "guard sceneDiagonal.isFinite, distance.isFinite, distance > 0",
+    ]:
+        require(fragment in projectile_math,
+                f"shared projectile math must preserve scene-aware exit distance: {fragment}",
+                failures)
+    for fragment in [
         "if !actual.x.isFinite || !actual.y.isFinite",
         "CGPoint(x: 3.0, y: 4.0)",
         "CGPoint(x: 0.0, y: 0.0)",
@@ -355,6 +376,21 @@ def main():
                 f"executable projectile behavior coverage is missing: {fragment}",
                 failures)
     for fragment in [
+        "ProjectileMath.exitDistance(",
+        "CGSize(width: 1366.0, height: 1024.0)",
+        "CGSize(width: 768.0, height: 1366.0)",
+        "hypot(1366.0, 1024.0) + 40.0",
+        "zero-width scenes are rejected",
+        "negative scene dimensions are rejected",
+        "non-finite scene dimensions are rejected",
+        "negative projectile dimensions are rejected",
+        "non-finite projectile dimensions are rejected",
+        "overflowing exit distances are rejected",
+    ]:
+        require(fragment in projectile_tests,
+                f"executable projectile exit-distance coverage is missing: {fragment}",
+                failures)
+    for fragment in [
         '"$SWIFTC"',
         '"$ROOT/EmojiThrower/ProjectileMath.swift"',
         '"$ROOT/Tests/ProjectileMathTests/main.swift"',
@@ -364,11 +400,17 @@ def main():
                 f"projectile behavior test runner is missing: {fragment}",
                 failures)
     require(touches_ended_index != -1 and touch_direction_guard_index != -1 and
+            projectile_distance_guard_index != -1 and
             projectile_physics_index != -1 and projectile_add_index != -1 and
             projectile_sound_index != -1 and
-            touch_direction_guard_index < projectile_physics_index <
+            touch_direction_guard_index < projectile_distance_guard_index <
+            projectile_physics_index <
             projectile_add_index < projectile_sound_index,
-            "GameScene must validate projectile direction before physics, insertion, and sound",
+            "GameScene must validate projectile direction and exit geometry before physics, insertion, and sound",
+            failures)
+    require("let shootDistance = direction * projectileTravelDistance" in game_scene and
+            "direction * 1000" not in game_scene,
+            "GameScene must use scene-aware projectile travel distance instead of a fixed scalar",
             failures)
     require("projectileDidCollideWithMonster(projectile, monster: monster)" in game_scene and
             "monsterDidCollideWithPlayer(monster, player: player)" in game_scene and
@@ -469,6 +511,18 @@ def main():
     require("docs/plans/2026-06-16-executable-projectile-math-tests.md" in readme and
             "executable Swift" in readme,
             "README must document executable projectile math coverage",
+            failures)
+    require("title: Scene-Aware Projectile Exit Distance" in scene_aware_distance_plan and
+            "type: fix" in scene_aware_distance_plan and
+            "date: 2026-06-17" in scene_aware_distance_plan and
+            "R1." in scene_aware_distance_plan and "R6." in scene_aware_distance_plan and
+            "status:" not in scene_aware_distance_plan.lower(),
+            "scene-aware projectile distance plan must preserve portable metadata and requirements",
+            failures)
+    require("scene-aware exit distance" in readme.lower() and
+            "2026-06-17-020-fix-scene-aware-projectile-distance-plan.md" in readme and
+            "scene-aware" in changes.lower() and "projectile travel" in changes.lower(),
+            "README and CHANGES must document scene-aware projectile travel",
             failures)
     require("make lint" in readme and "make test" in readme and "make build" in readme and "make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme and
             "image" in readme.lower() and "game-over" in readme.lower() and "spawn" in readme.lower() and

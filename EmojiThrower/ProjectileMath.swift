@@ -18,4 +18,22 @@ enum ProjectileMath {
 
         return direction
     }
+
+    static func exitDistance(sceneSize: CGSize, projectileSize: CGSize) -> CGFloat? {
+        guard sceneSize.width.isFinite, sceneSize.height.isFinite,
+              sceneSize.width > 0, sceneSize.height > 0,
+              projectileSize.width.isFinite, projectileSize.height.isFinite,
+              projectileSize.width >= 0, projectileSize.height >= 0 else {
+            return nil
+        }
+
+        let sceneDiagonal = hypot(sceneSize.width, sceneSize.height)
+        let projectileClearance = max(projectileSize.width, projectileSize.height)
+        let distance = sceneDiagonal + projectileClearance
+        guard sceneDiagonal.isFinite, distance.isFinite, distance > 0 else {
+            return nil
+        }
+
+        return distance
+    }
 }

@@ -1,5 +1,12 @@
 # Changes
 
+## 2026-06-17
+
+- Replaced the fixed projectile travel scalar with validated scene-aware
+  projectile travel that includes node clearance for wide and tall scenes.
+- Extended the executable Swift harness with scene geometry, projectile margin,
+  invalid dimension, and overflow cases.
+
 ## 2026-06-16
 
 - Added executable Swift tests for projectile direction normalization using the
