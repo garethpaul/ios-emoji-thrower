@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-18
+
+- Required active-scene game-over ownership before terminal state changes,
+  spawn cancellation, contact shutdown, or destination presentation.
+
 ## 2026-06-17
 
 - Replaced the fixed projectile travel scalar with validated scene-aware

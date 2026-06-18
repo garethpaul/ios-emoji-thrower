@@ -1,6 +1,6 @@
 # Active Game-Over Presentation
 
-status: planned
+status: completed
 
 ## Context
 
@@ -87,8 +87,22 @@ gameplay, no-network boundary, and historical secret-rotation warning.
 
 ## Work Completed
 
-Pending implementation.
+- Guarded terminal presentation with active `SKView` scene ownership before
+  every terminal side effect.
+- Returned accepted or rejected transition status and presented through the
+  validated view reference.
+- Added portable ordering, guidance, and completed-evidence contracts without
+  changing gameplay constants or project metadata.
 
 ## Verification Completed
 
-Pending implementation and validation.
+- All four Make gates passed after the completed implementation.
+- The absolute Makefile gate passed from an external directory.
+- `python3 -m py_compile scripts/check-baseline.py` and
+  `sh -n scripts/run-projectile-math-tests.sh` passed.
+- Seven isolated hostile mutations were rejected for ownership, ordering,
+  validated view use, return behavior, guidance, and plan evidence.
+- `git diff --check` passed with generated-artifact, protected-metadata, and
+  changed-line credential audits.
+- Local `swiftc and xcodebuild were unavailable`; hosted macOS remains
+  authoritative for Swift and SpriteKit builds.

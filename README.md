@@ -57,6 +57,8 @@ unsigned simulator build when Xcode is available.
 - The game uses SpriteKit scene logic, bundled image resources, sound files, and `Sketch3D.otf`.
 - Win and loss paths share a guarded game-over presenter so contacts do not trigger repeated scene transitions.
 - Game-over restarts confirm the current scene before presenting a fresh game scene.
+- Active-scene game-over ownership is required before the outgoing scene
+  cancels gameplay or presents its terminal destination.
 - Collision handlers ignore late callbacks after game-over presentation begins.
 - The game-over presenter clears the physics contact delegate before scene transition.
 - Enemy spawning is keyed and stopped when game-over presentation starts.

@@ -22,6 +22,8 @@ Priority:
 - Keep optional image helper rendering tolerant of missing assets
 - Keep game-over transitions guarded against repeated contact handling
 - Keep delayed game-over restarts tied to the current SpriteKit scene
+- Require active-scene game-over ownership before terminal scene mutation or
+  transition presentation
 - Keep collision handlers from mutating score or player state after game over
 - Clear the physics contact delegate before game-over scene transitions
 - Stop enemy spawning as soon as game-over presentation starts

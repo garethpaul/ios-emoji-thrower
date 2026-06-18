@@ -30,6 +30,7 @@ LOCATION_INDEPENDENT_MAKE_PLAN = ROOT / "docs/plans/2026-06-13-location-independ
 STALE_PLAYER_CONTACT_PLAN = ROOT / "docs/plans/2026-06-14-stale-player-contact-guard.md"
 PROJECTILE_TEST_PLAN = ROOT / "docs/plans/2026-06-16-executable-projectile-math-tests.md"
 SCENE_AWARE_DISTANCE_PLAN = ROOT / "docs/plans/2026-06-17-020-fix-scene-aware-projectile-distance-plan.md"
+ACTIVE_GAME_OVER_PLAN = ROOT / "docs/plans/2026-06-18-active-game-over-presentation.md"
 EXPECTED_WORKFLOW = """name: Check
 
 on:
@@ -221,6 +222,7 @@ def main():
     stale_player_contact_plan = STALE_PLAYER_CONTACT_PLAN.read_text(encoding="utf-8") if STALE_PLAYER_CONTACT_PLAN.exists() else ""
     projectile_test_plan = PROJECTILE_TEST_PLAN.read_text(encoding="utf-8") if PROJECTILE_TEST_PLAN.exists() else ""
     scene_aware_distance_plan = SCENE_AWARE_DISTANCE_PLAN.read_text(encoding="utf-8") if SCENE_AWARE_DISTANCE_PLAN.exists() else ""
+    active_game_over_plan = ACTIVE_GAME_OVER_PLAN.read_text(encoding="utf-8") if ACTIVE_GAME_OVER_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
@@ -418,12 +420,30 @@ def main():
             "GameScene must guard physics contact casts and handle projectile/player contacts",
             failures)
     require("var gameIsOver = false" in game_scene and
-            "func presentGameOver(won: Bool, transition: SKTransition)" in game_scene and
-            "if gameIsOver { return }" in game_scene and
+            "func presentGameOver(won: Bool, transition: SKTransition) -> Bool" in game_scene and
             "gameIsOver = true" in game_scene,
             "GameScene must guard repeated game-over transition handling",
             failures)
     present_game_over_index = game_scene.find("func presentGameOver")
+    projectile_collision_index = game_scene.find("func projectileDidCollideWithMonster")
+    present_game_over_body = game_scene[present_game_over_index:projectile_collision_index]
+    ownership_guard = "guard !gameIsOver, let view = self.view, view.scene === self else {"
+    ownership_guard_index = present_game_over_body.find(ownership_guard)
+    terminal_side_effect_indexes = [
+        present_game_over_body.find("gameIsOver = true"),
+        present_game_over_body.find('removeAction(forKey: "monsterSpawn")'),
+        present_game_over_body.find("physicsWorld.contactDelegate = nil"),
+        present_game_over_body.find("let gameOverScene = GameOverScene"),
+        present_game_over_body.find("view.presentScene(gameOverScene, transition: transition)"),
+    ]
+    require("@discardableResult" in game_scene[max(0, present_game_over_index - 30):present_game_over_index] and
+            ownership_guard_index != -1 and
+            "return false" in present_game_over_body and
+            "return true" in present_game_over_body and
+            all(index > ownership_guard_index for index in terminal_side_effect_indexes) and
+            "self.view?.presentScene" not in present_game_over_body,
+            "game-over terminal side effects must require active-scene view ownership",
+            failures)
     contact_delegate_clear_index = game_scene.find("physicsWorld.contactDelegate = nil", present_game_over_index)
     present_scene_index = game_scene.find("presentScene", present_game_over_index)
     require("physicsWorld.contactDelegate = self" in game_scene and
@@ -435,7 +455,6 @@ def main():
             "presentGameOver(won: false, transition: reveal)" in game_scene,
             "GameScene win and loss paths must use the guarded game-over presenter",
             failures)
-    projectile_collision_index = game_scene.find("func projectileDidCollideWithMonster")
     projectile_guard_index = game_scene.find("if gameIsOver { return }", projectile_collision_index)
     projectile_active_node_guard_index = game_scene.find("guard projectile.parent === self, monster.parent === self else { return }", projectile_collision_index)
     projectile_remove_index = game_scene.find("projectile.removeFromParent()", projectile_collision_index)
@@ -523,6 +542,36 @@ def main():
             "2026-06-17-020-fix-scene-aware-projectile-distance-plan.md" in readme and
             "scene-aware" in changes.lower() and "projectile travel" in changes.lower(),
             "README and CHANGES must document scene-aware projectile travel",
+            failures)
+    active_game_over_statuses = re.findall(
+        r"(?mi)^status:\s*(.+?)\s*$", active_game_over_plan
+    )
+    active_game_over_verification = markdown_section(
+        active_game_over_plan, "Verification Completed"
+    )
+    active_game_over_required = (
+        "All four Make gates",
+        "absolute Makefile",
+        "python3 -m py_compile scripts/check-baseline.py",
+        "sh -n scripts/run-projectile-math-tests.sh",
+        "Seven isolated hostile mutations",
+        "git diff --check",
+        "swiftc and xcodebuild were unavailable",
+    )
+    require(active_game_over_statuses == ["completed"] and
+            all(item in active_game_over_verification
+                for item in active_game_over_required) and
+            not re.search(r"(?i)\b(?:pending|todo|tbd|not run)\b",
+                          active_game_over_verification),
+            "active game-over plan must record completed verification",
+            failures)
+    normalized_guidance = [
+        " ".join(document.lower().split())
+        for document in [readme, security, vision, changes, agent_guidance]
+    ]
+    require(all("active-scene game-over ownership" in document
+                for document in normalized_guidance),
+            "project guidance must document active-scene game-over ownership",
             failures)
     require("make lint" in readme and "make test" in readme and "make build" in readme and "make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme and
             "image" in readme.lower() and "game-over" in readme.lower() and "spawn" in readme.lower() and

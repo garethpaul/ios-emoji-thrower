@@ -48,6 +48,8 @@ player launches emoji projectiles at moving targets.
 - Debug logging from launch and gameplay paths should stay removed; score should remain visible in-game rather than printed to the console.
 - Runtime debug overlays should stay disabled outside explicit troubleshooting builds.
 - Resource changes should keep image, sound, font, scene, and Xcode project references aligned, with fallback behavior for optional image helper rendering.
+- Keep active-scene game-over ownership ahead of terminal state, spawn,
+  contact-delegate, and presentation side effects.
 - This is an Apple platform sample. Xcode, Swift, and deployment target versions
   must stay aligned with the checked-in project settings.
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.

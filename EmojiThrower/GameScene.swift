@@ -277,13 +277,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         run(SKAction.playSoundFileNamed("pew-pew-lei.caf", waitForCompletion: false))
     }
 
-    func presentGameOver(won: Bool, transition: SKTransition) {
-        if gameIsOver { return }
+    @discardableResult
+    func presentGameOver(won: Bool, transition: SKTransition) -> Bool {
+        guard !gameIsOver, let view = self.view, view.scene === self else {
+            return false
+        }
+
         gameIsOver = true
         removeAction(forKey: "monsterSpawn")
         physicsWorld.contactDelegate = nil
         let gameOverScene = GameOverScene(size: self.size, won: won)
-        self.view?.presentScene(gameOverScene, transition: transition)
+        view.presentScene(gameOverScene, transition: transition)
+        return true
     }
     
     //MARK: - Projectile Collision Actions
