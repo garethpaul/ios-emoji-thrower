@@ -101,6 +101,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func random(min: CGFloat, max: CGFloat) -> CGFloat {
         return CGFloat.random(in: min...max)
     }
+
+    func monsterSpawnY(spriteHeight: CGFloat) -> CGFloat? {
+        guard spriteHeight.isFinite, size.height.isFinite, spriteHeight > 0 else {
+            return nil
+        }
+
+        let minY = spriteHeight / 2
+        let maxY = size.height - minY
+        guard minY <= maxY else {
+            return nil
+        }
+
+        return random(min: minY, max: maxY)
+    }
+
+    func projectileDirection(offset: CGPoint) -> CGPoint? {
+        return ProjectileMath.direction(offset: offset)
+    }
     
     //MARK: - Get Profile Picture
     func roundSquareImage(imageName: String) -> SKSpriteNode {
@@ -140,7 +158,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         
         // Determine where to spawn the monster along the Y axis
-        let actualY = random(min: monster.size.height/2, max: size.height - monster.size.height/2)
+        guard let actualY = monsterSpawnY(spriteHeight: monster.size.height) else {
+            return
+        }
         
         // Position the monster slightly off-screen along the right edge,
         // and along a random position along the Y axis as calculated above
@@ -221,8 +241,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Determine offset of touch location to projectile
         let offset = touchLocation - projectile.position
         
-        // Cancel shots that do not travel forward.
-        if (offset.x <= 0) { return }
+        guard let direction = projectileDirection(offset: offset) else {
+            return
+        }
+        guard let projectileTravelDistance = ProjectileMath.exitDistance(
+            sceneSize: size,
+            projectileSize: projectile.size
+        ) else {
+            return
+        }
         
         // Projectile collision set up
         projectile.physicsBody = SKPhysicsBody(circleOfRadius: projectile.size.width/2)
@@ -235,11 +262,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Add projectile after double-checking direction of shot
         addChild(projectile)
         
-        // Get the direction of where to shoot
-        let direction = offset.normalized()
-        
-        // Make it shoot far enough to be guaranteed off screen
-        let shootDistance = direction * 1000
+        // Make it shoot far enough to move the whole node off screen.
+        let shootDistance = direction * projectileTravelDistance
         
         // Add the shoot amount to the current position
         let realDest = shootDistance + projectile.position
@@ -253,13 +277,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         run(SKAction.playSoundFileNamed("pew-pew-lei.caf", waitForCompletion: false))
     }
 
-    func presentGameOver(won: Bool, transition: SKTransition) {
-        if gameIsOver { return }
+    @discardableResult
+    func presentGameOver(won: Bool, transition: SKTransition) -> Bool {
+        guard !gameIsOver, let view = self.view, view.scene === self else {
+            return false
+        }
+
         gameIsOver = true
         removeAction(forKey: "monsterSpawn")
         physicsWorld.contactDelegate = nil
         let gameOverScene = GameOverScene(size: self.size, won: won)
-        self.view?.presentScene(gameOverScene, transition: transition)
+        view.presentScene(gameOverScene, transition: transition)
+        return true
     }
     
     //MARK: - Projectile Collision Actions
@@ -282,6 +311,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     func monsterDidCollideWithPlayer(_ monster:SKSpriteNode, player:SKSpriteNode) {
         if gameIsOver { return }
+        guard monster.parent === self, player.parent === self else { return }
 
         playerDestroyed = true
 

@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import xml.etree.ElementTree as ET
 
 
@@ -24,6 +25,13 @@ CI_PLAN = ROOT / "docs/plans/2026-06-10-ci-baseline.md"
 HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
 SWIFT_5_BUILD_PLAN = ROOT / "docs/plans/2026-06-10-swift-5-spritekit-build.md"
 DUPLICATE_CONTACT_PLAN = ROOT / "docs/plans/2026-06-12-projectile-duplicate-contact-guard.md"
+UNDERSIZED_SPAWN_PLAN = ROOT / "docs/plans/2026-06-13-undersized-scene-spawn-guard.md"
+FINITE_TOUCH_VECTOR_PLAN = ROOT / "docs/plans/2026-06-13-finite-projectile-touch-vector.md"
+LOCATION_INDEPENDENT_MAKE_PLAN = ROOT / "docs/plans/2026-06-13-location-independent-make.md"
+STALE_PLAYER_CONTACT_PLAN = ROOT / "docs/plans/2026-06-14-stale-player-contact-guard.md"
+PROJECTILE_TEST_PLAN = ROOT / "docs/plans/2026-06-16-executable-projectile-math-tests.md"
+SCENE_AWARE_DISTANCE_PLAN = ROOT / "docs/plans/2026-06-17-020-fix-scene-aware-projectile-distance-plan.md"
+ACTIVE_GAME_OVER_PLAN = ROOT / "docs/plans/2026-06-18-active-game-over-presentation.md"
 EXPECTED_WORKFLOW = """name: Check
 
 on:
@@ -59,6 +67,14 @@ def require(condition, message, failures):
 
 def read(relative_path):
     return (ROOT / relative_path).read_text(encoding="utf-8", errors="replace")
+
+
+def markdown_section(text, heading):
+    match = re.search(
+        rf"(?ms)^## {re.escape(heading)}\s*$\n(.*?)(?=^## |\Z)",
+        text,
+    )
+    return match.group(1).strip() if match else ""
 
 
 def strip_swift_line_comments(text):
@@ -106,6 +122,7 @@ def main():
         "EmojiThrower/Info.plist",
         "EmojiThrower/AppDelegate.swift",
         "EmojiThrower/GameScene.swift",
+        "EmojiThrower/ProjectileMath.swift",
         "EmojiThrower/GameViewController.swift",
         "EmojiThrower/GameOverScene.swift",
         "EmojiThrower/GameScene.sks",
@@ -138,7 +155,15 @@ def main():
         "docs/plans/2026-06-10-hosted-project-validation.md",
         "docs/plans/2026-06-10-swift-5-spritekit-build.md",
         "docs/plans/2026-06-12-projectile-duplicate-contact-guard.md",
+        "docs/plans/2026-06-13-undersized-scene-spawn-guard.md",
+        "docs/plans/2026-06-13-finite-projectile-touch-vector.md",
+        "docs/plans/2026-06-13-location-independent-make.md",
+        "docs/plans/2026-06-14-stale-player-contact-guard.md",
+        "docs/plans/2026-06-16-executable-projectile-math-tests.md",
+        "docs/plans/2026-06-17-020-fix-scene-aware-projectile-distance-plan.md",
         "docs/readme-overview.svg",
+        "Tests/ProjectileMathTests/main.swift",
+        "scripts/run-projectile-math-tests.sh",
     ]
 
     for relative_path in required_files:
@@ -166,6 +191,9 @@ def main():
     swift_sources = "\n".join(strip_swift_line_comments(path.read_text(encoding="utf-8", errors="replace"))
                               for path in sorted((ROOT / "EmojiThrower").glob("*.swift")))
     game_scene = read("EmojiThrower/GameScene.swift")
+    projectile_math = read("EmojiThrower/ProjectileMath.swift")
+    projectile_tests = read("Tests/ProjectileMathTests/main.swift")
+    projectile_test_runner = read("scripts/run-projectile-math-tests.sh")
     readme = read("README.md")
     vision = read("VISION.md")
     security = read("SECURITY.md")
@@ -189,6 +217,13 @@ def main():
     hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
     swift_5_build_plan = SWIFT_5_BUILD_PLAN.read_text(encoding="utf-8") if SWIFT_5_BUILD_PLAN.exists() else ""
     duplicate_contact_plan = DUPLICATE_CONTACT_PLAN.read_text(encoding="utf-8") if DUPLICATE_CONTACT_PLAN.exists() else ""
+    undersized_spawn_plan = UNDERSIZED_SPAWN_PLAN.read_text(encoding="utf-8") if UNDERSIZED_SPAWN_PLAN.exists() else ""
+    finite_touch_vector_plan = FINITE_TOUCH_VECTOR_PLAN.read_text(encoding="utf-8") if FINITE_TOUCH_VECTOR_PLAN.exists() else ""
+    location_independent_make_plan = LOCATION_INDEPENDENT_MAKE_PLAN.read_text(encoding="utf-8") if LOCATION_INDEPENDENT_MAKE_PLAN.exists() else ""
+    stale_player_contact_plan = STALE_PLAYER_CONTACT_PLAN.read_text(encoding="utf-8") if STALE_PLAYER_CONTACT_PLAN.exists() else ""
+    projectile_test_plan = PROJECTILE_TEST_PLAN.read_text(encoding="utf-8") if PROJECTILE_TEST_PLAN.exists() else ""
+    scene_aware_distance_plan = SCENE_AWARE_DISTANCE_PLAN.read_text(encoding="utf-8") if SCENE_AWARE_DISTANCE_PLAN.exists() else ""
+    active_game_over_plan = ACTIVE_GAME_OVER_PLAN.read_text(encoding="utf-8") if ACTIVE_GAME_OVER_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
@@ -202,6 +237,10 @@ def main():
             failures)
     for resource in ["Assets.xcassets", "sprites.atlas", "background-music-aac.caf", "pew-pew-lei.caf", "Sketch3D.otf", "GameScene.sks"]:
         require(resource in project, f"Xcode project must keep resource reference: {resource}", failures)
+    require(project.count("ProjectileMath.swift in Sources") == 2 and
+            "path = ProjectileMath.swift;" in project,
+            "Xcode project must compile shared projectile math in the app target",
+            failures)
     require(app_plist.get("UIAppFonts") == ["Sketch3D.otf"],
             "Info.plist must register the bundled Sketch3D font",
             failures)
@@ -227,11 +266,32 @@ def main():
     add_monster_index = game_scene.find("func addMonster()")
     spawn_guard_index = game_scene.find("if gameIsOver { return }", add_monster_index)
     create_enemy_index = game_scene.find("let monster = SKSpriteNode", add_monster_index)
+    spawn_y_index = game_scene.find("func monsterSpawnY(spriteHeight: CGFloat) -> CGFloat?")
+    next_helper_index = game_scene.find("func roundSquareImage", spawn_y_index)
+    spawn_y_body = game_scene[spawn_y_index:next_helper_index]
+    spawn_y_guard_index = game_scene.find(
+        "guard let actualY = monsterSpawnY(spriteHeight: monster.size.height) else",
+        add_monster_index,
+    )
+    add_child_index = game_scene.find("addChild(monster)", add_monster_index)
     require('withKey: "monsterSpawn"' in game_scene and 'removeAction(forKey: "monsterSpawn")' in game_scene,
             "GameScene must run enemy spawning with a key and remove it when game-over presentation starts",
             failures)
     require(add_monster_index != -1 and spawn_guard_index != -1 and spawn_guard_index < create_enemy_index,
             "GameScene must guard enemy spawning after game over before creating sprites",
+            failures)
+    require(spawn_y_index != -1 and next_helper_index != -1 and
+            "guard spriteHeight.isFinite, size.height.isFinite, spriteHeight > 0 else" in spawn_y_body and
+            "let minY = spriteHeight / 2" in spawn_y_body and
+            "let maxY = size.height - minY" in spawn_y_body and
+            "guard minY <= maxY else" in spawn_y_body and
+            "return random(min: minY, max: maxY)" in spawn_y_body,
+            "monsterSpawnY must reject invalid geometry before constructing the closed random range",
+            failures)
+    require(spawn_y_guard_index != -1 and add_child_index != -1 and
+            create_enemy_index < spawn_y_guard_index < add_child_index and
+            "random(min: monster.size.height/2" not in game_scene,
+            "addMonster must skip invalid spawn geometry before adding the monster",
             failures)
     require("guard let originalPicture = UIImage(named: imageName)" in game_scene and
             "guard let scaledImage = UIGraphicsGetImageFromCurrentImageContext()" in game_scene and
@@ -254,8 +314,106 @@ def main():
     require("let pointLength = length()" in game_scene and "return CGPoint.zero" in game_scene,
             "CGPoint normalization must handle zero-length vectors",
             failures)
-    require("if (offset.x <= 0) { return }" in game_scene and "let direction = offset.normalized()" in game_scene,
-            "GameScene must guard non-forward projectile vectors before normalization",
+    projectile_direction_index = game_scene.find(
+        "func projectileDirection(offset: CGPoint) -> CGPoint?"
+    )
+    projectile_direction_end = game_scene.find(
+        "func roundSquareImage", projectile_direction_index
+    )
+    projectile_direction_body = game_scene[
+        projectile_direction_index:projectile_direction_end
+    ]
+    touches_ended_index = game_scene.find("override func touchesEnded")
+    touch_direction_guard_index = game_scene.find(
+        "guard let direction = projectileDirection(offset: offset) else",
+        touches_ended_index,
+    )
+    projectile_physics_index = game_scene.find(
+        "projectile.physicsBody =", touches_ended_index
+    )
+    projectile_add_index = game_scene.find("addChild(projectile)", touches_ended_index)
+    projectile_sound_index = game_scene.find(
+        "SKAction.playSoundFileNamed", touches_ended_index
+    )
+    projectile_distance_guard_index = game_scene.find(
+        "guard let projectileTravelDistance = ProjectileMath.exitDistance(",
+        touches_ended_index,
+    )
+    require(projectile_direction_index != -1 and
+            "return ProjectileMath.direction(offset: offset)" in projectile_direction_body,
+            "GameScene must delegate projectile validation to shared executable math",
+            failures)
+    for fragment in [
+        "guard offset.x.isFinite, offset.y.isFinite, offset.x > 0",
+        "let offsetLength = sqrt(offset.x * offset.x + offset.y * offset.y)",
+        "guard offsetLength.isFinite, offsetLength > 0",
+        "let direction = CGPoint(x: offset.x / offsetLength, y: offset.y / offsetLength)",
+        "guard direction.x.isFinite, direction.y.isFinite",
+    ]:
+        require(fragment in projectile_math,
+                f"shared projectile math must preserve finite-vector contract: {fragment}",
+                failures)
+    for fragment in [
+        "static func exitDistance(sceneSize: CGSize, projectileSize: CGSize) -> CGFloat?",
+        "sceneSize.width.isFinite, sceneSize.height.isFinite",
+        "sceneSize.width > 0, sceneSize.height > 0",
+        "projectileSize.width.isFinite, projectileSize.height.isFinite",
+        "projectileSize.width >= 0, projectileSize.height >= 0",
+        "let sceneDiagonal = hypot(sceneSize.width, sceneSize.height)",
+        "let projectileClearance = max(projectileSize.width, projectileSize.height)",
+        "let distance = sceneDiagonal + projectileClearance",
+        "guard sceneDiagonal.isFinite, distance.isFinite, distance > 0",
+    ]:
+        require(fragment in projectile_math,
+                f"shared projectile math must preserve scene-aware exit distance: {fragment}",
+                failures)
+    for fragment in [
+        "if !actual.x.isFinite || !actual.y.isFinite",
+        "CGPoint(x: 3.0, y: 4.0)",
+        "CGPoint(x: 0.0, y: 0.0)",
+        "CGPoint(x: -1.0, y: 0.0)",
+        "CGPoint(x: .nan, y: 1.0)",
+        "CGFloat.greatestFiniteMagnitude",
+    ]:
+        require(fragment in projectile_tests,
+                f"executable projectile behavior coverage is missing: {fragment}",
+                failures)
+    for fragment in [
+        "ProjectileMath.exitDistance(",
+        "CGSize(width: 1366.0, height: 1024.0)",
+        "CGSize(width: 768.0, height: 1366.0)",
+        "hypot(1366.0, 1024.0) + 40.0",
+        "zero-width scenes are rejected",
+        "negative scene dimensions are rejected",
+        "non-finite scene dimensions are rejected",
+        "negative projectile dimensions are rejected",
+        "non-finite projectile dimensions are rejected",
+        "overflowing exit distances are rejected",
+    ]:
+        require(fragment in projectile_tests,
+                f"executable projectile exit-distance coverage is missing: {fragment}",
+                failures)
+    for fragment in [
+        '"$SWIFTC"',
+        '"$ROOT/EmojiThrower/ProjectileMath.swift"',
+        '"$ROOT/Tests/ProjectileMathTests/main.swift"',
+        '"$BUILD_DIR/projectile-math-tests"',
+    ]:
+        require(fragment in projectile_test_runner,
+                f"projectile behavior test runner is missing: {fragment}",
+                failures)
+    require(touches_ended_index != -1 and touch_direction_guard_index != -1 and
+            projectile_distance_guard_index != -1 and
+            projectile_physics_index != -1 and projectile_add_index != -1 and
+            projectile_sound_index != -1 and
+            touch_direction_guard_index < projectile_distance_guard_index <
+            projectile_physics_index <
+            projectile_add_index < projectile_sound_index,
+            "GameScene must validate projectile direction and exit geometry before physics, insertion, and sound",
+            failures)
+    require("let shootDistance = direction * projectileTravelDistance" in game_scene and
+            "direction * 1000" not in game_scene,
+            "GameScene must use scene-aware projectile travel distance instead of a fixed scalar",
             failures)
     require("projectileDidCollideWithMonster(projectile, monster: monster)" in game_scene and
             "monsterDidCollideWithPlayer(monster, player: player)" in game_scene and
@@ -263,12 +421,30 @@ def main():
             "GameScene must guard physics contact casts and handle projectile/player contacts",
             failures)
     require("var gameIsOver = false" in game_scene and
-            "func presentGameOver(won: Bool, transition: SKTransition)" in game_scene and
-            "if gameIsOver { return }" in game_scene and
+            "func presentGameOver(won: Bool, transition: SKTransition) -> Bool" in game_scene and
             "gameIsOver = true" in game_scene,
             "GameScene must guard repeated game-over transition handling",
             failures)
     present_game_over_index = game_scene.find("func presentGameOver")
+    projectile_collision_index = game_scene.find("func projectileDidCollideWithMonster")
+    present_game_over_body = game_scene[present_game_over_index:projectile_collision_index]
+    ownership_guard = "guard !gameIsOver, let view = self.view, view.scene === self else {"
+    ownership_guard_index = present_game_over_body.find(ownership_guard)
+    terminal_side_effect_indexes = [
+        present_game_over_body.find("gameIsOver = true"),
+        present_game_over_body.find('removeAction(forKey: "monsterSpawn")'),
+        present_game_over_body.find("physicsWorld.contactDelegate = nil"),
+        present_game_over_body.find("let gameOverScene = GameOverScene"),
+        present_game_over_body.find("view.presentScene(gameOverScene, transition: transition)"),
+    ]
+    require("@discardableResult" in game_scene[max(0, present_game_over_index - 30):present_game_over_index] and
+            ownership_guard_index != -1 and
+            "return false" in present_game_over_body and
+            "return true" in present_game_over_body and
+            all(index > ownership_guard_index for index in terminal_side_effect_indexes) and
+            "self.view?.presentScene" not in present_game_over_body,
+            "game-over terminal side effects must require active-scene view ownership",
+            failures)
     contact_delegate_clear_index = game_scene.find("physicsWorld.contactDelegate = nil", present_game_over_index)
     present_scene_index = game_scene.find("presentScene", present_game_over_index)
     require("physicsWorld.contactDelegate = self" in game_scene and
@@ -280,7 +456,6 @@ def main():
             "presentGameOver(won: false, transition: reveal)" in game_scene,
             "GameScene win and loss paths must use the guarded game-over presenter",
             failures)
-    projectile_collision_index = game_scene.find("func projectileDidCollideWithMonster")
     projectile_guard_index = game_scene.find("if gameIsOver { return }", projectile_collision_index)
     projectile_active_node_guard_index = game_scene.find("guard projectile.parent === self, monster.parent === self else { return }", projectile_collision_index)
     projectile_remove_index = game_scene.find("projectile.removeFromParent()", projectile_collision_index)
@@ -297,10 +472,17 @@ def main():
             failures)
     player_collision_index = game_scene.find("func monsterDidCollideWithPlayer")
     player_guard_index = game_scene.find("if gameIsOver { return }", player_collision_index)
+    player_active_node_guard_index = game_scene.find("guard monster.parent === self, player.parent === self else { return }", player_collision_index)
     player_destroyed_index = game_scene.find("playerDestroyed = true", player_collision_index)
+    player_remove_index = game_scene.find("player.removeFromParent()", player_collision_index)
     require(player_collision_index != -1 and player_guard_index != -1 and
             player_destroyed_index != -1 and player_guard_index < player_destroyed_index,
             "Player collision handler must ignore late contacts before mutating player state",
+            failures)
+    require(player_active_node_guard_index != -1 and
+            player_guard_index < player_active_node_guard_index < player_destroyed_index and
+            player_active_node_guard_index < player_remove_index,
+            "Player collisions must require active nodes before mutating player state",
             failures)
     game_view_controller = read("EmojiThrower/GameViewController.swift")
     require("guard let skView = view as? SKView" in game_view_controller,
@@ -332,13 +514,71 @@ def main():
     require("*.local.xcconfig" in gitignore and ".env" in gitignore and "DerivedData" in gitignore,
             ".gitignore must exclude local config and Xcode build products",
             failures)
-    require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
-            "Makefile must expose lint, test, and build aliases for the local baseline",
+    require(".PHONY: build check lint test" in makefile and
+            "SWIFTC ?= swiftc" in makefile and
+            "ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile and
+            "lint test build: check" in makefile and
+            '"$(ROOT)/scripts/run-projectile-math-tests.sh"' in makefile and
+            'python3 "$(ROOT)/scripts/check-baseline.py"' in makefile and
+            "python3 scripts/check-baseline.py" not in makefile,
+            "Makefile must expose location-independent lint, test, build, and check aliases",
+            failures)
+    require("Status: Completed" in projectile_test_plan and
+            "make check" in projectile_test_plan and
+            "hostile mutations" in projectile_test_plan.lower(),
+            "executable projectile math plan must preserve completed verification evidence",
+            failures)
+    require("docs/plans/2026-06-16-executable-projectile-math-tests.md" in readme and
+            "executable Swift" in readme,
+            "README must document executable projectile math coverage",
+            failures)
+    require("title: Scene-Aware Projectile Exit Distance" in scene_aware_distance_plan and
+            "type: fix" in scene_aware_distance_plan and
+            "date: 2026-06-17" in scene_aware_distance_plan and
+            "R1." in scene_aware_distance_plan and "R6." in scene_aware_distance_plan and
+            "status:" not in scene_aware_distance_plan.lower(),
+            "scene-aware projectile distance plan must preserve portable metadata and requirements",
+            failures)
+    require("scene-aware exit distance" in readme.lower() and
+            "2026-06-17-020-fix-scene-aware-projectile-distance-plan.md" in readme and
+            "scene-aware" in changes.lower() and "projectile travel" in changes.lower(),
+            "README and CHANGES must document scene-aware projectile travel",
+            failures)
+    active_game_over_statuses = re.findall(
+        r"(?mi)^status:\s*(.+?)\s*$", active_game_over_plan
+    )
+    active_game_over_verification = markdown_section(
+        active_game_over_plan, "Verification Completed"
+    )
+    active_game_over_required = (
+        "All four Make gates",
+        "absolute Makefile",
+        "python3 -m py_compile scripts/check-baseline.py",
+        "sh -n scripts/run-projectile-math-tests.sh",
+        "Seven isolated hostile mutations",
+        "git diff --check",
+        "swiftc and xcodebuild were unavailable",
+    )
+    require(active_game_over_statuses == ["completed"] and
+            all(item in active_game_over_verification
+                for item in active_game_over_required) and
+            not re.search(r"(?i)\b(?:pending|todo|tbd|not run)\b",
+                          active_game_over_verification),
+            "active game-over plan must record completed verification",
+            failures)
+    normalized_guidance = [
+        " ".join(document.lower().split())
+        for document in [readme, security, vision, changes, agent_guidance]
+    ]
+    require(all("active-scene game-over ownership" in document
+                for document in normalized_guidance),
+            "project guidance must document active-scene game-over ownership",
             failures)
     require("make lint" in readme and "make test" in readme and "make build" in readme and "make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme and
             "image" in readme.lower() and "game-over" in readme.lower() and "spawn" in readme.lower() and
             "background scroll" in readme.lower() and "per-frame" in readme.lower() and "collision handler" in readme.lower() and
-            "contact delegate" in readme.lower() and "restart" in readme.lower() and "GitHub Actions" in readme,
+            "contact delegate" in readme.lower() and "restart" in readme.lower() and
+            "undersized scene" in readme.lower() and "GitHub Actions" in readme,
             "README must document static verification, project usage, SpriteKit context, collision handler guardrails, and image guardrails",
             failures)
     require("local game" in readme.lower() and "debug logging" in readme.lower() and "debug overlays" in readme.lower(),
@@ -347,20 +587,34 @@ def main():
     require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and "make build" in vision and "asset" in vision.lower() and
             "game-over" in vision.lower() and "spawn" in vision.lower() and
             "background scroll" in vision.lower() and "per-frame" in vision.lower() and "collision handler" in vision.lower() and
-            "contact delegate" in vision.lower() and "restart" in vision.lower() and "GitHub Actions" in vision,
+            "contact delegate" in vision.lower() and "restart" in vision.lower() and
+            "undersized scene" in vision.lower() and "GitHub Actions" in vision,
             "VISION must describe the current static SpriteKit baseline",
             failures)
     require("debug logging" in security.lower() and "debug overlays" in security.lower() and
             "spawn" in security.lower() and "background scroll" in security.lower() and "per-frame" in security.lower() and
             "collision handler" in security.lower() and "contact delegate" in security.lower() and
-            "restart" in security.lower() and "make check" in security and "GitHub Actions" in security,
+            "restart" in security.lower() and "undersized scene" in security.lower() and
+            "make check" in security and "GitHub Actions" in security,
             "SECURITY must document debug logging/overlay and static baseline guardrails",
             failures)
     require("debug console logging" in changes and "debug overlays" in changes and "player-hit" in changes and
             "projectile" in changes and "zero-length" in changes and "image" in changes.lower() and
             "game-over" in changes.lower() and "restart" in changes.lower() and "spawn" in changes.lower() and
-            "background scroll" in changes.lower() and "per-frame" in changes.lower() and "make check" in changes and "make lint" in changes and "make test" in changes and "make build" in changes,
+            "background scroll" in changes.lower() and "per-frame" in changes.lower() and
+            "undersized scene" in changes.lower() and "make check" in changes and
+            "make lint" in changes and "make test" in changes and "make build" in changes,
             "CHANGES must record the debug cleanup, contact handling, vector guard, image guard, game-over guard, spawn guard, and baseline",
+            failures)
+    require("non-finite touch vectors" in readme.lower() and
+            "non-finite touch vectors" in security.lower() and
+            "non-finite touch vectors" in vision.lower() and
+            "non-finite touch vectors" in changes.lower(),
+            "Docs must record finite projectile touch-vector validation",
+            failures)
+    require("absolute makefile path" in readme.lower() and
+            "location-independent" in changes.lower(),
+            "README and CHANGES must document location-independent Make verification",
             failures)
     require("collision handler" in changes.lower(),
             "CHANGES must record the collision handler game-over guard",
@@ -403,9 +657,104 @@ def main():
     require("status: completed" in swift_5_build_plan and "simulator" in swift_5_build_plan.lower(),
             "Swift 5 SpriteKit build plan must be completed and document simulator verification",
             failures)
-    require("status: completed" in duplicate_contact_plan and "mutations" in duplicate_contact_plan.lower(),
-            "duplicate projectile contact plan must record completed mutation verification",
+    require("status: completed" in undersized_spawn_plan and
+            "All four Make gates" in undersized_spawn_plan and
+            "hostile mutations" in undersized_spawn_plan.lower(),
+            "undersized scene spawn plan must record completed status and verification",
             failures)
+    location_make_statuses = re.findall(
+        r"^status: .+$", location_independent_make_plan, flags=re.MULTILINE
+    )
+    location_make_verification = markdown_section(
+        location_independent_make_plan, "Verification Completed"
+    )
+    require(location_make_statuses == ["status: completed"] and
+            "All four Make gates passed from the checkout" in location_make_verification and
+            "All four Make gates passed from `/tmp` through the absolute Makefile path" in location_make_verification and
+            "python3 -m py_compile scripts/check-baseline.py" in location_make_verification and
+            "git diff --check" in location_make_verification and
+            "`xcodebuild` was unavailable" in location_make_verification and
+            "Five isolated hostile mutations were rejected" in location_make_verification and
+            re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                      location_make_verification,
+                      re.IGNORECASE) is None,
+            "location-independent Make plan must record completed status and actual local verification",
+            failures)
+    finite_touch_statuses = re.findall(
+        r"^status: .+$", finite_touch_vector_plan, flags=re.MULTILINE
+    )
+    finite_touch_sections = finite_touch_vector_plan.split(
+        "## Verification Completed\n", 1
+    )
+    finite_touch_verification = (
+        finite_touch_sections[1] if len(finite_touch_sections) == 2 else ""
+    )
+    finite_touch_required_evidence = (
+        "All four Make gates",
+        "`xcodebuild` was",
+        "python3 -m py_compile scripts/check-baseline.py",
+        "plist, XML, and workflow YAML parsing",
+        "git diff --check",
+        "Seven isolated hostile mutations",
+    )
+    require(finite_touch_statuses == ["status: completed"]
+            and all(item in finite_touch_verification
+                    for item in finite_touch_required_evidence)
+            and re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                          finite_touch_verification,
+                          re.IGNORECASE) is None,
+            "finite projectile touch-vector plan must record completed status and actual local verification",
+            failures)
+    stale_player_contact_statuses = re.findall(
+        r"^status: .+$", stale_player_contact_plan, flags=re.MULTILINE
+    )
+    stale_player_contact_verification = markdown_section(
+        stale_player_contact_plan, "Verification Completed"
+    )
+    require(stale_player_contact_statuses == ["status: completed"] and
+            "All four Make gates" in stale_player_contact_verification and
+            "absolute Makefile path" in stale_player_contact_verification and
+            "Five isolated hostile mutations" in stale_player_contact_verification and
+            "git diff --check" in stale_player_contact_verification and
+            "`xcodebuild` was unavailable" in stale_player_contact_verification and
+            re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                      stale_player_contact_verification,
+                      re.IGNORECASE) is None,
+            "stale player contact plan must record completed status and actual local verification",
+            failures)
+    duplicate_contact_status = re.findall(
+        r"(?mi)^status:\s*(.+?)\s*$", duplicate_contact_plan
+    )
+    duplicate_contact_work = markdown_section(duplicate_contact_plan, "Work Completed")
+    duplicate_contact_verification = markdown_section(
+        duplicate_contact_plan, "Verification Completed"
+    )
+    require(duplicate_contact_status == ["completed"] and duplicate_contact_work,
+            "duplicate projectile contact plan must record one completed status and completed work",
+            failures)
+    require(duplicate_contact_verification and
+            not re.search(r"(?i)\b(?:pending|todo|tbd|not run)\b", duplicate_contact_verification),
+            "duplicate projectile contact plan must record finished verification without pending markers",
+            failures)
+    for evidence in [
+        "make check",
+        "make lint",
+        "make test",
+        "make build",
+        "python3 -m py_compile scripts/check-baseline.py",
+        "git diff --check",
+        "27394998651",
+        "27395002711",
+        "27395075194",
+        "27402323210",
+        "560e645d46cd073f7d062719c486e022e0d79611",
+        "8ce9716ffb4a523612fad6a401a326b2d17b22ac",
+        "guard projectile.parent === self, monster.parent === self else { return }",
+        "monstersDestroyed += 1",
+    ]:
+        require(evidence in duplicate_contact_verification,
+                f"duplicate projectile contact plan must preserve verification evidence: {evidence}",
+                failures)
     workflow_files = sorted(
         str(path.relative_to(ROOT))
         for path in (ROOT / ".github/workflows").rglob("*")
@@ -424,23 +773,33 @@ def main():
             failures)
 
     if shutil.which("xcodebuild"):
-        result = subprocess.run(
-            [
-                "xcodebuild",
-                "-project", "EmojiThrower.xcodeproj",
-                "-target", "EmojiThrower",
-                "-configuration", "Debug",
-                "-sdk", "iphonesimulator",
-                "CODE_SIGNING_ALLOWED=NO",
-                "build",
-            ],
-            cwd=ROOT,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-        )
+        repo_build_existed = (ROOT / "build").exists()
+        with tempfile.TemporaryDirectory(prefix="emoji-xcodebuild-") as build_root:
+            build_root_path = Path(build_root)
+            result = subprocess.run(
+                [
+                    "xcodebuild",
+                    "-project", "EmojiThrower.xcodeproj",
+                    "-scheme", "EmojiThrower",
+                    "-configuration", "Debug",
+                    "-sdk", "iphonesimulator",
+                    "-derivedDataPath", str(build_root_path / "DerivedData"),
+                    f"SYMROOT={build_root_path / 'Products'}",
+                    f"OBJROOT={build_root_path / 'Intermediates'}",
+                    f"SHARED_PRECOMPS_DIR={build_root_path / 'PrecompiledHeaders'}",
+                    "CODE_SIGNING_ALLOWED=NO",
+                    "build",
+                ],
+                cwd=ROOT,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
         require(result.returncode == 0,
                 "xcodebuild could not compile EmojiThrower for the simulator: " + result.stdout.strip(),
+                failures)
+        require(repo_build_existed or not (ROOT / "build").exists(),
+                "xcodebuild verification must not leave a repo-local build directory",
                 failures)
     else:
         print("xcodebuild unavailable; static iOS baseline only.")

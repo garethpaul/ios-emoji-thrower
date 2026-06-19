@@ -22,9 +22,14 @@ Priority:
 - Keep optional image helper rendering tolerant of missing assets
 - Keep game-over transitions guarded against repeated contact handling
 - Keep delayed game-over restarts tied to the current SpriteKit scene
+- Require active-scene game-over ownership before terminal scene mutation or
+  transition presentation
 - Keep collision handlers from mutating score or player state after game over
 - Clear the physics contact delegate before game-over scene transitions
 - Stop enemy spawning as soon as game-over presentation starts
+- Skip enemy spawning when invalid or undersized scene geometry cannot contain
+  the monster sprite
+- Reject non-finite touch vectors before projectile side effects
 - Keep background scroll movement running per-frame until game over
 - Avoid adding account or network behavior without a clear purpose
 - Keep `scripts/check-baseline.py` passing for bundled resources, Xcode
@@ -65,7 +70,7 @@ Current baseline: `make lint`, `make test`, `make build`, and `make check` run
 metadata, bundled resource references, SpriteKit scene sources, image helper
 fallbacks, game-over transition guards, game-over restart handling, collision
 handler game-over guards, contact delegate cleanup, spawn lifecycle guards,
-per-frame background scroll movement, and local-only gameplay with no debug
+undersized scene spawn geometry, per-frame background scroll movement, and local-only gameplay with no debug
 logging, network, analytics, upload, or persistence behavior.
 On macOS, the baseline should compile an unsigned simulator build without
 rendering frames, playing audio, simulating physics, or running gameplay.

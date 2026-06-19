@@ -1,5 +1,36 @@
 # Changes
 
+## 2026-06-18
+
+- Required active-scene game-over ownership before terminal state changes,
+  spawn cancellation, contact shutdown, or destination presentation.
+
+## 2026-06-17
+
+- Replaced the fixed projectile travel scalar with validated scene-aware
+  projectile travel that includes node clearance for wide and tall scenes.
+- Extended the executable Swift harness with scene geometry, projectile margin,
+  invalid dimension, and overflow cases.
+
+## 2026-06-16
+
+- Added executable Swift tests for projectile direction normalization using the
+  same finite-vector implementation as the SpriteKit scene.
+
+## 2026-06-14
+
+- Ignored queued player contacts after either collision node has already left
+  the active scene.
+
+## 2026-06-13
+
+- Made all Make verification aliases location-independent when invoked through
+  an absolute Makefile path.
+- Rejected non-finite touch vectors before projectile physics, insertion,
+  movement, or sound effects.
+- Skipped enemy spawning for invalid or undersized scene geometry before
+  constructing a closed random range or adding the SpriteKit node.
+
 ## 2026-06-12
 
 - Prevented duplicate queued projectile contacts from scoring after either

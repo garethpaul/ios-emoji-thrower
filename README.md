@@ -8,7 +8,7 @@
 `garethpaul/ios-emoji-thrower` is a Swift 5 SpriteKit game sample in which the
 player launches emoji projectiles at moving targets.
 
-This README is based on the checked-in source, manifests, scripts, and repository metadata on the `master` branch. The project language mix found during review was: Swift (9).
+This README is based on the checked-in source, manifests, scripts, and repository metadata on the `master` branch. The project language mix found during review was: Swift (10).
 
 ## Repository Contents
 
@@ -57,11 +57,15 @@ unsigned simulator build when Xcode is available.
 - The game uses SpriteKit scene logic, bundled image resources, sound files, and `Sketch3D.otf`.
 - Win and loss paths share a guarded game-over presenter so contacts do not trigger repeated scene transitions.
 - Game-over restarts confirm the current scene before presenting a fresh game scene.
+- Active-scene game-over ownership is required before the outgoing scene
+  cancels gameplay or presents its terminal destination.
 - Collision handlers ignore late callbacks after game-over presentation begins.
 - The game-over presenter clears the physics contact delegate before scene transition.
 - Enemy spawning is keyed and stopped when game-over presentation starts.
 - Background scroll movement advances per-frame from each node's current
   position until game over.
+- Projectile launches use a scene-aware exit distance so the whole node clears
+  wide and tall scene bounds before its movement action completes.
 - This is a local game sample. Do not add accounts, analytics, persistence, upload, or network behavior without a dedicated design and security review.
 
 ## Testing and Verification
@@ -82,7 +86,17 @@ The `lint`, `test`, and `build` targets intentionally alias the canonical baseli
 on hosts without Xcode, so the standard local gate commands
 stay available while preserving the single source of truth.
 
-The baseline runs `scripts/check-baseline.py`, parses plist/storyboard/asset metadata, validates the binary SpriteKit scene plist, checks Xcode resource references, verifies the Swift source inventory, and guards against image-helper force unwraps, repeated game-over transitions, unguarded game-over restarts, late collision handler mutations, uncleared contact delegate callbacks, late spawn actions, broken per-frame background scroll movement, debug logging, network, analytics, upload, or persistence behavior.
+The baseline runs executable Swift projectile-math tests when `swiftc` is
+available, then runs `scripts/check-baseline.py`. It parses
+plist/storyboard/asset metadata, validates the binary SpriteKit scene plist,
+checks Xcode resource references, verifies the Swift source inventory, and
+guards against image-helper force unwraps, non-finite touch vectors, repeated
+game-over transitions, unguarded game-over restarts, stale collision nodes,
+late collision handler mutations, uncleared contact delegate callbacks, late
+spawn actions, broken per-frame background scroll movement, debug logging,
+network, analytics, upload, or persistence behavior.
+The executable harness covers both finite direction normalization and
+scene-aware projectile travel for wide, tall, invalid, and overflowing geometry.
 
 The pinned GitHub Actions check runs `make check` on `macos-15`. When Xcode is
 available, the baseline also compiles an unsigned Swift 5 Debug build for the
@@ -106,6 +120,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - Debug logging from launch and gameplay paths should stay removed; score should remain visible in-game rather than printed to the console.
 - Runtime debug overlays should stay disabled outside explicit troubleshooting builds.
 - Resource changes should keep image, sound, font, scene, and Xcode project references aligned, with fallback behavior for optional image helper rendering.
+- Enemy spawning skips invalid or undersized scene geometry before constructing
+  a random range or adding a SpriteKit node.
 
 ## Maintenance Notes
 
@@ -118,6 +134,14 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-09-collision-handler-game-over-guard.md` for the collision handler guardrail.
 - See `docs/plans/2026-06-09-contact-delegate-game-over-guard.md` for the contact delegate game-over guardrail.
 - See `docs/plans/2026-06-10-game-over-restart-guard.md` for the game-over restart guardrail.
+- See `docs/plans/2026-06-13-undersized-scene-spawn-guard.md` for the enemy
+  spawn geometry guardrail.
+- See `docs/plans/2026-06-14-stale-player-contact-guard.md` for the stale player
+  collision guardrail.
+- See `docs/plans/2026-06-16-executable-projectile-math-tests.md` for the shared
+  projectile validation and executable Swift behavioral gate.
+- See `docs/plans/2026-06-17-020-fix-scene-aware-projectile-distance-plan.md`
+  for the scene-aware exit distance and invalid-geometry guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - See `docs/plans/2026-06-10-ci-baseline.md` for the GitHub Actions baseline.
 - See `docs/plans/2026-06-10-hosted-project-validation.md` for the hosted Xcode
@@ -125,6 +149,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-10-swift-5-spritekit-build.md` for the Swift 5
   simulator-build migration.
 - Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, plist/storyboard files, SpriteKit assets, sounds, fonts, Xcode metadata, or gameplay/privacy documentation.
+- The same gates may be invoked through an absolute Makefile path from another
+  directory; verification resolves the checker relative to the checkout.
 
 ## Contributing
 
