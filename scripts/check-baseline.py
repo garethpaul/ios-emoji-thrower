@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import xml.etree.ElementTree as ET
 
 
@@ -772,23 +773,33 @@ def main():
             failures)
 
     if shutil.which("xcodebuild"):
-        result = subprocess.run(
-            [
-                "xcodebuild",
-                "-project", "EmojiThrower.xcodeproj",
-                "-target", "EmojiThrower",
-                "-configuration", "Debug",
-                "-sdk", "iphonesimulator",
-                "CODE_SIGNING_ALLOWED=NO",
-                "build",
-            ],
-            cwd=ROOT,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-        )
+        repo_build_existed = (ROOT / "build").exists()
+        with tempfile.TemporaryDirectory(prefix="emoji-xcodebuild-") as build_root:
+            build_root_path = Path(build_root)
+            result = subprocess.run(
+                [
+                    "xcodebuild",
+                    "-project", "EmojiThrower.xcodeproj",
+                    "-scheme", "EmojiThrower",
+                    "-configuration", "Debug",
+                    "-sdk", "iphonesimulator",
+                    "-derivedDataPath", str(build_root_path / "DerivedData"),
+                    f"SYMROOT={build_root_path / 'Products'}",
+                    f"OBJROOT={build_root_path / 'Intermediates'}",
+                    f"SHARED_PRECOMPS_DIR={build_root_path / 'PrecompiledHeaders'}",
+                    "CODE_SIGNING_ALLOWED=NO",
+                    "build",
+                ],
+                cwd=ROOT,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
         require(result.returncode == 0,
                 "xcodebuild could not compile EmojiThrower for the simulator: " + result.stdout.strip(),
+                failures)
+        require(repo_build_existed or not (ROOT / "build").exists(),
+                "xcodebuild verification must not leave a repo-local build directory",
                 failures)
     else:
         print("xcodebuild unavailable; static iOS baseline only.")
