@@ -222,6 +222,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7FB5DE5D1D14C5BC00813314 /* Build configuration list for PBXNativeTarget "EmojiThrower" */;
 			buildPhases = (
+				A3F0C1112C00000100000001 /* Validate local provider configuration */,
 				0C638A740B8BEDAF365D70B6 /* Check Pods Manifest.lock */,
 				7FB5DE471D14C5BC00813314 /* Sources */,
 				7FB5DE481D14C5BC00813314 /* Frameworks */,
@@ -296,6 +297,22 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		A3F0C1112C00000100000001 /* Validate local provider configuration */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/scripts/config_security.py",
+			);
+			name = "Validate local provider configuration";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "python3 \"${SRCROOT}/scripts/config_security.py\" validate-local --root \"${SRCROOT}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		0C638A740B8BEDAF365D70B6 /* Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

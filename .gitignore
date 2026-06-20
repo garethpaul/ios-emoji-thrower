@@ -41,4 +41,10 @@ Podfile.lock
 # Packages/
 .build/
 
-Config.plist
+# Python verification artifacts
+__pycache__/
+*.pyc
+
+# Local provider configuration. Copy the sanitized examples; never commit live values.
+EmojiThrower/Config.plist
+EmojiThrower/GoogleService-Info.plist

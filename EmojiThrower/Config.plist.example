@@ -3,8 +3,8 @@
 <plist version="1.0">
 <dict>
 	<key>twtrKey</key>
-	<string>IQKbtAYlXLripLGPWd0HUA</string>
+	<string>REPLACE_WITH_TWITTER_CONSUMER_KEY</string>
 	<key>twtrSecret</key>
-	<string>GgDYlkSvaPxGxC4X8liwpUoqKwwr3lCADbz8A7ADU</string>
+	<string>REPLACE_WITH_TWITTER_CONSUMER_SECRET</string>
 </dict>
 </plist>
