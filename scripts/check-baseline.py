@@ -516,7 +516,7 @@ def main():
             failures)
     require(".PHONY: build check lint test" in makefile and
             "SWIFTC ?= swiftc" in makefile and
-            "ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile and
+            "override ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile and
             "lint test build: check" in makefile and
             '"$(ROOT)/scripts/run-projectile-math-tests.sh"' in makefile and
             'python3 "$(ROOT)/scripts/check-baseline.py"' in makefile and
