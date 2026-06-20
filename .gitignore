@@ -42,3 +42,4 @@ Podfile.lock
 .build/
 
 Config.plist
+GoogleService-Info.plist
