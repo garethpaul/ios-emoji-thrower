@@ -19,6 +19,8 @@ This README is based on the checked-in source, manifests, scripts, and repositor
 - `Makefile` - local verification entry point
 - `SECURITY.md` - security reporting and disclosure guidance
 - `scripts/check-baseline.py` - static SpriteKit resource and source verifier
+- `scripts/run-projectile-math-tests.sh` - temporary executable Swift test runner
+- `Tests/ProjectileMathTests/main.swift` - projectile direction and travel assertions
 - `VISION.md` - project direction and maintenance guardrails
 
 Additional scan context:
@@ -26,7 +28,8 @@ Additional scan context:
 - Source directories: EmojiThrower
 - Dependency and build manifests: none detected
 - Entry points or build surfaces: `make check`, EmojiThrower.xcodeproj
-- Test-looking files: no obvious test files detected
+- Executable test surfaces: `Tests/ProjectileMathTests/main.swift` through
+  `scripts/run-projectile-math-tests.sh`
 
 ## Getting Started
 
@@ -98,10 +101,11 @@ network, analytics, upload, or persistence behavior.
 The executable harness covers both finite direction normalization and
 scene-aware projectile travel for wide, tall, invalid, and overflowing geometry.
 
-The pinned GitHub Actions check runs `make check` on `macos-15`. When Xcode is
-available, the baseline also compiles an unsigned Swift 5 Debug build for the
-iOS Simulator. It does not launch SpriteKit gameplay, render frames, play audio,
-or run physics simulation.
+The pinned GitHub Actions check runs `make check` on `macos-15`, including the
+executable projectile-math harness and static baseline. When Xcode is available,
+the baseline also compiles an unsigned Swift 5 Debug app build for the iOS
+Simulator. The repository has no XCTest target, and the hosted boundary does not
+launch SpriteKit gameplay, render frames, play audio, or run physics simulation.
 
 For runtime verification on macOS, launch the game in a simulator and exercise
 projectiles, collisions, game-over transitions, and restart behavior.
@@ -110,7 +114,12 @@ When the required SDK or runtime is unavailable, use static checks and source re
 
 ## Configuration and Secrets
 
-- No required secret or credential file was identified in the repository scan. If you add integrations later, keep secrets out of git.
+- Current `master` requires no credential file for local gameplay. If you add
+  integrations later, keep secrets out of git.
+- The repository remains under a separate credential-response HOLD. An owner
+  must verify and revoke or rotate the affected Google credential with the
+  provider before resolving the corresponding GitHub alert. This documentation
+  correction does not complete or replace that remediation.
 
 ## Security and Privacy Notes
 
