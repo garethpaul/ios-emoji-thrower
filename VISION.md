@@ -18,6 +18,8 @@ Priority:
 
 - Preserve the core SpriteKit gameplay loop
 - Keep scene, score, and game-over behavior easy to inspect
+- Keep persistent player and score positions tied to the current scene size
+  when `.resizeFill` responds to view or orientation changes
 - Maintain asset and sound file alignment with project references
 - Keep optional image helper rendering tolerant of missing assets
 - Keep game-over transitions guarded against repeated contact handling

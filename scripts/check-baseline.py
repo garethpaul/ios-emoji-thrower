@@ -32,6 +32,7 @@ STALE_PLAYER_CONTACT_PLAN = ROOT / "docs/plans/2026-06-14-stale-player-contact-g
 PROJECTILE_TEST_PLAN = ROOT / "docs/plans/2026-06-16-executable-projectile-math-tests.md"
 SCENE_AWARE_DISTANCE_PLAN = ROOT / "docs/plans/2026-06-17-020-fix-scene-aware-projectile-distance-plan.md"
 ACTIVE_GAME_OVER_PLAN = ROOT / "docs/plans/2026-06-18-active-game-over-presentation.md"
+RESIZE_LAYOUT_PLAN = ROOT / "docs/plans/2026-06-25-resize-safe-persistent-layout.md"
 EXPECTED_WORKFLOW = """name: Check
 
 on:
@@ -79,6 +80,10 @@ def markdown_section(text, heading):
 
 def strip_swift_line_comments(text):
     return "\n".join(line.split("//", 1)[0] for line in text.splitlines())
+
+
+def strip_swift_comments(text):
+    return strip_swift_line_comments(re.sub(r"/\*.*?\*/", "", text, flags=re.DOTALL))
 
 
 def parse_xml(relative_path, failures):
@@ -161,6 +166,7 @@ def main():
         "docs/plans/2026-06-14-stale-player-contact-guard.md",
         "docs/plans/2026-06-16-executable-projectile-math-tests.md",
         "docs/plans/2026-06-17-020-fix-scene-aware-projectile-distance-plan.md",
+        "docs/plans/2026-06-25-resize-safe-persistent-layout.md",
         "docs/readme-overview.svg",
         "Tests/ProjectileMathTests/main.swift",
         "scripts/run-projectile-math-tests.sh",
@@ -224,6 +230,7 @@ def main():
     projectile_test_plan = PROJECTILE_TEST_PLAN.read_text(encoding="utf-8") if PROJECTILE_TEST_PLAN.exists() else ""
     scene_aware_distance_plan = SCENE_AWARE_DISTANCE_PLAN.read_text(encoding="utf-8") if SCENE_AWARE_DISTANCE_PLAN.exists() else ""
     active_game_over_plan = ACTIVE_GAME_OVER_PLAN.read_text(encoding="utf-8") if ACTIVE_GAME_OVER_PLAN.exists() else ""
+    resize_layout_plan = RESIZE_LAYOUT_PLAN.read_text(encoding="utf-8") if RESIZE_LAYOUT_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
@@ -254,8 +261,23 @@ def main():
     require('scoreLabel.text = "Score: \\(monstersDestroyed)"' in game_scene,
             "GameScene must keep visible score label updates",
             failures)
-    require('scoreLabel.text = "Score: 0"' in game_scene and "view.frame.width/2" in game_scene,
-            "GameScene must initialize visible score text without force-unwrapping self.view",
+    game_scene_contracts = strip_swift_comments(game_scene)
+    did_move_index = game_scene_contracts.find("override func didMove(to view: SKView)")
+    layout_call_index = game_scene_contracts.find("layoutPersistentNodes()", did_move_index)
+    layout_index = game_scene_contracts.find("func layoutPersistentNodes()")
+    did_change_size_index = game_scene_contracts.find("override func didChangeSize(_ oldSize: CGSize)")
+    contract_add_monster_index = game_scene_contracts.find("func addMonster()")
+    layout_body = game_scene_contracts[layout_index:did_change_size_index]
+    resize_body = game_scene_contracts[did_change_size_index:contract_add_monster_index]
+    require('scoreLabel.text = "Score: 0"' in game_scene and
+            did_move_index != -1 and did_move_index < layout_call_index < layout_index and
+            "player.position = CGPoint(x: size.width * 0.1, y: size.height * 0.5)" in layout_body and
+            "scoreLabel.position = CGPoint(x: size.width * 0.5, y: size.height - 40)" in layout_body and
+            "super.didChangeSize(oldSize)" in resize_body and
+            "layoutPersistentNodes()" in resize_body and
+            "view.frame.width" not in game_scene_contracts and
+            "view.frame.height" not in game_scene_contracts,
+            "GameScene must relayout the player and score from scene size changes",
             failures)
     require("SKAction.playSoundFileNamed" in game_scene and "background-music-aac.caf" in game_scene,
             "GameScene must keep bundled sound playback references",
@@ -612,6 +634,14 @@ def main():
             "non-finite touch vectors" in changes.lower(),
             "Docs must record finite projectile touch-vector validation",
             failures)
+    require("Persistent player and score layout" in readme and
+            "didChangeSize(_:)" in agent_guidance and
+            "persistent player and score positions" in vision.lower() and
+            "scene-size-driven player and score layout" in security.lower() and
+            "2026-06-25 06:22 PDT" in changes and
+            "didChangeSize(_:)" in changes,
+            "Docs must record resize-safe persistent player and score layout",
+            failures)
     require("absolute makefile path" in readme.lower() and
             "location-independent" in changes.lower(),
             "README and CHANGES must document location-independent Make verification",
@@ -656,6 +686,27 @@ def main():
             failures)
     require("status: completed" in swift_5_build_plan and "simulator" in swift_5_build_plan.lower(),
             "Swift 5 SpriteKit build plan must be completed and document simulator verification",
+            failures)
+    resize_layout_statuses = re.findall(
+        r"^status: .+$", resize_layout_plan, flags=re.MULTILINE
+    )
+    resize_layout_verification = markdown_section(
+        resize_layout_plan, "Verification Completed"
+    )
+    resize_layout_evidence = [
+        "All four Make gates passed from the checkout",
+        "absolute Makefile `check` gate passed from `/tmp`",
+        "python3 -m py_compile scripts/check-baseline.py",
+        "sh -n scripts/run-projectile-math-tests.sh",
+        "git diff --check",
+        "Eight isolated hostile mutations were rejected",
+        "Local `swiftc` and `xcodebuild` were unavailable",
+    ]
+    require(resize_layout_statuses == ["status: completed"] and
+            all(item in resize_layout_verification for item in resize_layout_evidence) and
+            re.search(r"(?i)\b(?:pending|todo|tbd|not run)\b",
+                      resize_layout_verification) is None,
+            "resize-safe persistent layout plan must record completed local verification",
             failures)
     require("status: completed" in undersized_spawn_plan and
             "All four Make gates" in undersized_spawn_plan and

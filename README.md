@@ -69,6 +69,8 @@ unsigned simulator build when Xcode is available.
   position until game over.
 - Projectile launches use a scene-aware exit distance so the whole node clears
   wide and tall scene bounds before its movement action completes.
+- Persistent player and score layout derives from the current scene size and is
+  reapplied when `.resizeFill` changes that size, including iPad rotation.
 - This is a local game sample. Do not add accounts, analytics, persistence, upload, or network behavior without a dedicated design and security review.
 
 ## Testing and Verification
@@ -96,7 +98,8 @@ checks Xcode resource references, verifies the Swift source inventory, and
 guards against image-helper force unwraps, non-finite touch vectors, repeated
 game-over transitions, unguarded game-over restarts, stale collision nodes,
 late collision handler mutations, uncleared contact delegate callbacks, late
-spawn actions, broken per-frame background scroll movement, debug logging,
+spawn actions, stale persistent-node resize layout, broken per-frame background
+scroll movement, debug logging,
 network, analytics, upload, or persistence behavior.
 The executable harness covers both finite direction normalization and
 scene-aware projectile travel for wide, tall, invalid, and overflowing geometry.
@@ -107,8 +110,10 @@ the baseline also compiles an unsigned Swift 5 Debug app build for the iOS
 Simulator. The repository has no XCTest target, and the hosted boundary does not
 launch SpriteKit gameplay, render frames, play audio, or run physics simulation.
 
-For runtime verification on macOS, launch the game in a simulator and exercise
-projectiles, collisions, game-over transitions, and restart behavior.
+For runtime verification on macOS, launch the game in an iPad simulator,
+exercise projectiles, collisions, game-over transitions, and restart behavior,
+then rotate between portrait and landscape and confirm the player remains at
+the left-center gameplay position while the score remains centered at the top.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
 
@@ -151,6 +156,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   projectile validation and executable Swift behavioral gate.
 - See `docs/plans/2026-06-17-020-fix-scene-aware-projectile-distance-plan.md`
   for the scene-aware exit distance and invalid-geometry guardrail.
+- See `docs/plans/2026-06-25-resize-safe-persistent-layout.md` for the
+  scene-size-driven player and score layout guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - See `docs/plans/2026-06-10-ci-baseline.md` for the GitHub Actions baseline.
 - See `docs/plans/2026-06-10-hosted-project-validation.md` for the hosted Xcode

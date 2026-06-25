@@ -1,5 +1,14 @@
 # Changes
 
+## 2026-06-25 06:22 PDT
+
+- Centralized persistent player and score positioning on `SKScene.size` and
+  reapplied it from `didChangeSize(_:)`, keeping both nodes correctly placed
+  when `.resizeFill` updates the scene during iPad rotation or view resizing.
+- Added a comment-aware static regression contract, a runtime rotation check,
+  and a completed implementation plan without changing gameplay constants,
+  assets, project metadata, or the local-only data boundary.
+
 ## 2026-06-18
 
 - Required active-scene game-over ownership before terminal state changes,
