@@ -71,8 +71,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let backgroundMusic = SKAudioNode(fileNamed: "background-music-aac.caf")
         backgroundMusic.autoplayLooped = true
         addChild(backgroundMusic)
-        // set starting position
-        player.position = CGPoint(x: size.width * 0.1, y: size.height * 0.5)
         // create sprite
         addChild(player)
         // add physics to player
@@ -92,10 +90,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 ])
             ), withKey: "monsterSpawn")
         scoreLabel.fontSize = 50
-        scoreLabel.position = CGPoint(x: view.frame.width/2, y: view.frame.height-40)
         scoreLabel.fontColor = #colorLiteral(red: 0.137254902, green: 0.137254902, blue: 0.3450980392, alpha: 1)
         scoreLabel.text = "Score: 0"
         addChild(scoreLabel)
+        layoutPersistentNodes()
+    }
+
+    func layoutPersistentNodes() {
+        player.position = CGPoint(x: size.width * 0.1, y: size.height * 0.5)
+        scoreLabel.position = CGPoint(x: size.width * 0.5, y: size.height - 40)
+    }
+
+    override func didChangeSize(_ oldSize: CGSize) {
+        super.didChangeSize(oldSize)
+        layoutPersistentNodes()
     }
     //MARK: - Create a random number
     func random(min: CGFloat, max: CGFloat) -> CGFloat {

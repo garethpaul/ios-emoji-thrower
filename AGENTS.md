@@ -50,6 +50,8 @@ player launches emoji projectiles at moving targets.
 - Resource changes should keep image, sound, font, scene, and Xcode project references aligned, with fallback behavior for optional image helper rendering.
 - Keep active-scene game-over ownership ahead of terminal state, spawn,
   contact-delegate, and presentation side effects.
+- Keep persistent player and score positions derived from `SKScene.size`, and
+  reapply them from `didChangeSize(_:)` when `.resizeFill` resizes the scene.
 - This is an Apple platform sample. Xcode, Swift, and deployment target versions
   must stay aligned with the checked-in project settings.
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
