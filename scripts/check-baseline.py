@@ -35,6 +35,7 @@ ACTIVE_GAME_OVER_PLAN = ROOT / "docs/plans/2026-06-18-active-game-over-presentat
 RESIZE_LAYOUT_PLAN = ROOT / "docs/plans/2026-06-25-resize-safe-persistent-layout.md"
 BACKGROUND_RESIZE_PLAN = ROOT / "docs/plans/2026-06-26-resize-safe-background-tiling.md"
 SPAWN_WIDTH_PLAN = ROOT / "docs/plans/2026-06-26-invalid-scene-width-spawn-guard.md"
+GAME_OVER_RESIZE_PLAN = ROOT / "docs/plans/2026-06-26-resize-safe-game-over.md"
 EXPECTED_WORKFLOW = """name: Check
 
 on:
@@ -236,6 +237,7 @@ def main():
     resize_layout_plan = RESIZE_LAYOUT_PLAN.read_text(encoding="utf-8") if RESIZE_LAYOUT_PLAN.exists() else ""
     background_resize_plan = BACKGROUND_RESIZE_PLAN.read_text(encoding="utf-8") if BACKGROUND_RESIZE_PLAN.exists() else ""
     spawn_width_plan = SPAWN_WIDTH_PLAN.read_text(encoding="utf-8") if SPAWN_WIDTH_PLAN.exists() else ""
+    game_over_resize_plan = GAME_OVER_RESIZE_PLAN.read_text(encoding="utf-8") if GAME_OVER_RESIZE_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
@@ -548,11 +550,34 @@ def main():
             "GameViewController must keep SpriteKit debug overlays disabled",
             failures)
     game_over_scene = read("EmojiThrower/GameOverScene.swift")
+    require("let resultLabel = SKLabelNode(fontNamed: \"Helvetica\")" in game_over_scene and
+            "func layoutResultLabel()" in game_over_scene and
+            "override func didChangeSize(_ oldSize: CGSize)" in game_over_scene and
+            "resultLabel.position = CGPoint(x: size.width/2, y: size.height/2)" in game_over_scene and
+            "self.restartGame(size: self.size, transition: reveal)" in game_over_scene,
+            "GameOverScene must relayout its label and restart from current scene size",
+            failures)
+    require("status: completed" in game_over_resize_plan and
+            "red-first" in game_over_resize_plan.lower() and
+            "hostile game-over resize mutations" in game_over_resize_plan.lower(),
+            "game-over resize plan must record completed verification evidence",
+            failures)
+    game_over_resize_guidance = "The game-over label follows the current scene center after resize, and delayed restart uses the current game-over scene size instead of captured pre-resize geometry."
+    for relative_path, document in [
+        ("AGENTS.md", agent_guidance),
+        ("README.md", readme),
+        ("SECURITY.md", security),
+        ("VISION.md", vision),
+        ("CHANGES.md", changes),
+    ]:
+        require(game_over_resize_guidance in document,
+                f"{relative_path} must document resize-safe game-over geometry",
+                failures)
     require("func restartGame(size: CGSize, transition: SKTransition) -> Bool" in game_over_scene and
             "guard let view = self.view, view.scene === self else" in game_over_scene and
             "scene.scaleMode = .resizeFill" in game_over_scene and
             "view.presentScene(scene, transition: transition)" in game_over_scene and
-            "self.restartGame(size: size, transition: reveal)" in game_over_scene,
+            "self.restartGame(size: self.size, transition: reveal)" in game_over_scene,
             "GameOverScene must guard delayed restarts and keep restart scale mode aligned",
             failures)
     require(not re.search(r"\b(?:print|println|NSLog)\s*\(", swift_sources),

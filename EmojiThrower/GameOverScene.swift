@@ -6,6 +6,7 @@ import Foundation
 import SpriteKit
 
 class GameOverScene: SKScene {
+    let resultLabel = SKLabelNode(fontNamed: "Helvetica")
     
     init(size: CGSize, won: Bool) {
         
@@ -15,21 +16,29 @@ class GameOverScene: SKScene {
 
         let message = won ? "You Won!" : "You Lose!"
 
-        let label = SKLabelNode(fontNamed: "Helvetica")
-        label.text = message
-        label.fontSize = 40
-        label.fontColor = .black
-        label.position = CGPoint(x: size.width/2, y: size.height/2)
-        addChild(label)
+        resultLabel.text = message
+        resultLabel.fontSize = 40
+        resultLabel.fontColor = .black
+        addChild(resultLabel)
+        layoutResultLabel()
 
         run(SKAction.sequence([
             SKAction.wait(forDuration: 3.0),
             SKAction.run {
                 let reveal = SKTransition.flipHorizontal(withDuration: 0.2)
-                self.restartGame(size: size, transition: reveal)
+                self.restartGame(size: self.size, transition: reveal)
             }
             ]))
         
+    }
+
+    func layoutResultLabel() {
+        resultLabel.position = CGPoint(x: size.width/2, y: size.height/2)
+    }
+
+    override func didChangeSize(_ oldSize: CGSize) {
+        super.didChangeSize(oldSize)
+        layoutResultLabel()
     }
 
     func restartGame(size: CGSize, transition: SKTransition) -> Bool {
