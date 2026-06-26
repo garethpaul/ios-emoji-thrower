@@ -52,6 +52,7 @@ player launches emoji projectiles at moving targets.
   contact-delegate, and presentation side effects.
 - Keep persistent player and score positions derived from `SKScene.size`, and
   reapply them from `didChangeSize(_:)` when `.resizeFill` resizes the scene.
+- Enemy spawning rejects non-finite or non-positive scene width before deriving an off-screen monster position.
 - Keep the two scrolling background tiles contiguous after initial setup and
   every scene-size change without resizing them independently per frame.
 - This is an Apple platform sample. Xcode, Swift, and deployment target versions

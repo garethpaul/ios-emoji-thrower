@@ -140,7 +140,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     func monsterSpawnY(spriteHeight: CGFloat) -> CGFloat? {
-        guard spriteHeight.isFinite, size.height.isFinite, spriteHeight > 0 else {
+        guard spriteHeight.isFinite,
+            size.width.isFinite, size.height.isFinite,
+            size.width > 0, spriteHeight > 0 else {
             return nil
         }
 
