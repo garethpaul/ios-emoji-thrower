@@ -1,5 +1,15 @@
 # Changes
 
+## 2026-06-26
+
+- Centralized scrolling background sizing and adjacency on `SKScene.size`.
+- Preserved the leading tile's scroll phase while retiling both backgrounds
+  during initial setup and every `.resizeFill` size change.
+- Removed independent per-frame background resizing, which could introduce gaps
+  or overlap after rotation.
+- Added a red-first, comment-aware static contract and completed verification
+  plan without changing scroll speed, gameplay nodes, scoring, or collisions.
+
 ## 2026-06-25 06:22 PDT
 
 - Centralized persistent player and score positioning on `SKScene.size` and

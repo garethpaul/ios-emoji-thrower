@@ -33,6 +33,7 @@ PROJECTILE_TEST_PLAN = ROOT / "docs/plans/2026-06-16-executable-projectile-math-
 SCENE_AWARE_DISTANCE_PLAN = ROOT / "docs/plans/2026-06-17-020-fix-scene-aware-projectile-distance-plan.md"
 ACTIVE_GAME_OVER_PLAN = ROOT / "docs/plans/2026-06-18-active-game-over-presentation.md"
 RESIZE_LAYOUT_PLAN = ROOT / "docs/plans/2026-06-25-resize-safe-persistent-layout.md"
+BACKGROUND_RESIZE_PLAN = ROOT / "docs/plans/2026-06-26-resize-safe-background-tiling.md"
 EXPECTED_WORKFLOW = """name: Check
 
 on:
@@ -167,6 +168,7 @@ def main():
         "docs/plans/2026-06-16-executable-projectile-math-tests.md",
         "docs/plans/2026-06-17-020-fix-scene-aware-projectile-distance-plan.md",
         "docs/plans/2026-06-25-resize-safe-persistent-layout.md",
+        "docs/plans/2026-06-26-resize-safe-background-tiling.md",
         "docs/readme-overview.svg",
         "Tests/ProjectileMathTests/main.swift",
         "scripts/run-projectile-math-tests.sh",
@@ -231,6 +233,7 @@ def main():
     scene_aware_distance_plan = SCENE_AWARE_DISTANCE_PLAN.read_text(encoding="utf-8") if SCENE_AWARE_DISTANCE_PLAN.exists() else ""
     active_game_over_plan = ACTIVE_GAME_OVER_PLAN.read_text(encoding="utf-8") if ACTIVE_GAME_OVER_PLAN.exists() else ""
     resize_layout_plan = RESIZE_LAYOUT_PLAN.read_text(encoding="utf-8") if RESIZE_LAYOUT_PLAN.exists() else ""
+    background_resize_plan = BACKGROUND_RESIZE_PLAN.read_text(encoding="utf-8") if BACKGROUND_RESIZE_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
@@ -278,6 +281,33 @@ def main():
             "view.frame.width" not in game_scene_contracts and
             "view.frame.height" not in game_scene_contracts,
             "GameScene must relayout the player and score from scene size changes",
+            failures)
+    background_layout_index = game_scene_contracts.find("func layoutScrollingBackground()")
+    background_layout_end = game_scene_contracts.find("func random(", background_layout_index)
+    background_layout_body = game_scene_contracts[background_layout_index:background_layout_end]
+    initialize_background_index = game_scene_contracts.find("func initializingScrollingBackground()")
+    initialize_background_end = game_scene_contracts.find("func moveBackground()", initialize_background_index)
+    initialize_background_body = game_scene_contracts[initialize_background_index:initialize_background_end]
+    move_background_end = game_scene_contracts.find("override func update", initialize_background_end)
+    move_background_body = game_scene_contracts[initialize_background_end:move_background_end]
+    require(background_layout_index != -1 and background_layout_end != -1 and
+            "children.compactMap" in background_layout_body and
+            'child.name == "background"' in background_layout_body and
+            "sorted { $0.position.x < $1.position.x }" in background_layout_body and
+            "guard backgrounds.count == 2" in background_layout_body and
+            "size.width.isFinite" in background_layout_body and
+            "size.height.isFinite" in background_layout_body and
+            "size.width > 0" in background_layout_body and
+            "size.height > 0" in background_layout_body and
+            "backgrounds[0].position.x.truncatingRemainder(" in background_layout_body and
+            "dividingBy: size.width" in background_layout_body and
+            "if leadingX > 0" in background_layout_body and
+            "background.size = size" in background_layout_body and
+            "leadingX + CGFloat(index) * size.width" in background_layout_body and
+            "layoutScrollingBackground()" in initialize_background_body and
+            "layoutScrollingBackground()" in resize_body and
+            "bg.size = self.frame.size" not in move_background_body,
+            "scrolling background tiles must stay contiguous across scene size changes",
             failures)
     require("SKAction.playSoundFileNamed" in game_scene and "background-music-aac.caf" in game_scene,
             "GameScene must keep bundled sound playback references",
@@ -707,6 +737,22 @@ def main():
             re.search(r"(?i)\b(?:pending|todo|tbd|not run)\b",
                       resize_layout_verification) is None,
             "resize-safe persistent layout plan must record completed local verification",
+            failures)
+    background_resize_verification = markdown_section(
+        background_resize_plan, "Verification Completed"
+    )
+    require("status: completed" in background_resize_plan and
+            "red-first" in background_resize_plan.lower() and
+            "Seven isolated hostile mutations were rejected" in background_resize_verification and
+            "All four Make gates passed from the checkout" in background_resize_verification and
+            "All four Make gates passed from `/tmp`" in background_resize_verification and
+            "python3 -m py_compile scripts/check-baseline.py" in background_resize_verification and
+            "sh -n scripts/run-projectile-math-tests.sh" in background_resize_verification and
+            "git diff --check" in background_resize_verification and
+            "Local `swiftc` and `xcodebuild` were unavailable" in background_resize_verification and
+            "resize-safe background" in readme.lower() and
+            "scrolling background tiles" in agent_guidance.lower(),
+            "resize-safe background tiling plan must record completed local verification",
             failures)
     require("status: completed" in undersized_spawn_plan and
             "All four Make gates" in undersized_spawn_plan and

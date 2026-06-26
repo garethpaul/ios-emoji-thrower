@@ -52,6 +52,8 @@ player launches emoji projectiles at moving targets.
   contact-delegate, and presentation side effects.
 - Keep persistent player and score positions derived from `SKScene.size`, and
   reapply them from `didChangeSize(_:)` when `.resizeFill` resizes the scene.
+- Keep the two scrolling background tiles contiguous after initial setup and
+  every scene-size change without resizing them independently per frame.
 - This is an Apple platform sample. Xcode, Swift, and deployment target versions
   must stay aligned with the checked-in project settings.
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.

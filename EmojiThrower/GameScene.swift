@@ -101,9 +101,38 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         scoreLabel.position = CGPoint(x: size.width * 0.5, y: size.height - 40)
     }
 
+    func layoutScrollingBackground() {
+        let backgrounds = children.compactMap { child -> SKSpriteNode? in
+            guard child.name == "background" else { return nil }
+            return child as? SKSpriteNode
+        }.sorted { $0.position.x < $1.position.x }
+        guard backgrounds.count == 2,
+            size.width.isFinite, size.height.isFinite,
+            size.width > 0, size.height > 0,
+            backgrounds.allSatisfy({ $0.position.x.isFinite }) else {
+                return
+        }
+
+        var leadingX = backgrounds[0].position.x.truncatingRemainder(
+            dividingBy: size.width
+        )
+        if leadingX > 0 {
+            leadingX -= size.width
+        }
+
+        for (index, background) in backgrounds.enumerated() {
+            background.size = size
+            background.position = CGPoint(
+                x: leadingX + CGFloat(index) * size.width,
+                y: 0
+            )
+        }
+    }
+
     override func didChangeSize(_ oldSize: CGSize) {
         super.didChangeSize(oldSize)
         layoutPersistentNodes()
+        layoutScrollingBackground()
     }
     //MARK: - Create a random number
     func random(min: CGFloat, max: CGFloat) -> CGFloat {
@@ -207,13 +236,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             bg.name = "background"
             self.addChild(bg)
         }
+        layoutScrollingBackground()
     }
     
     //
     func moveBackground() {
         self.enumerateChildNodes(withName: "background", using: { (node, stop) -> Void in
             if let bg = node as? SKSpriteNode {
-                bg.size = self.frame.size
                 bg.position = CGPoint(x: bg.position.x - self.backgroundVelocity, y: bg.position.y)
                 bg.zPosition = -13
                 // Checks if bg node is completely scrolled off the screen, if yes, then puts it at the end of the other node.
