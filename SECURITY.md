@@ -34,6 +34,7 @@ Helpful reports include:
 - `make check` runs a static baseline that guards bundled resource references, image helper fallbacks, non-finite touch vectors, game-over restart handling, collision handler game-over guards, contact delegate cleanup, spawn lifecycle guards, invalid or undersized scene spawn geometry, scene-size-driven player and score layout, per-frame background scroll movement, plist/storyboard metadata, Xcode project wiring, source inventory, debug logging, and local-only gameplay behavior when Xcode is unavailable.
 - Active-scene game-over ownership prevents detached scenes from mutating
   terminal gameplay state without an authoritative presentation target.
+- Enemy spawning rejects non-finite or non-positive scene width before deriving an off-screen monster position.
 - The pinned macOS GitHub Actions workflow uses read-only repository permissions
   and compiles an unsigned simulator build without executing gameplay,
   rendering, audio, physics, or signing operations.

@@ -34,6 +34,7 @@ SCENE_AWARE_DISTANCE_PLAN = ROOT / "docs/plans/2026-06-17-020-fix-scene-aware-pr
 ACTIVE_GAME_OVER_PLAN = ROOT / "docs/plans/2026-06-18-active-game-over-presentation.md"
 RESIZE_LAYOUT_PLAN = ROOT / "docs/plans/2026-06-25-resize-safe-persistent-layout.md"
 BACKGROUND_RESIZE_PLAN = ROOT / "docs/plans/2026-06-26-resize-safe-background-tiling.md"
+SPAWN_WIDTH_PLAN = ROOT / "docs/plans/2026-06-26-invalid-scene-width-spawn-guard.md"
 EXPECTED_WORKFLOW = """name: Check
 
 on:
@@ -234,6 +235,7 @@ def main():
     active_game_over_plan = ACTIVE_GAME_OVER_PLAN.read_text(encoding="utf-8") if ACTIVE_GAME_OVER_PLAN.exists() else ""
     resize_layout_plan = RESIZE_LAYOUT_PLAN.read_text(encoding="utf-8") if RESIZE_LAYOUT_PLAN.exists() else ""
     background_resize_plan = BACKGROUND_RESIZE_PLAN.read_text(encoding="utf-8") if BACKGROUND_RESIZE_PLAN.exists() else ""
+    spawn_width_plan = SPAWN_WIDTH_PLAN.read_text(encoding="utf-8") if SPAWN_WIDTH_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
@@ -333,7 +335,9 @@ def main():
             "GameScene must guard enemy spawning after game over before creating sprites",
             failures)
     require(spawn_y_index != -1 and next_helper_index != -1 and
-            "guard spriteHeight.isFinite, size.height.isFinite, spriteHeight > 0 else" in spawn_y_body and
+            "guard spriteHeight.isFinite," in spawn_y_body and
+            "size.width.isFinite, size.height.isFinite," in spawn_y_body and
+            "size.width > 0, spriteHeight > 0 else" in spawn_y_body and
             "let minY = spriteHeight / 2" in spawn_y_body and
             "let maxY = size.height - minY" in spawn_y_body and
             "guard minY <= maxY else" in spawn_y_body and
@@ -759,6 +763,23 @@ def main():
             "hostile mutations" in undersized_spawn_plan.lower(),
             "undersized scene spawn plan must record completed status and verification",
             failures)
+    require("Status: Completed" in spawn_width_plan and
+            "repository-root and external-directory `make check` passed" in spawn_width_plan and
+            "hostile scene-width spawn mutations" in spawn_width_plan and
+            "Native SpriteKit execution was not performed" in spawn_width_plan,
+            "scene-width spawn plan must record completed verification evidence",
+            failures)
+    spawn_width_guidance = "Enemy spawning rejects non-finite or non-positive scene width before deriving an off-screen monster position."
+    for relative_path, document in [
+        ("AGENTS.md", agent_guidance),
+        ("README.md", readme),
+        ("SECURITY.md", security),
+        ("VISION.md", vision),
+        ("CHANGES.md", changes),
+    ]:
+        require(spawn_width_guidance in document,
+                f"{relative_path} must document scene-width spawn validation",
+                failures)
     location_make_statuses = re.findall(
         r"^status: .+$", location_independent_make_plan, flags=re.MULTILINE
     )

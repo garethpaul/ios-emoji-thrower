@@ -1,5 +1,11 @@
 # Changes
 
+## 2026-06-26 - P1 - Reject invalid scene width during enemy spawn
+
+- Enemy spawning rejects non-finite or non-positive scene width before deriving an off-screen monster position.
+- Extended the red-first spawn helper contract beyond vertical range safety to
+  the horizontal position input used by `addMonster()`.
+
 ## 2026-06-26
 
 - Centralized scrolling background sizing and adjacency on `SKScene.size`.

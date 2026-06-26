@@ -138,6 +138,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - Resource changes should keep image, sound, font, scene, and Xcode project references aligned, with fallback behavior for optional image helper rendering.
 - Enemy spawning skips invalid or undersized scene geometry before constructing
   a random range or adding a SpriteKit node.
+- Enemy spawning rejects non-finite or non-positive scene width before deriving an off-screen monster position.
 
 ## Maintenance Notes
 

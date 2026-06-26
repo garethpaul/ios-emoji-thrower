@@ -31,6 +31,7 @@ Priority:
 - Stop enemy spawning as soon as game-over presentation starts
 - Skip enemy spawning when invalid or undersized scene geometry cannot contain
   the monster sprite
+- Enemy spawning rejects non-finite or non-positive scene width before deriving an off-screen monster position.
 - Reject non-finite touch vectors before projectile side effects
 - Keep background scroll movement running per-frame until game over
 - Keep both scrolling background tiles contiguous when the scene size changes
