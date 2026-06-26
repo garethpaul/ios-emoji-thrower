@@ -55,6 +55,7 @@ player launches emoji projectiles at moving targets.
 - Enemy spawning rejects non-finite or non-positive scene width before deriving an off-screen monster position.
 - Keep the two scrolling background tiles contiguous after initial setup and
   every scene-size change without resizing them independently per frame.
+- The game-over label follows the current scene center after resize, and delayed restart uses the current game-over scene size instead of captured pre-resize geometry.
 - This is an Apple platform sample. Xcode, Swift, and deployment target versions
   must stay aligned with the checked-in project settings.
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.

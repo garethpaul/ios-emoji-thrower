@@ -35,6 +35,7 @@ Priority:
 - Reject non-finite touch vectors before projectile side effects
 - Keep background scroll movement running per-frame until game over
 - Keep both scrolling background tiles contiguous when the scene size changes
+- The game-over label follows the current scene center after resize, and delayed restart uses the current game-over scene size instead of captured pre-resize geometry.
 - Avoid adding account or network behavior without a clear purpose
 - Keep `scripts/check-baseline.py` passing for bundled resources, Xcode
   metadata, SpriteKit source inventory, local-only gameplay, contact handling,

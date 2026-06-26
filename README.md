@@ -73,6 +73,7 @@ unsigned simulator build when Xcode is available.
   wide and tall scene bounds before its movement action completes.
 - Persistent player and score layout derives from the current scene size and is
   reapplied when `.resizeFill` changes that size, including iPad rotation.
+- The game-over label follows the current scene center after resize, and delayed restart uses the current game-over scene size instead of captured pre-resize geometry.
 - This is a local game sample. Do not add accounts, analytics, persistence, upload, or network behavior without a dedicated design and security review.
 
 ## Testing and Verification
@@ -163,6 +164,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
   scene-size-driven player and score layout guardrail.
 - See `docs/plans/2026-06-26-resize-safe-background-tiling.md` for contiguous
   scrolling background layout across scene-size changes.
+- See `docs/plans/2026-06-26-resize-safe-game-over.md` for current-size result layout and delayed restart geometry.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - See `docs/plans/2026-06-10-ci-baseline.md` for the GitHub Actions baseline.
 - See `docs/plans/2026-06-10-hosted-project-validation.md` for the hosted Xcode

@@ -35,6 +35,7 @@ Helpful reports include:
 - Active-scene game-over ownership prevents detached scenes from mutating
   terminal gameplay state without an authoritative presentation target.
 - Enemy spawning rejects non-finite or non-positive scene width before deriving an off-screen monster position.
+- The game-over label follows the current scene center after resize, and delayed restart uses the current game-over scene size instead of captured pre-resize geometry.
 - The pinned macOS GitHub Actions workflow uses read-only repository permissions
   and compiles an unsigned simulator build without executing gameplay,
   rendering, audio, physics, or signing operations.

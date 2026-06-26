@@ -1,5 +1,22 @@
 # Changes
 
+## 2026-06-26 15:55 - P1 - Keep game-over geometry current across resize
+
+- The game-over label follows the current scene center after resize, and delayed restart uses the current game-over scene size instead of captured pre-resize geometry.
+- Added red-first source contracts for resize relayout and current-size delayed restart.
+- Preserved result copy, delay, transition, active-scene restart ownership, and `.resizeFill` behavior.
+- Six hostile mutations covering scene-owned label state, resize callback,
+  current-center geometry, current-size restart, guidance, and plan status were
+  rejected.
+- All four Make aliases and external-directory `make check`, Python/shell
+  syntax, and `git diff --check` passed. Local `swiftc` and `xcodebuild` were
+  unavailable, so hosted macOS remains authoritative.
+- Hosted push baseline `28269675521`, pull-request baseline `28269677372`, and
+  CodeQL run `28269677126` passed on implementation head
+  `52f900b4c7cfb73e80cc7e8cdbbd1c3ee5f3fc76`, including Swift analysis.
+- Codex review stopped before analysis with OpenAI HTTP 401; immutable manual
+  review found no actionable issues.
+
 ## 2026-06-26 - P1 - Reject invalid scene width during enemy spawn
 
 - Enemy spawning rejects non-finite or non-positive scene width before deriving an off-screen monster position.
