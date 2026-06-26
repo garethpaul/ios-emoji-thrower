@@ -67,6 +67,8 @@ unsigned simulator build when Xcode is available.
 - Enemy spawning is keyed and stopped when game-over presentation starts.
 - Background scroll movement advances per-frame from each node's current
   position until game over.
+- Resize-safe background tiling preserves both tiles' scroll phase and retiles
+  them contiguously from `SKScene.size` after `.resizeFill` size changes.
 - Projectile launches use a scene-aware exit distance so the whole node clears
   wide and tall scene bounds before its movement action completes.
 - Persistent player and score layout derives from the current scene size and is
@@ -98,8 +100,8 @@ checks Xcode resource references, verifies the Swift source inventory, and
 guards against image-helper force unwraps, non-finite touch vectors, repeated
 game-over transitions, unguarded game-over restarts, stale collision nodes,
 late collision handler mutations, uncleared contact delegate callbacks, late
-spawn actions, stale persistent-node resize layout, broken per-frame background
-scroll movement, debug logging,
+spawn actions, stale persistent-node or background resize layout, broken
+per-frame background scroll movement, debug logging,
 network, analytics, upload, or persistence behavior.
 The executable harness covers both finite direction normalization and
 scene-aware projectile travel for wide, tall, invalid, and overflowing geometry.
@@ -158,6 +160,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   for the scene-aware exit distance and invalid-geometry guardrail.
 - See `docs/plans/2026-06-25-resize-safe-persistent-layout.md` for the
   scene-size-driven player and score layout guardrail.
+- See `docs/plans/2026-06-26-resize-safe-background-tiling.md` for contiguous
+  scrolling background layout across scene-size changes.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - See `docs/plans/2026-06-10-ci-baseline.md` for the GitHub Actions baseline.
 - See `docs/plans/2026-06-10-hosted-project-validation.md` for the hosted Xcode
