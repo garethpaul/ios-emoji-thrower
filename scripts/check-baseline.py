@@ -177,6 +177,7 @@ def main():
         "docs/readme-overview.svg",
         "Tests/ProjectileMathTests/main.swift",
         "scripts/run-projectile-math-tests.sh",
+        "scripts/test-make-spaced-path.py",
     ]
 
     for relative_path in required_files:
@@ -604,10 +605,13 @@ def main():
             failures)
     require(".PHONY: build check lint test" in makefile and
             "SWIFTC ?= swiftc" in makefile and
-            "override ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile and
+            "override makefile_space := __IOS_EMOJI_THROWER_MAKEFILE_SPACE__" in makefile and
+            "override encoded_makefile_list := $(patsubst $(makefile_space)%,%,$(subst $(space),$(makefile_space),$(MAKEFILE_LIST)))" in makefile and
+            "override ROOT := $(subst $(makefile_space),$(space),$(abspath $(dir $(lastword $(encoded_makefile_list)))))" in makefile and
             "lint test build: check" in makefile and
             '"$(ROOT)/scripts/run-projectile-math-tests.sh"' in makefile and
             'python3 "$(ROOT)/scripts/check-baseline.py"' in makefile and
+            'python3 "$(ROOT)/scripts/test-make-spaced-path.py"' in makefile and
             "python3 scripts/check-baseline.py" not in makefile,
             "Makefile must expose location-independent lint, test, build, and check aliases",
             failures)
@@ -840,6 +844,7 @@ def main():
     require(location_make_statuses == ["status: completed"] and
             "All four Make gates passed from the checkout" in location_make_verification and
             "All four Make gates passed from `/tmp` through the absolute Makefile path" in location_make_verification and
+            "GNU Make 4.2 and 4.4 space-containing absolute Makefile paths passed" in location_make_verification and
             "python3 -m py_compile scripts/check-baseline.py" in location_make_verification and
             "git diff --check" in location_make_verification and
             "`xcodebuild` was unavailable" in location_make_verification and
