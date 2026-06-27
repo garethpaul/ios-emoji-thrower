@@ -44,7 +44,10 @@ player launches emoji projectiles at moving targets.
 
 ## Safety and gotchas
 
-- No required secret or credential file was identified in the repository scan. If you add integrations later, keep secrets out of git.
+- No required secret or credential file is needed for current gameplay. Keep
+  `GoogleService-Info.plist` and any future integration secrets out of git.
+- Historical Google API key alerts must remain open until the credential owner
+  verifies provider-side revocation or rotation.
 - Debug logging from launch and gameplay paths should stay removed; score should remain visible in-game rather than printed to the console.
 - Runtime debug overlays should stay disabled outside explicit troubleshooting builds.
 - Resource changes should keep image, sound, font, scene, and Xcode project references aligned, with fallback behavior for optional image helper rendering.

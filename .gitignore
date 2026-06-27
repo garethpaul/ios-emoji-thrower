@@ -29,6 +29,7 @@ xcuserdata/
 .DS_Store
 *.local.xcconfig
 *.secrets.xcconfig
+GoogleService-Info.plist
 .env
 .env.*
 

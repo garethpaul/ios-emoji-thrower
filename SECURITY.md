@@ -30,6 +30,9 @@ Helpful reports include:
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.
 - This should remain a local game sample. Treat new accounts, analytics, persistence, upload, networking, or telemetry as security-sensitive until the data flow and user value are documented.
+- Historical Google API key alerts must remain open until the credential owner
+  verifies provider-side revocation or rotation. Current-tree cleanup and
+  documentation are not evidence that the provider credential was revoked.
 - Debug logging and runtime debug overlays should stay removed from normal gameplay paths; use visible in-game state for score feedback instead of console output.
 - `make check` runs a static baseline that guards bundled resource references, image helper fallbacks, non-finite touch vectors, game-over restart handling, collision handler game-over guards, contact delegate cleanup, spawn lifecycle guards, invalid or undersized scene spawn geometry, scene-size-driven player and score layout, per-frame background scroll movement, plist/storyboard metadata, Xcode project wiring, source inventory, debug logging, and local-only gameplay behavior when Xcode is unavailable.
 - Active-scene game-over ownership prevents detached scenes from mutating

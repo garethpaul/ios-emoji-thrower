@@ -1,5 +1,66 @@
 # Changes
 
+## 2026-06-26 17:52 PDT - P1 - Preserve historical Google key response
+
+### Summary
+
+Formalized the unresolved owner-response boundary for the historical Google API
+key alert without exposing the value or claiming provider-side remediation.
+
+### Work completed
+
+- Added the retired Google service credential filename to `.gitignore`.
+- Synchronized the revocation/rotation requirement across maintained security
+  and contributor guidance.
+- Added a static baseline contract and completed design/implementation evidence.
+
+### Threads
+
+- None; the alert metadata, current default branch, and maintained verifier were
+  audited directly.
+
+### Files changed
+
+- `.gitignore` — excludes `GoogleService-Info.plist`.
+- `scripts/check-baseline.py` — enforces the ignore and owner-response contract.
+- `README.md`, `SECURITY.md`, and `AGENTS.md` — preserve the unresolved
+  provider-action boundary.
+- `docs/plans/2026-06-26-historical-google-key-response-design.md` and
+  `docs/plans/2026-06-26-historical-google-key-response.md` — record the
+  decision, scope, and verification plan.
+
+### Validation
+
+- GitHub secret-scanning metadata — the alert points to repository history, has
+  unknown validity, and remains open.
+- Current `master` review — the flagged credential file is absent.
+- Red-first `make check` — rejected the missing ignore entry, guidance, and
+  completed response evidence.
+- `make check`, `make lint`, `make test`, and `make build` — passed the static
+  SpriteKit baseline; local `swiftc` and `xcodebuild` skipped truthfully.
+- `/usr/bin/make -C /tmp -f "$PWD/Makefile" check` — passed from an external
+  caller directory.
+- Ignore-entry and security-guidance hostile mutations — both rejected.
+- Python AST parsing, shell syntax, and `git diff --check` — passed.
+- `gitleaks detect --source . --no-git --redact` — no current-tree leaks found.
+
+### Bugs / findings
+
+- P1 security response gap: a README-only HOLD was not enforced by the baseline
+  or repeated in the security policy and contributor guidance.
+- Historical Google API key alerts must remain open until the credential owner
+  verifies provider-side revocation or rotation.
+
+### Blockers
+
+- Only the credential owner can verify provider-side revocation or rotation;
+  this change intentionally does not resolve the GitHub alert.
+
+### Next action
+
+- Complete local and hosted validation, run review on the exact head, and merge
+  the focused security-response PR if all gates pass.
+
 ## 2026-06-26 15:55 - P1 - Keep game-over geometry current across resize
 
 - The game-over label follows the current scene center after resize, and delayed restart uses the current game-over scene size instead of captured pre-resize geometry.
