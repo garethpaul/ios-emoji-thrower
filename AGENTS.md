@@ -18,6 +18,8 @@ player launches emoji projectiles at moving targets.
 - Install dependencies: no repository-specific install command is documented.
 - Full baseline: `make check` (includes an unsigned simulator build when Xcode
   is available)
+- Make gates support absolute checkout paths containing spaces; preserve the
+  single-Makefile authority boundary and recursive regression.
 - Local Apple development: `open EmojiThrower.xcodeproj`
 - If a command above skips because a platform toolchain is missing, verify on a machine with that SDK before claiming platform behavior is tested.
 

@@ -7,11 +7,13 @@ status: completed
 Absolute Makefile invocations previously resolved `scripts/check-baseline.py`
 relative to the caller instead of the checkout. That made the documented
 verification aliases fail outside the repository directory even though the
-checker itself already derived the checkout root from its own path.
+checker itself already derived the checkout root from its own path. GNU Make
+also splits loaded absolute Makefile paths containing spaces.
 
 ## Scope
 
-1. Derive the checkout root from the loaded Makefile.
+1. Derive the checkout root from the single loaded Makefile path while
+   preserving spaces.
 2. Invoke the baseline checker from that root for every Make alias.
 3. Add exact Makefile, completed-plan, external-run, and guidance contracts.
 4. Preserve SpriteKit behavior, project metadata, resources, and workflow
@@ -29,8 +31,8 @@ checker itself already derived the checkout root from its own path.
 
 ## Work Completed
 
-- Derived the checkout root from the loaded Makefile and invoked the baseline
-  checker by absolute path.
+- Derived the checkout root from the sole loaded Makefile, rejected ambiguous
+  Makefile inputs, and invoked the baseline checker by absolute path.
 - Added exact Makefile, completed-plan, external-run, and synchronized guidance
   contracts without changing gameplay, project, resource, or workflow files.
 
@@ -38,6 +40,8 @@ checker itself already derived the checkout root from its own path.
 
 - All four Make gates passed from the checkout.
 - All four Make gates passed from `/tmp` through the absolute Makefile path.
+- GNU Make 4.2 and 4.4 space-containing absolute Makefile paths passed.
+- Preloaded, overridden, additional, and recipe-replacement Makefiles failed closed.
 - `python3 -m py_compile scripts/check-baseline.py` and `git diff --check`
   passed.
 - Local validation reported that `xcodebuild` was unavailable and therefore ran

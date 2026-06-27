@@ -172,7 +172,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   simulator-build migration.
 - Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, plist/storyboard files, SpriteKit assets, sounds, fonts, Xcode metadata, or gameplay/privacy documentation.
 - The same gates may be invoked through an absolute Makefile path from another
-  directory; verification resolves the checker relative to the checkout.
+  directory, including when the checkout path contains spaces; verification
+  resolves the checker relative to the checkout.
 
 ## Contributing
 

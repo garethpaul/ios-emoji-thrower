@@ -1,5 +1,9 @@
 # Changes
 
+- Preserved absolute Makefile roots containing spaces and added a recursive-safe
+  baseline regression without changing gameplay or credential handling.
+- Rejected ambiguous Makefile inputs so later recipes cannot replace verification.
+
 ## 2026-06-26 17:52 PDT - P1 - Preserve historical Google key response
 
 ### Summary
