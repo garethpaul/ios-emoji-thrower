@@ -19,7 +19,7 @@ player launches emoji projectiles at moving targets.
 - Full baseline: `make check` (includes an unsigned simulator build when Xcode
   is available)
 - Make gates support absolute checkout paths containing spaces; preserve the
-  encoded `MAKEFILE_LIST` root derivation and recursive regression.
+  single-Makefile authority boundary and recursive regression.
 - Local Apple development: `open EmojiThrower.xcodeproj`
 - If a command above skips because a platform toolchain is missing, verify on a machine with that SDK before claiming platform behavior is tested.
 

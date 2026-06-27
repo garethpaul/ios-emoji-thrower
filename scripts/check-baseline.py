@@ -603,17 +603,18 @@ def main():
     require("GoogleService-Info.plist" in gitignore.splitlines(),
             ".gitignore must exclude the retired Google credential file",
             failures)
-    require(".PHONY: build check lint test" in makefile and
+    require(".PHONY: __repository-make-authority build check lint test" in makefile and
             "SWIFTC ?= swiftc" in makefile and
-            "override makefile_space := __IOS_EMOJI_THROWER_MAKEFILE_SPACE__" in makefile and
-            "override encoded_makefile_list := $(patsubst $(makefile_space)%,%,$(subst $(space),$(makefile_space),$(MAKEFILE_LIST)))" in makefile and
-            "override ROOT := $(subst $(makefile_space),$(space),$(abspath $(dir $(lastword $(encoded_makefile_list)))))" in makefile and
-            "lint test build: check" in makefile and
+            "MAKEFILES must be empty" in makefile and
+            "MAKEFILE_LIST must not be overridden" in makefile and
+            "repository Makefile must be loaded alone" in makefile and
+            ".SECONDEXPANSION:" in makefile and
+            "lint test build:: check" in makefile and
             '"$(ROOT)/scripts/run-projectile-math-tests.sh"' in makefile and
             'python3 "$(ROOT)/scripts/check-baseline.py"' in makefile and
             'python3 "$(ROOT)/scripts/test-make-spaced-path.py"' in makefile and
             "python3 scripts/check-baseline.py" not in makefile,
-            "Makefile must expose location-independent lint, test, build, and check aliases",
+            "Makefile must expose location-independent aliases with a single-Makefile authority boundary",
             failures)
     require("Status: Completed" in projectile_test_plan and
             "make check" in projectile_test_plan and
