@@ -124,10 +124,9 @@ When the required SDK or runtime is unavailable, use static checks and source re
 
 - Current `master` requires no credential file for local gameplay. If you add
   integrations later, keep secrets out of git.
-- The repository remains under a separate credential-response HOLD. An owner
-  must verify and revoke or rotate the affected Google credential with the
-  provider before resolving the corresponding GitHub alert. This documentation
-  correction does not complete or replace that remediation.
+- Historical Google API key alerts must remain open until the credential owner
+  verifies provider-side revocation or rotation. This repository guidance does
+  not complete or replace that provider action.
 
 ## Security and Privacy Notes
 

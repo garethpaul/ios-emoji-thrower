@@ -36,6 +36,7 @@ RESIZE_LAYOUT_PLAN = ROOT / "docs/plans/2026-06-25-resize-safe-persistent-layout
 BACKGROUND_RESIZE_PLAN = ROOT / "docs/plans/2026-06-26-resize-safe-background-tiling.md"
 SPAWN_WIDTH_PLAN = ROOT / "docs/plans/2026-06-26-invalid-scene-width-spawn-guard.md"
 GAME_OVER_RESIZE_PLAN = ROOT / "docs/plans/2026-06-26-resize-safe-game-over.md"
+GOOGLE_KEY_RESPONSE_PLAN = ROOT / "docs/plans/2026-06-26-historical-google-key-response.md"
 EXPECTED_WORKFLOW = """name: Check
 
 on:
@@ -171,6 +172,8 @@ def main():
         "docs/plans/2026-06-17-020-fix-scene-aware-projectile-distance-plan.md",
         "docs/plans/2026-06-25-resize-safe-persistent-layout.md",
         "docs/plans/2026-06-26-resize-safe-background-tiling.md",
+        "docs/plans/2026-06-26-historical-google-key-response-design.md",
+        "docs/plans/2026-06-26-historical-google-key-response.md",
         "docs/readme-overview.svg",
         "Tests/ProjectileMathTests/main.swift",
         "scripts/run-projectile-math-tests.sh",
@@ -238,6 +241,7 @@ def main():
     background_resize_plan = BACKGROUND_RESIZE_PLAN.read_text(encoding="utf-8") if BACKGROUND_RESIZE_PLAN.exists() else ""
     spawn_width_plan = SPAWN_WIDTH_PLAN.read_text(encoding="utf-8") if SPAWN_WIDTH_PLAN.exists() else ""
     game_over_resize_plan = GAME_OVER_RESIZE_PLAN.read_text(encoding="utf-8") if GAME_OVER_RESIZE_PLAN.exists() else ""
+    google_key_response_plan = GOOGLE_KEY_RESPONSE_PLAN.read_text(encoding="utf-8") if GOOGLE_KEY_RESPONSE_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
 
     require(project.count("IPHONEOS_DEPLOYMENT_TARGET = 12.0;") == 2 and
@@ -595,6 +599,9 @@ def main():
     require("*.local.xcconfig" in gitignore and ".env" in gitignore and "DerivedData" in gitignore,
             ".gitignore must exclude local config and Xcode build products",
             failures)
+    require("GoogleService-Info.plist" in gitignore.splitlines(),
+            ".gitignore must exclude the retired Google credential file",
+            failures)
     require(".PHONY: build check lint test" in makefile and
             "SWIFTC ?= swiftc" in makefile and
             "override ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile and
@@ -654,6 +661,25 @@ def main():
     require(all("active-scene game-over ownership" in document
                 for document in normalized_guidance),
             "project guidance must document active-scene game-over ownership",
+            failures)
+    google_key_response_guidance = (
+        "historical google api key alerts must remain open until the credential "
+        "owner verifies provider-side revocation or rotation."
+    )
+    for relative_path, document in [
+        ("README.md", readme),
+        ("SECURITY.md", security),
+        ("AGENTS.md", agent_guidance),
+        ("CHANGES.md", changes),
+    ]:
+        require(google_key_response_guidance in " ".join(document.lower().split()),
+                f"{relative_path} must document the historical Google key response boundary",
+                failures)
+    require("status: completed" in google_key_response_plan and
+            "provider-side revocation or rotation" in google_key_response_plan and
+            "make check" in google_key_response_plan and
+            "git diff --check" in google_key_response_plan,
+            "historical Google key response plan must record completed verification",
             failures)
     require("make lint" in readme and "make test" in readme and "make build" in readme and "make check" in readme and "EmojiThrower.xcodeproj" in readme and "SpriteKit" in readme and
             "image" in readme.lower() and "game-over" in readme.lower() and "spawn" in readme.lower() and
